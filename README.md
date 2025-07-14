@@ -2,10 +2,8 @@
 git submodule add https://github.com/DigitalValue/DView.git carpeta_origen
 
 
-# Configurar para siempre actualizar submódulos en pull
+# Configurar para siempre actualizar submódulos en pull y push
 git config submodule.recurse true
-
-# O solo para este repositorio
-git config --global submodule.recurse true
+git config push.recurseSubmodules on-demand
 
 
