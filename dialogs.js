@@ -1,9 +1,16 @@
+import { Button, Icon } from "./elements";
+import { Input } from "./forms";
+import { Box, Div, FlexRow } from "./layout";
+import { H2 } from "./texts";
+
+
 
 
 export { 
     alertDialog, confirmDialog, promptDialog, 
     Modal, ModalContent, ModalHeader, ModalFooter 
 }
+
 
 /*
 *
@@ -33,7 +40,7 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
       view:()=>  m(Modal, {size: options.size || 'tiny'},
               m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
               
-              m(Div,{padding:'1em'},    m.trust(options.message)),
+              m(Div,{padding:'1em'}, m.trust(options.message)),
               
               m(ModalFooter,
 
@@ -69,9 +76,6 @@ function alertDialog(options={
     dom:(el)=>el // devuelve el elemento
 }){
 
-     console.log('message', options.message, options)
-
-
     var elem = document.createElement("div")
 
     elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : 'position:fixed')
@@ -85,8 +89,6 @@ function alertDialog(options={
     if(options.dom){
         options.dom(elem)
     }
-
-
    
     let types = {
         'info':{
@@ -207,58 +209,54 @@ function promptDialog(options={
             })
         },
         view:()=> m(Modal, { size:'tiny' },
-                types[options.type] || options.title ? 
-                m(ModalHeader,
-                    m(Icon,{ icon: types[options.type]?.icon, color: types[options.type]?.color }),
-                    m(Box,{ width:'10px' }),
-                    m(H2,{ marginTop:0 }, options.title ||  types[options.type]?.text )
-                ) :  null,
+            types[options.type] || options.title ? 
+            m(ModalHeader,
+                m(Icon,{ icon: types[options.type]?.icon, color: types[options.type]?.color }),
+                m(Box,{ width:'10px' }),
+                m(H2,{ marginTop:0 }, options.title ||  types[options.type]?.text )
+            ) :  null,
 
-                m(Div,{padding:'1em'}, 
-                    
-                    m(Input,{
-                        label: options.message,
-                        type: options.type || 'text',
-                        data: data,
-                        name: name,
-                        onchange: options.onchange || (()=>{}),
-                        placeholder: options.placeholder || localize({es:'Escribe aquí...',va:'Escriu ací...'}),
-                        fluid: options.fluid || false,
-                    }),
-                    
+            m(Div,{padding:'1em'}, 
+                m(Input,{
+                    label: options.message,
+                    type: options.type || 'text',
+                    data: data,
+                    name: name,
+                    onchange: options.onchange || (()=>{}),
+                    placeholder: options.placeholder || localize({es:'Escribe aquí...',va:'Escriu ací...'}),
+                    fluid: options.fluid || false,
+                })
+            ),
+
+            m(ModalFooter,
+
+                m(Button, {
+                    onclick:(e)=>{
+                        if(!data[name]) return;
+                        options.then ? options.then(data[name]):null; 
+                        elem.remove()
+                    },
+                    disabled: !data[name] || data[name] == '',
+                    fluid: options.fluid,
+                    type: 'positive'
+                },
+                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Aceptar',va:"Aceptar"})
                 ),
 
-                m(ModalFooter,
+                m(Box, {width:'1em'}),
 
                     m(Button, {
-                        onclick:(e)=>{
-                            if(!data[name]) return;
-                            options.then ? options.then(data[name]):null; 
-                            elem.remove()
-                        },
-                        disabled: !data[name] || data[name] == '',
-                        fluid: options.fluid,
-                        type: 'positive'
+                    onclick:(e)=>{
+                        options.then ? options.then():null; 
+                        elem.remove()
                     },
-                        options.buttonLabels ? options.buttonLabels[0] : localize({es:'Aceptar',va:"Aceptar"})
-                    ),
-
-                    m(Box, {width:'1em'}),
-
-                     m(Button, {
-                        onclick:(e)=>{
-                            options.then ? options.then():null; 
-                            elem.remove()
-                        },
-                        fluid:options.fluid,
-                        type:'negative'
-                    },
-                        options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})
-                    ),
-
-
+                    fluid:options.fluid,
+                    type:'negative'
+                },
+                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})
                 )
             )
+        )
     })
 }
 
@@ -347,9 +345,7 @@ function ModalHeader(){
     return {
         view:(vnode)=>{
             return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', fontWeight:'bold'},
-                
                 vnode.children
-            
             )
         }
     }

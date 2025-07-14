@@ -1,5 +1,8 @@
-# Para añadir el submódulo en algún proyecto, desde el root
+# Para añadir el submódulo en algún proyecto diferente a zity-components, desde el root
 git submodule add https://github.com/DigitalValue/DView.git carpeta_origen
+
+# Para updatear en zity-components
+git submodule update --init src/components/dview  # specific path only
 
 
 # Configurar para siempre actualizar submódulos en pull y push
