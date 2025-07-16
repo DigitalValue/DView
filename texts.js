@@ -1,4 +1,5 @@
 
+
 export { H1, H2, H3, Text, SmallText, TinyText }
 
 
@@ -52,7 +53,7 @@ function H3(){
             return m("h3",{
                 style: {
                     marginTop:0,
-                    marginBottom:0,
+                    marginBottom: 0,
                     fontFamily:'Poppins, Lato,  HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,Lato',
                     ...vnode.attrs
                 }

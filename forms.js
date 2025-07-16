@@ -1,8 +1,6 @@
-import { Button, FlexCol, FlexRow } from "./layout.js"
+import { FlexCol, FlexRow, Box } from "./layout.js"
 import { Text } from "./texts.js"
-import { Icon } from './elements.js'
-
-
+import { Icon, Button } from './elements.js'
 
 
 export {
@@ -22,9 +20,8 @@ function FormLabel(){
             let {label, required, info} = vnode.attrs
             
             return [
-                
                 m(FlexRow,
-                    m("label",{style:labelStyle}, localize(vnode.children) ),
+                    m("label",{style:labelStyle}, vnode.children ),
                     required ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*'): null,
 
                     info 
@@ -55,8 +52,6 @@ function Input(){
         view: (vnode)=>{
             let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info} = vnode.attrs
 
-            console.log('style', vnode.attrs.style)
-
             return [
                 m(FlexCol,{width:'100%'},
 
@@ -84,14 +79,10 @@ function Input(){
                         ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
                         ...title ? {title: title} : {},
                         ...placeholder ? {placeholder: placeholder} : {},
-                        ...onchange ? {
-                            onchange:(e)=>{
-                                onchange(e)
-                              
-                            }
-                        } : '',
-                        //...vnode.attrs
                         
+                        onchange:(e)=>{
+                            if(onchange) onchange(e)
+                        },
                     })
                 )
 
@@ -407,7 +398,7 @@ function InfoTooltip(){
                                tooltipstyle + (inverted ? 'background:#000000de; color:white;' : ''),
                         onmouseover:(e)=> showingInfo = true,
                         onmouseout:(e)=> showingInfo = false,
-                    },m.trust(localize(text || vnode.children)))
+                    },m.trust(text || vnode.children))
                 )
             ]
         }

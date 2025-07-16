@@ -275,9 +275,20 @@ function Animate() {
     let duration;
     let styleTimeout;
 
+    let animations = {
+        'scaleIn': {
+            from: {
+                transform:'scale(0)'
+            },
+            to: {
+                transform: 'scale(1)'
+            }
+        }
+    }
+
     return {
         oncreate: ({attrs, dom})=> {
-            let { animate={}, to={}, style={} } = attrs
+            let { animate={}, to={}, style={}, name = {} } = attrs
             
             if(Object.keys(animate).length == 0){
                 animate = to

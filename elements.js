@@ -1,5 +1,5 @@
-import { Div, FlexRow, Tappable } from "./layout"
-import { Text, SmallText } from "./texts"
+import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
+import { Text, SmallText } from "./texts.js"
 
 
 export { 
@@ -345,13 +345,15 @@ function Button(){
             paddingLeft:'0.3em',
             paddingRight:'0.3em',
             fontSize:'0.875em',
-            minHeight:'30px'
+            minHeight:'30px',
+            minWidth:'30px'
         },
         default: {
             paddingLeft:`1.5em`,
             paddingRight:'1.5em',
             fontSize:'1.1em',
-            minHeight:'40px'
+            minHeight:'40px',
+            minWidth:'40px'
         }
     }
     
@@ -373,8 +375,11 @@ function Button(){
                     userSelect:'none',
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
-                    opacity: disabled ? '0.5':'1',
-                    ...(fluid ? {width:'100%'} : {}),
+                    ...disabled && {
+                        opacity:'0.5',
+                        cursor: 'not-allowed',
+                        boxShadow:'none'
+                    },
                     ...types[type] || types.primary,
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
