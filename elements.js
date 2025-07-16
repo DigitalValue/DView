@@ -361,7 +361,7 @@ function Button(){
 
     return {
         view:(vnode)=>{
-            let { type='primary', onclick, disabled, fluid } = vnode.attrs
+            let { type='primary', onclick, disabled, fluid, icon, size } = vnode.attrs
             
             return m("div",{
                 style:{
@@ -389,7 +389,10 @@ function Button(){
                 onmouseout:(e)=> (brightness=100),
                 onmousedown:(e)=> (brightness=60),
                 onmouseup:(e)=> (brightness=100),
-            }, vnode.children)
+            }, 
+                icon ? m(Icon,{icon:icon, size: size || 'small', color: types[type].color || "black" }) : null,
+                vnode.children
+            )
         }
     }
 }
