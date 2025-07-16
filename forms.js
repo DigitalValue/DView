@@ -5,8 +5,10 @@ import { Icon, Button } from './elements.js'
 
 export {
     FormLabel, Input, TranslationInput, Dropdown,
-    IntegerInput, Switch, InfoTooltip
+    IntegerInput, Switch, InfoTooltip, Checkbox
 }
+
+// repensar si añadir localize a estas funciones !!
 
 function FormLabel(){
 
@@ -29,6 +31,41 @@ function FormLabel(){
                     : null
                 )
                 
+            ]
+        }
+    }
+}
+
+function Checkbox(){
+
+    let checkboxStyle = {
+        width:'17px', 
+        height:'17px',
+        cursor:'pointer',
+    }
+
+    return {
+        view:(vnode)=>{
+            let {data, name, onchange,label, checked} = vnode.attrs
+
+            return [
+                m(FlexRow,
+                    m("input",{
+                        type:'checkbox',
+                        checked: data && name ? data[name] : checked,
+                        style: checkboxStyle,
+                        onchange:(e)=>{
+                            if(data && name){
+                                data[name] = e.target.checked
+                            }
+
+                            onchange ? onchange(e): ''
+                        }
+                    }),
+                    m(Box,{width:'0.5em'}),
+
+                    m("label", label)
+                )
             ]
         }
     }
@@ -99,8 +136,8 @@ function TranslationInput(){
 
     return {
         oninit:(vnode)=> {
-            if(Page.settings && Page.settings.languages){
-                languages = Page.settings.languages.map((e)=> e.id || e)
+            if(vnode.attrs.languages){
+                languages = vnode.attrs.languages.map((e)=> e.id || e)
             }
 
             if(vnode.attrs.initialLang){

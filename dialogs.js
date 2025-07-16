@@ -5,12 +5,22 @@ import { H2 } from "./texts.js";
 
 
 
-
 export { 
     alertDialog, confirmDialog, promptDialog, 
     Modal, ModalContent, ModalHeader, ModalFooter 
 }
 
+
+
+function localize(localized, lang = 'es') {
+
+    if (!localized) return '';
+    if (typeof localized == 'string' || typeof localized == 'number') return localized
+    if (typeof localized != 'object') return 'ERR translation:'+typeof localized; //???
+
+    return localized[lang] || localized['es'] || localized['und']
+  
+}
 
 /*
 *
@@ -24,7 +34,6 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
     elem.id = Math.random()*10000 + ''
     document.body.appendChild(elem);
 
-    console.log(document.body.clientHeight)
     // TODO!! AÑADIR TRANSICIÓN DE SALIDA !!
     m.mount(elem, {
       onbeforeremove:()=>{

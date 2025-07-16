@@ -8,9 +8,10 @@ export {
     Sidebar, Label, 
     Message,  Card,  Checkbox, Spinner, 
     BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell,
-
+    Table, TableHead, TableBody, TableRow, TableCell
 }
+
+
 
 
 function Segment(){
@@ -63,7 +64,6 @@ function Segment(){
         }
     }
 }
-
 
 
 function Table(){
@@ -664,16 +664,16 @@ function Card(){
                             "src": photo + '?w=300', 
                             "style": { 
                                 "width": "100%",  "height": "auto", "max-height":'150px', 
-                                "object-fit":"contain", "border-style": "none", "background":'white',
-                                'border-top-left-radius':'1em', 'border-top-right-radius':'1em', 'object-fit':'cover',
-                                //'border-bottom':'1px solid lightgrey',
+                                "border-style": "none", "background":'white',
+                                'border-top-left-radius':'1em', 'border-top-right-radius':'1em',         
+                                willChange: 'transform', 
                                 ...vnode.attrs.imgStyle
-                            } 
-                            }),
+                            }}),
 
+                            borderColor &&
                             m(Div, {
-                                height:'1px',
-                                borderTop: `2px solid ${borderColor}`,
+                                height:'2px',
+                                background: `${borderColor}`,
                                 width:'90%',
                                 margin:'0 auto',
                             })
