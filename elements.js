@@ -390,7 +390,10 @@ function Button(){
                 onmousedown:(e)=> (brightness=60),
                 onmouseup:(e)=> (brightness=100),
             }, 
-                icon ? m(Icon,{icon:icon, size: size || 'small', color: types[type].color || "black" }) : null,
+                icon ? [
+                    m(Icon,{ icon:icon, size: size || 'small', color: types[type].color || "black" }),
+                    m(Box, { width:'5px' })
+                ] : null,
                 vnode.children
             )
         }
@@ -551,14 +554,12 @@ function Label(){
             return [
                 m("div",{
                     style: {
-                        display: "inline-block",
                         lineHeight: "1",
-                        verticalAlign: "baseline",
                         margin: "0 .14285714em",
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        fontWeight: "700",
+                        
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
@@ -574,7 +575,7 @@ function Label(){
                 }, 
                     vnode.attrs.icon || vnode.attrs.text ? 
                     m(FlexRow, {gap:'0.5em', alignItems:'center'},
-                        vnode.attrs.icon && m(Icon,{icon:vnode.attrs.icon, size:'small'}),
+                        vnode.attrs.icon && m(Icon,{icon:vnode.attrs.icon, size:'small', color: types[type]?.color || 'white'}),
                         vnode.attrs.text && m(SmallText, vnode.attrs.text),
                     ) : null,
 
