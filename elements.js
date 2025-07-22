@@ -1,5 +1,5 @@
-import { Div, FlexRow, Tappable } from "./layout"
-import { Text, SmallText } from "./texts"
+import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
+import { Text, SmallText } from "./texts.js"
 
 
 export { 
@@ -8,9 +8,10 @@ export {
     Sidebar, Label, 
     Message,  Card,  Checkbox, Spinner, 
     BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell,
-
+    Table, TableHead, TableBody, TableRow, TableCell
 }
+
+
 
 
 function Segment(){
@@ -63,7 +64,6 @@ function Segment(){
         }
     }
 }
-
 
 
 function Table(){
@@ -345,21 +345,23 @@ function Button(){
             paddingLeft:'0.3em',
             paddingRight:'0.3em',
             fontSize:'0.875em',
-            minHeight:'30px'
+            minHeight:'30px',
+            minWidth:'30px'
         },
         default: {
             paddingLeft:`1.5em`,
             paddingRight:'1.5em',
             fontSize:'1.1em',
-            minHeight:'40px'
+            minHeight:'40px',
+            minWidth:'40px'
         }
     }
     
     let brightness = 100;
 
     return {
-        view:(vnode)=> {
-            let { type='primary', onclick, disabled, fluid } = vnode.attrs
+        view:(vnode)=>{
+            let { type='primary', onclick, disabled, fluid, icon, size } = vnode.attrs
             
             return m("div",{
                 style:{
@@ -373,7 +375,11 @@ function Button(){
                     userSelect:'none',
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
-                    opacity: disabled ? '0.5':'1',
+                    ...disabled && {
+                        opacity:'0.5',
+                        cursor: 'not-allowed',
+                        boxShadow:'none'
+                    },
                     ...types[type] || types.primary,
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
@@ -383,7 +389,13 @@ function Button(){
                 onmouseout:(e)=> (brightness=100),
                 onmousedown:(e)=> (brightness=60),
                 onmouseup:(e)=> (brightness=100),
-            }, vnode.children)
+            }, 
+                icon ? [
+                    m(Icon,{ icon:icon, size: size || 'small', color: types[type].color || "black" }),
+                    m(Box, { width:'5px' })
+                ] : null,
+                vnode.children
+            )
         }
     }
 }
@@ -542,14 +554,12 @@ function Label(){
             return [
                 m("div",{
                     style: {
-                        display: "inline-block",
                         lineHeight: "1",
-                        verticalAlign: "baseline",
                         margin: "0 .14285714em",
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        fontWeight: "700",
+                        
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
@@ -565,7 +575,7 @@ function Label(){
                 }, 
                     vnode.attrs.icon || vnode.attrs.text ? 
                     m(FlexRow, {gap:'0.5em', alignItems:'center'},
-                        vnode.attrs.icon && m(Icon,{icon:vnode.attrs.icon, size:'small'}),
+                        vnode.attrs.icon && m(Icon,{icon:vnode.attrs.icon, size:'small', color: types[type]?.color || 'white'}),
                         vnode.attrs.text && m(SmallText, vnode.attrs.text),
                     ) : null,
 
@@ -658,17 +668,16 @@ function Card(){
                             "src": photo + '?w=300', 
                             "style": { 
                                 "width": "100%",  "height": "auto", "max-height":'150px', 
-                                "object-fit":"contain", "border-style": "none", "background":'white',
-                                'border-top-left-radius':'1em', 'border-top-right-radius':'1em', 'object-fit':'cover',
-                                
-                                //'border-bottom':'1px solid lightgrey',
+                                "border-style": "none", "background":'white',
+                                'border-top-left-radius':'1em', 'border-top-right-radius':'1em',         
+                                willChange: 'transform', 
                                 ...vnode.attrs.imgStyle
-                            } 
-                            }),
+                            }}),
 
+                            borderColor &&
                             m(Div, {
-                                height:'1px',
-                                borderTop: `2px solid ${borderColor}`,
+                                height:'2px',
+                                background: `${borderColor}`,
                                 width:'90%',
                                 margin:'0 auto',
                             })

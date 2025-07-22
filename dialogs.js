@@ -1,8 +1,7 @@
-import { Button, Icon } from "./elements";
-import { Input } from "./forms";
-import { Box, Div, FlexRow } from "./layout";
-import { H2 } from "./texts";
-
+import { Button, Icon } from "./elements.js";
+import { Input } from "./forms.js";
+import { Box, Div, FlexRow } from "./layout.js";
+import { H2 } from "./texts.js";
 
 
 
@@ -11,6 +10,17 @@ export {
     Modal, ModalContent, ModalHeader, ModalFooter 
 }
 
+
+
+function localize(localized, lang = 'es') {
+
+    if (!localized) return '';
+    if (typeof localized == 'string' || typeof localized == 'number') return localized
+    if (typeof localized != 'object') return 'ERR translation:'+typeof localized; //???
+
+    return localized[lang] || localized['es'] || localized['und']
+  
+}
 
 /*
 *
@@ -24,7 +34,6 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
     elem.id = Math.random()*10000 + ''
     document.body.appendChild(elem);
 
-    console.log(document.body.clientHeight)
     // TODO!! AÑADIR TRANSICIÓN DE SALIDA !!
     m.mount(elem, {
       onbeforeremove:()=>{
@@ -276,7 +285,7 @@ function Modal(){
         zIndex:1001,
         display:'flex',
         flexDirection:'column',
-
+        transition: 'all 0.3s ease-out'
     }
 
     let sizes = {
@@ -301,11 +310,23 @@ function Modal(){
                 modalStyle.maxWidth = '90vw'
             }
 
+            if(vnode.attrs.animate){ 
+                modalStyle.transform = 'translate(-50%,-30%) scale(0.7)'
+            }
+
             return m("div", {
                 style: dimmerStyle
             }, m("div",{
                     style:modalStyle,
-                    oncreate:({dom})=> dom.focus(),
+                    oncreate:({dom})=> { 
+                        if(vnode.attrs.animate){
+                            setTimeout(()=>{
+                                dom.style.transform = 'translate(-50%,-40%) scale(1)'
+                            }, 100)
+                        }
+
+                        dom.focus()
+                    },
                     onkeyup:(e)=>{
                         if (e.key==="Escape" && vnode.attrs.close) vnode.attrs.close()
                     }

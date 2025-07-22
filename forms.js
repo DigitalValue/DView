@@ -1,14 +1,14 @@
-import { Button, FlexCol, FlexRow } from "./layout.js"
+import { FlexCol, FlexRow, Box } from "./layout.js"
 import { Text } from "./texts.js"
-import { Icon } from './elements.js'
-
-
+import { Icon, Button } from './elements.js'
 
 
 export {
     FormLabel, Input, TranslationInput, Dropdown,
-    IntegerInput, Switch, InfoTooltip
+    IntegerInput, Switch, InfoTooltip, Checkbox
 }
+
+// repensar si añadir localize a estas funciones !!
 
 function FormLabel(){
 
@@ -22,9 +22,8 @@ function FormLabel(){
             let {label, required, info} = vnode.attrs
             
             return [
-                
                 m(FlexRow,
-                    m("label",{style:labelStyle}, localize(vnode.children) ),
+                    m("label",{style:labelStyle}, vnode.children ),
                     required ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*'): null,
 
                     info 
@@ -32,6 +31,41 @@ function FormLabel(){
                     : null
                 )
                 
+            ]
+        }
+    }
+}
+
+function Checkbox(){
+
+    let checkboxStyle = {
+        width:'17px', 
+        height:'17px',
+        cursor:'pointer',
+    }
+
+    return {
+        view:(vnode)=>{
+            let {data, name, onchange,label, checked} = vnode.attrs
+
+            return [
+                m(FlexRow,
+                    m("input",{
+                        type:'checkbox',
+                        checked: data && name ? data[name] : checked,
+                        style: checkboxStyle,
+                        onchange:(e)=>{
+                            if(data && name){
+                                data[name] = e.target.checked
+                            }
+
+                            onchange ? onchange(e): ''
+                        }
+                    }),
+                    m(Box,{width:'0.5em'}),
+
+                    m("label", label)
+                )
             ]
         }
     }
@@ -54,8 +88,6 @@ function Input(){
     return {
         view: (vnode)=>{
             let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info} = vnode.attrs
-
-            console.log('style', vnode.attrs.style)
 
             return [
                 m(FlexCol,{width:'100%'},
@@ -84,14 +116,10 @@ function Input(){
                         ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
                         ...title ? {title: title} : {},
                         ...placeholder ? {placeholder: placeholder} : {},
-                        ...onchange ? {
-                            onchange:(e)=>{
-                                onchange(e)
-                              
-                            }
-                        } : '',
-                        //...vnode.attrs
                         
+                        onchange:(e)=>{
+                            if(onchange) onchange(e)
+                        },
                     })
                 )
 
@@ -108,8 +136,8 @@ function TranslationInput(){
 
     return {
         oninit:(vnode)=> {
-            if(Page.settings && Page.settings.languages){
-                languages = Page.settings.languages.map((e)=> e.id || e)
+            if(vnode.attrs.languages){
+                languages = vnode.attrs.languages.map((e)=> e.id || e)
             }
 
             if(vnode.attrs.initialLang){
@@ -407,7 +435,7 @@ function InfoTooltip(){
                                tooltipstyle + (inverted ? 'background:#000000de; color:white;' : ''),
                         onmouseover:(e)=> showingInfo = true,
                         onmouseout:(e)=> showingInfo = false,
-                    },m.trust(localize(text || vnode.children)))
+                    },m.trust(text || vnode.children))
                 )
             ]
         }
