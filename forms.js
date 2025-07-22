@@ -87,7 +87,7 @@ function Input(){
 
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info, onkeyup} = vnode.attrs
 
             return [
                 m(FlexCol,{width:'100%'},
@@ -116,7 +116,7 @@ function Input(){
                         ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
                         ...title ? {title: title} : {},
                         ...placeholder ? {placeholder: placeholder} : {},
-                        
+                        ...onkeyup ? {onkeyup: onkeyup} : {},
                         onchange:(e)=>{
                             if(onchange) onchange(e)
                         },

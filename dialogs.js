@@ -285,6 +285,7 @@ function Modal(){
         zIndex:1001,
         display:'flex',
         flexDirection:'column',
+        maxWidth:'90%',
         transition: 'all 0.3s ease-out'
     }
 
@@ -318,21 +319,22 @@ function Modal(){
                 style: dimmerStyle
             }, m("div",{
                     style:modalStyle,
+                    tabindex: -1,
                     oncreate:({dom})=> { 
                         if(vnode.attrs.animate){
                             setTimeout(()=>{
                                 dom.style.transform = 'translate(-50%,-40%) scale(1)'
                             }, 100)
                         }
-
-                        dom.focus()
+                        
+                        setTimeout(()=>dom.focus(),50)
                     },
                     onkeyup:(e)=>{
                         if (e.key==="Escape" && vnode.attrs.close) vnode.attrs.close()
                     }
                 },  
                     vnode.attrs.header ?
-                    m(FlexRow,{ justifyContent:'space-between',borderBottom: '2px solid lightgrey', padding:'1em', alignItems:'center'},
+                    m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey', padding:'1em', alignItems:'center'},
                         m(H2,{marginBottom:0}, vnode.attrs.header),
 
                         m(Icon,{size:'large', style:"cursor:pointer", icon:'cancel', onclick: vnode.attrs.close})
@@ -365,7 +367,7 @@ function ModalHeader(){
 
     return {
         view:(vnode)=>{
-            return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', fontWeight:'bold'},
+            return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', fontWeight:'bold', ...vnode.attrs},
                 vnode.children
             )
         }
