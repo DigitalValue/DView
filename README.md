@@ -4,7 +4,6 @@ git submodule add https://github.com/DigitalValue/DView.git carpeta_origen
 # Para updatear en zity-components
 git submodule update --init src/components/dview  # specific path only
 
-
 # Configurar para siempre actualizar submódulos en pull y push
 git config submodule.recurse true
 git config push.recurseSubmodules on-demand

@@ -7,11 +7,8 @@ let config = {
     h2: {},
     h3: {},
     p : {},
-
     button : {
         primary : {}
-    },
-
-
+    }
 
 }

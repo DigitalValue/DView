@@ -358,7 +358,7 @@ function Button(){
     let brightness = 100;
 
     return {
-        view:(vnode)=>{
+        view:(vnode)=> {
             let { type='primary', onclick, disabled, fluid } = vnode.attrs
             
             return m("div",{
@@ -374,7 +374,6 @@ function Button(){
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
                     opacity: disabled ? '0.5':'1',
-                    ...(fluid ? {width:'100%'} : {}),
                     ...types[type] || types.primary,
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
@@ -661,6 +660,7 @@ function Card(){
                                 "width": "100%",  "height": "auto", "max-height":'150px', 
                                 "object-fit":"contain", "border-style": "none", "background":'white',
                                 'border-top-left-radius':'1em', 'border-top-right-radius':'1em', 'object-fit':'cover',
+                                
                                 //'border-bottom':'1px solid lightgrey',
                                 ...vnode.attrs.imgStyle
                             } 
