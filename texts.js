@@ -52,9 +52,9 @@ function H3(){
         view:(vnode)=>{
             return m("h3",{
                 style: {
-                    marginTop:0,
+                    marginTop: 0,
                     marginBottom: 0,
-                    fontFamily:'Poppins, Lato,  HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,Lato',
+                    fontFamily: 'Poppins, Lato,  HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,Lato',
                     ...vnode.attrs
                 }
             }, vnode.children)
