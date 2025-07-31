@@ -3,7 +3,7 @@
 export {
     Container,
     Grid, FlexCol, FlexRow, 
-    Div, Animate, Tappable, 
+    Div, Animate, Tappable, Draggable,
     Box, CssStyle
 }
 
@@ -260,6 +260,63 @@ function Tappable(){
     }
 }
 
+/**
+ * Componente con funcionalidad drag and drop
+ * @param {Function} ondrop - Funcion que se ejecuta al hacer drop 
+ * @param {*} data - Datos que se pasan de un elemento a otro al hacer drop
+*/
+function Draggable() {
+
+    function getTarget(e) {
+        if (e.target.draggable)
+            return e.target
+        else
+            return e.target.closest("[draggable]")
+    }
+
+    return {
+        view: ({ attrs, children })=> {
+            let { style={}, data, ondrop } = attrs
+
+            return m("div", {
+                style: {
+                    ...style,
+                    cursor: "grab"
+                },
+                draggable: true,
+                ondrag: (e) => e.target.style['border'] = "1px solid #2878C1",
+                ondragstart: (e) => {
+                    e.dataTransfer.effectAllowed = 'move'
+                    e.dataTransfer.setData('data', data)
+                },
+                ondragend: (e) => {
+                    e.preventDefault()
+                    e.target.style["border"] = style.border || "none"
+                },
+                ondrop: (e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    let _data = e.dataTransfer.getData('data')
+                    let target = getTarget(e)
+                    target.style["border"] = style.border || "none"
+                    target.style["filter"] = "none"
+
+                    if(ondrop && typeof ondrop == "function" ) ondrop(_data)
+                },
+                ondragover: (e) => {
+                    e.preventDefault()
+                    let target = getTarget(e)
+                    target.style["filter"] = "brightness(0.8)"
+                },
+                ondragleave: (e) => {
+                    e.preventDefault()
+                    let target = getTarget(e)
+                    target.style["filter"] = "none"
+                }
+            }, children)
+        }
+    }
+}
 
 /**
  * Anima un componente
