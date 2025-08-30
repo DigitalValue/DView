@@ -1,6 +1,9 @@
 
 
+import { config } from "./config.js"
+
 export { H1, H2, H3, Text, SmallText, TinyText }
+
 
 
 
@@ -15,9 +18,9 @@ function H1(){
         view:(vnode)=>{
             return m("h1",{
                 style: {
-                    fontSize:'2.25rem',
+                    fontSize:'2.5rem',
                     lineHeight:'2.25',
-                    fontFamily:'Poppins, Lato,  HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,Lato',
+                    fontFamily: config.fontFamily,
                     //fontWeight:'lighter', 
                     marginTop: 0,
                     marginBottom:0,
@@ -37,7 +40,7 @@ function H2(){
                     fontSize: '1.5rem',
                     lineHeight:'1.5',
                     marginBottom:0,
-                    fontFamily:'Poppins, Lato,  HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,Lato',
+                    fontFamily: config.fontFamily,
                     marginTop:0,
 
                     ...vnode.attrs
@@ -54,7 +57,7 @@ function H3(){
                 style: {
                     marginTop: 0,
                     marginBottom: 0,
-                    fontFamily: 'Poppins, Lato,  HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue,Lato',
+                    fontFamily: config.fontFamily,
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -70,6 +73,7 @@ function Text(){
                     fontSize: '1.1rem',
                     lineHeight: '1.4',
                     margin: 0,
+                    fontFamily: config.fontFamily,
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -85,6 +89,7 @@ function SmallText(){
                     fontSize: "0.875rem",
                     lineHeight: "1.25rem",
                     margin: 0,
+                    fontFamily: config.fontFamily,
                     ...vnode.attrs
                 }
             }, vnode.children)

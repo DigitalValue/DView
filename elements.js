@@ -4,11 +4,29 @@ import { Text, SmallText } from "./texts.js"
 
 export { 
     Segment,  Span, RippleEffect,
-    Button, Icon,    
+    Button, Icon, Img,    
     Sidebar, Label, 
     Message,  Card,  Checkbox, Spinner, 
     BreadCrumb,
     Table, TableHead, TableBody, TableRow, TableCell
+}
+
+
+
+function Img(){
+    return {
+        view:(vnode) => {
+            return [
+                m("img",{
+                    src: vnode.attrs.src,
+                    id: vnode.attrs.id,
+                    style: vnode.attrs.style,
+                    onload: vnode.attrs.onload,
+                    alt:vnode.attrs.alt
+                })
+            ]
+        }
+    }
 }
 
 
@@ -298,7 +316,7 @@ function Button(){
     let types = {
         primary: {
             color: 'white',
-            border: '1px solid white',
+            //border: '1px solid white',
             background: '#1b1c1d'
         },
         secondary: {
@@ -422,7 +440,7 @@ function Icon(){
         'tiny':'font-size:16px',
         'small':'font-size:18px;',
         'medium':'',
-        'large':'font-size:26px',
+        'large':'font-size:28px',
         'huge':'font-size:32px',
         'massive':'font-size:50px'
     }

@@ -8,7 +8,6 @@ export {
 }
 
 
-
 function Container(){
     
     
@@ -81,7 +80,7 @@ function FlexCol(){
                 style:{
                     display:'flex',
                     flexDirection:'column',
-                    ...vnode.attrs
+                    ...vnode.attrs.style || vnode.attrs 
                 }, 
             }, vnode.children)
         }
@@ -148,7 +147,7 @@ function Grid() {
                 m("div",{
                     id: id,
                     style : {
-                        ...vnode.attrs,
+                        ...vnode.attrs.style || vnode.attrs ,
                     }
                 },
                     vnode.children
@@ -225,21 +224,30 @@ function Tappable(){
                     
                     if(vnode.attrs.clickout){
                         clickout = vnode.attrs.clickout
-                        
                         document.body.removeEventListener('click', checkclickout)
                         document.body.addEventListener("click", checkclickout)
                     }
+                    
                 },
                 onremove:(e)=> document.body.removeEventListener('click', checkclickout),
                 onmouseenter:(e)=> {
                     if(vnode.attrs.hover) {
                         Object.keys(vnode.attrs.hover).forEach(h => elem.style[h] = vnode.attrs.hover[h])
                     }
+
+                    if(vnode.attrs.onhover){
+                        vnode.attrs.onhover(true)
+                    }
                 },
                 onmouseleave: (e)=> {
                     if(vnode.attrs.hover) {
                         Object.keys(vnode.attrs.hover).forEach(h => elem.style[h] = vnode.attrs.style && vnode.attrs.style[h] || '')
                     }
+
+                    if(vnode.attrs.onhover){
+                        vnode.attrs.onhover(false)
+                    }
+
                 },
                 onmousedown:(e)=> {
                     if(vnode.attrs.onmousedown) {
