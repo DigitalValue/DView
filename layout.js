@@ -73,14 +73,14 @@ function Container(){
 function FlexCol(){
     return {
         view:(vnode)=>{
-            let {justifyContent, alignItems} = vnode.attrs
+            /// let {justifyContent, alignItems} = vnode.attrs
 
 
             return m("div",{
                 style:{
                     display:'flex',
                     flexDirection:'column',
-                    ...vnode.attrs.style || vnode.attrs 
+                    ...vnode.attrs?.style || vnode.attrs 
                 }, 
             }, vnode.children)
         }
@@ -203,6 +203,10 @@ function Div(){
  * @param {Object} style - Estilos base del componente 
  * @param {Object} hover - Estilos para animar al hacer hover
  * @param {Object} click - Estilos para animar al hacer click
+ * @param {Function} onhover - Funcion que se ejecuta al hacer hover
+ * @param {Function} onclick - Funcion que se ejecuta al hacer click
+ * @param {Function} onmousedown - Funcion que se ejecuta al hacer mousedown
+ * @param {Function} onmouseup - Funcion que se ejecuta al hacer mouseup
 */
 function Tappable(){
 
@@ -247,7 +251,6 @@ function Tappable(){
                     if(vnode.attrs.onhover){
                         vnode.attrs.onhover(false)
                     }
-
                 },
                 onmousedown:(e)=> {
                     if(vnode.attrs.onmousedown) {
@@ -335,6 +338,7 @@ function Draggable() {
  * @param {Object} hover - Estilos para animar al hacer hover
  * @param {Object} click - Estilos para animar al hacer click
  * @param {Integer} duration - milisegundos
+ * 
  */
 function Animate() {
     let duration;
@@ -342,19 +346,31 @@ function Animate() {
 
     let animations = {
         'scaleIn': {
+            from: { transform: 'scale(0)' },
+            to: { transform: 'scale(1)' }
+        },
+
+        'fadeInUp': {
             from: {
-                transform:'scale(0)'
+                opacity: 0,
+                transform: 'translateY(20px)'
             },
             to: {
-                transform: 'scale(1)'
+                opacity: 1,
+                transform: 'translateY(0)'
             }
+        },
+
+        'opacity': {
+            from: { opacity: 0 },
+            to: { opacity: 1 }
         }
     }
 
     return {
         oncreate: ({attrs, dom})=> {
-            let { animate={}, to={}, style={}, name = {} } = attrs
-            
+            let { animate={}, to={}, style={}, name = {}, delay = 10 } = attrs
+
             if(Object.keys(animate).length == 0){
                 animate = to
             }
@@ -364,7 +380,7 @@ function Animate() {
                 Object.keys(animate).forEach(a => {
                     dom.style[a] = animate[a] 
                 })
-            }, 10)
+            }, delay)
 
             // estilos default
             styleTimeout=setTimeout(()=> {
@@ -389,6 +405,11 @@ function Animate() {
         },
         view: ({attrs, children})=>{
             duration = attrs.duration || 500
+
+            if(attrs.animation){
+                attrs.from = animations[attrs.animation]?.from || {}
+                attrs.to = animations[attrs.animation]?.to || {}
+            }
 
             return m("div", {
 

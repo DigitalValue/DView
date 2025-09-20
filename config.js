@@ -3,7 +3,7 @@
 // idea para configurar diferentes estilos? de momento no se añade !!
 export let config = {
 
-    fontFamily: 'Raleway',
+    fontFamily: 'Karla',
     h1: {},
     h2: {},
     h3: {},

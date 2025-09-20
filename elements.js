@@ -66,17 +66,17 @@ function Segment(){
 
     return {
         view:(vnode)=>{
-            let {type='default'} = vnode.attrs
+            let {type='default'} = vnode.attrs || {}
 
             return m(Div,{
                     padding:'1rem',
                     borderRadius: '1em',
                     transition: 'all .2s ease',
                     ...types[type] || types.primary,
-                    ...(vnode.attrs.basic && {border: 'none'}),
-                    ...(vnode.attrs.attach && attach[vnode.attrs.attach]),
-                    ...(vnode.attrs.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
-                    ...vnode.attrs.style
+                    ...(vnode.attrs?.basic && {border: 'none'}),
+                    ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
+                    ...(vnode.attrs?.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 },
             vnode.children)
         }

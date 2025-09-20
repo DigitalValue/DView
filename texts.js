@@ -24,9 +24,9 @@ function H1(){
                     //fontWeight:'lighter', 
                     marginTop: 0,
                     marginBottom:0,
-                    ...vnode.attrs
+                    ...vnode.attrs?.style || vnode.attrs
                 },
-                class: vnode.attrs.class
+                //class: vnode.attrs.class
             }, vnode.children)
         }
     }
@@ -42,7 +42,6 @@ function H2(){
                     marginBottom:0,
                     fontFamily: config.fontFamily,
                     marginTop:0,
-
                     ...vnode.attrs
                 }
             }, vnode.children)
