@@ -1,3 +1,4 @@
+import { config } from "./config.js"
 import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 
@@ -387,7 +388,7 @@ function Button(){
                     display:'flex',
                     alignItems:'center',
                     justifyContent:'center',
-                    fontFamily:'Poppins',
+                    fontFamily: config.fontFamily,
                     minHeight:'40px',
                     width: fluid ? '100%': 'auto',
                     userSelect:'none',

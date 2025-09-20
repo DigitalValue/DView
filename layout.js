@@ -367,11 +367,14 @@ function Animate() {
             }, 10)
 
             // estilos default
-            styleTimeout=setTimeout(()=> {
-                Object.keys(style).forEach(a => {
-                    dom.style[a] = style[a] 
-                })
-            }, duration)
+            if(style && Object.keys(style).length > 0){
+                styleTimeout=setTimeout(()=> {
+                    Object.keys(style).forEach(a => {
+                        dom.style[a] = style[a] 
+                    })
+                }, duration)
+            }
+
         },
         onbeforeremove: ({attrs, dom})=> {
             let { exit={} } = attrs
