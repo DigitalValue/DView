@@ -67,17 +67,17 @@ function Segment(){
 
     return {
         view:(vnode)=>{
-            let {type='default'} = vnode.attrs
+            let {type='default'} = vnode.attrs || {}
 
             return m(Div,{
                     padding:'1rem',
                     borderRadius: '1em',
                     transition: 'all .2s ease',
                     ...types[type] || types.primary,
-                    ...(vnode.attrs.basic && {border: 'none'}),
-                    ...(vnode.attrs.attach && attach[vnode.attrs.attach]),
-                    ...(vnode.attrs.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
-                    ...vnode.attrs.style
+                    ...(vnode.attrs?.basic && {border: 'none'}),
+                    ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
+                    ...(vnode.attrs?.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 },
             vnode.children)
         }
@@ -315,7 +315,7 @@ function RippleEffect() {
 function Button(){
 
     let types = {
-        primary: {
+        primary: config.button.primary || {
             color: 'white',
             //border: '1px solid white',
             background: '#1b1c1d'
@@ -653,9 +653,9 @@ function Card(){
             return [
                 m("div",{
                     style:{
-                        height:'100%',
+                        //height:'100%', width:'100%', // hay que meter la card siempre en un contenedor !!
                         border:'2px solid rgb(224, 224, 224)',
-                        cursor:'pointer', height:'100%', background: type == 'secondary' ? '#e0e0e0': 'white', //border:'1px solid lightgrey',
+                        cursor:'pointer', background: type == 'secondary' ? '#e0e0e0': 'white', //border:'1px solid lightgrey',
                         borderRadius:'1em', position:'relative', padding: !photo ? '1em':'0em',
                         ...(style || vnode.attrs)
                     },

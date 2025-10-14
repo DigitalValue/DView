@@ -1,6 +1,7 @@
 import { FlexCol, FlexRow, Box } from "./layout.js"
 import { Text } from "./texts.js"
 import { Icon, Button } from './elements.js'
+import { config } from "./config.js"
 
 
 export {
@@ -9,11 +10,10 @@ export {
 }
 
 // repensar si añadir localize a estas funciones !!
-
 function FormLabel(){
 
     let labelStyle = `font-weight:normal;display: block;
-    color: black; font-size: 1em;font-family: Poppins;
+    color: black; font-size: 1em;font-family: ${config.fontFamily};
     margin-bottom: 0.5em;
     white-space: normal;`
 
