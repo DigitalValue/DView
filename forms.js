@@ -46,10 +46,10 @@ function Checkbox(){
 
     return {
         view:(vnode)=>{
-            let {data, name, onchange,label, checked} = vnode.attrs
+            let {data, name, onchange,label, checked, vertical=false} = vnode.attrs
 
             return [
-                m(FlexRow,
+                m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row" },
                     m("input",{
                         type:'checkbox',
                         checked: data && name ? data[name] : checked,

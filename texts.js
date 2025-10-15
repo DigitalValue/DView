@@ -84,7 +84,7 @@ function Text(){
         view:(vnode)=>{
             return m("p",{
                 style:{
-                    fontSize: '1.1rem',
+                    fontSize: '1rem',
                     lineHeight: '1.4',
                     margin: 0,
                     fontFamily: config.fontFamily,

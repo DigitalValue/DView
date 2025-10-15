@@ -370,7 +370,7 @@ function Button(){
         default: {
             paddingLeft:`1.5em`,
             paddingRight:'1.5em',
-            fontSize:'1.1em',
+            fontSize:'1em',
             minHeight:'40px',
             minWidth:'40px'
         }
@@ -410,7 +410,7 @@ function Button(){
                 onmouseup:(e)=> (brightness=100),
             }, 
                 icon ? [
-                    m(Icon,{ icon:icon, size: size || 'small', color: types[type].color || "black" }),
+                    m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
                     m(Box, { width:'5px' })
                 ] : null,
                 vnode.children

@@ -82,6 +82,7 @@ function alertDialog(options={
     then:()=>{}, 
     multiple:false, 
     fluid:false,
+    size:"tiny",
     dom:(el)=>el // devuelve el elemento
 }){
 
@@ -130,7 +131,7 @@ function alertDialog(options={
                 setTimeout(resolve, 300)
             })
         },
-        view:()=> m(Modal, { size:'tiny' },
+        view:()=> m(Modal, { size: options.size || 'tiny' },
                 types[options.type] || options.title ? 
                 m(ModalHeader,
                     m(Icon,{icon: types[options.type]?.icon, color: types[options.type]?.color }),
