@@ -518,6 +518,11 @@ function Label(){
             color: "white",
             border: "1px solid #4b5563"
         },
+        tertiary: {
+            backgroundColor: "#e8e8e8",
+            color: "#00000099",
+            border: "1px solid #e8e8e8",
+        },
         positive: {
             backgroundColor: "#00c853",
             color: "white",
@@ -557,6 +562,9 @@ function Label(){
 
     // follow the fontSizes of H2, Text and SmallText
     let sizes = {
+        'small': {
+            fontSize:'0.6em',
+        },
         'default': {
             fontSize:'0.875em',
         },
