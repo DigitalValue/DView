@@ -6,7 +6,7 @@ import { H2 } from "./texts.js";
 
 
 export { 
-    alertDialog, confirmDialog, promptDialog, 
+    alertDialog, confirmDialog, promptDialog, openDialog,
     Modal, ModalContent, ModalHeader, ModalFooter 
 }
 
@@ -269,6 +269,30 @@ function promptDialog(options={
     })
 }
 
+// Crea un dialogo con un componente custom
+function openDialog(Component, options = {}) {
+    if (!Component) return 
+    
+    var elem = document.createElement("div")
+
+    elem.style = 'position:fixed;inset:0px;z-index:100000'
+    elem.id = Math.random() * 10000 + ''
+
+    document.body.appendChild(elem);
+
+    m.mount(elem, {
+        onbeforeremove: () => {
+            console.log('removing')
+        },
+        view: () => m(Component, {
+            ...(options.attrs ? options.attrs : {}),
+            onCancel: (e) => {
+                elem.remove()
+            }
+        })
+    })
+}
+
 
 function Modal(){
     let modalStyle = {
@@ -318,7 +342,7 @@ function Modal(){
             return m("div", {
                 style: dimmerStyle
             }, m("div",{
-                    style:modalStyle,
+                    style:{ ...modalStyle, ...vnode.attrs.style },
                     tabindex: -1,
                     oncreate:({dom})=> { 
                         if(vnode.attrs.animate){
