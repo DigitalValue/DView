@@ -14,7 +14,7 @@ function FormLabel(){
 
     let labelStyle = `font-weight:normal;display: block;
     color: black; font-size: 1em;font-family: ${config.fontFamily};
-    margin-bottom: 0.5em;
+    margin-bottom: 0.15em;
     white-space: normal;`
 
     return {
