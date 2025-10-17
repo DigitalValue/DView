@@ -103,7 +103,7 @@ function Table(){
     return {
         view:(vnode)=>{
             return m("table",{
-                style:tableStyle,
+                style:{ ...tableStyle, ...vnode.attrs.style},
             }, 
                 // use rows and
                 vnode.attrs.header ? m(TableHead,  
@@ -208,6 +208,7 @@ function TableCell(){
                 style: {
                     textAlign:'left',
                     padding:'1em',
+                    fontFamily: config.fontFamily,
                     ...vnode.attrs
                 }
             }, vnode.children)
