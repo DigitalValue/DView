@@ -394,6 +394,7 @@ function Button(){
                     userSelect:'none',
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
+                    gap: "5px",
                     ...disabled && {
                         opacity:'0.5',
                         cursor: 'not-allowed',
@@ -411,7 +412,7 @@ function Button(){
             }, 
                 icon ? [
                     m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
-                    m(Box, { width:'5px' })
+                    // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
             )
