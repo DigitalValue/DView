@@ -8,7 +8,6 @@ export {
 }
 
 
-
 function Container(){
     
     
@@ -75,14 +74,14 @@ function Container(){
 function FlexCol(){
     return {
         view:(vnode)=>{
-            let {justifyContent, alignItems} = vnode.attrs
+            /// let {justifyContent, alignItems} = vnode.attrs
 
 
             return m("div",{
                 style:{
                     display:'flex',
                     flexDirection:'column',
-                    ...vnode.attrs
+                    ...vnode.attrs?.style || vnode.attrs 
                 }, 
             }, vnode.children)
         }
@@ -149,7 +148,7 @@ function Grid() {
                 m("div",{
                     id: id,
                     style : {
-                        ...vnode.attrs,
+                        ...vnode.attrs.style || vnode.attrs ,
                     }
                 },
                     vnode.children
@@ -205,6 +204,10 @@ function Div(){
  * @param {Object} style - Estilos base del componente 
  * @param {Object} hover - Estilos para animar al hacer hover
  * @param {Object} click - Estilos para animar al hacer click
+ * @param {Function} onhover - Funcion que se ejecuta al hacer hover
+ * @param {Function} onclick - Funcion que se ejecuta al hacer click
+ * @param {Function} onmousedown - Funcion que se ejecuta al hacer mousedown
+ * @param {Function} onmouseup - Funcion que se ejecuta al hacer mouseup
 */
 function Tappable(){
 
@@ -226,20 +229,28 @@ function Tappable(){
                     
                     if(vnode.attrs.clickout){
                         clickout = vnode.attrs.clickout
-                        
                         document.body.removeEventListener('click', checkclickout)
                         document.body.addEventListener("click", checkclickout)
                     }
+                    
                 },
                 onremove:(e)=> document.body.removeEventListener('click', checkclickout),
                 onmouseenter:(e)=> {
                     if(vnode.attrs.hover) {
                         Object.keys(vnode.attrs.hover).forEach(h => elem.style[h] = vnode.attrs.hover[h])
                     }
+
+                    if(vnode.attrs.onhover){
+                        vnode.attrs.onhover(true)
+                    }
                 },
                 onmouseleave: (e)=> {
                     if(vnode.attrs.hover) {
                         Object.keys(vnode.attrs.hover).forEach(h => elem.style[h] = vnode.attrs.style && vnode.attrs.style[h] || '')
+                    }
+
+                    if(vnode.attrs.onhover){
+                        vnode.attrs.onhover(false)
                     }
                 },
                 onmousedown:(e)=> {
@@ -327,7 +338,10 @@ function Draggable() {
  * @param {Object} style - Estilos base del componente 
  * @param {Object} hover - Estilos para animar al hacer hover
  * @param {Object} click - Estilos para animar al hacer click
+ * @param {Integer} delay - Segundos de espera para la animación 
+ * @param {bool} animateOnScroll - Si la animación debe activarse al hacer scroll
  * @param {Integer} duration - milisegundos
+ * 
  */
 function Animate() {
     let duration;
@@ -335,36 +349,80 @@ function Animate() {
 
     let animations = {
         'scaleIn': {
+            from: { transform: 'scale(0)' },
+            to: { transform: 'scale(1)' }
+        },
+
+        'fadeUpIn': {
             from: {
-                transform:'scale(0)'
+                opacity: 0,
+                transform: 'translateY(20px)'
             },
             to: {
-                transform: 'scale(1)'
+                opacity: 1,
+                transform: 'translateY(0)'
             }
+        },
+
+        'fadeIn': {
+            from: {
+                opacity: 0,
+            },
+            to: {
+                opacity: 1,
+            }
+        },
+
+        'opacity': {
+            from: { opacity: 0 },
+            to: { opacity: 1 }
         }
     }
 
+    let observer;
+
     return {
         oncreate: ({attrs, dom})=> {
-            let { animate={}, to={}, style={}, name = {} } = attrs
-            
+            let { animate={}, to={}, style={}, name = {}, animateOnScroll, delay = 10 } = attrs
+
             if(Object.keys(animate).length == 0){
                 animate = to
             }
 
-            setTimeout(()=> {
-                // Animacion de entrada
-                Object.keys(animate).forEach(a => {
-                    dom.style[a] = animate[a] 
-                })
-            }, 10)
 
-            // estilos default
-            styleTimeout=setTimeout(()=> {
-                Object.keys(style).forEach(a => {
-                    dom.style[a] = style[a] 
-                })
-            }, duration)
+            if(animateOnScroll){
+                observer = new IntersectionObserver((entries) => { // esto tal vez gasta mucha memoria !!
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(()=> {
+                                // Animacion de entrada
+                                Object.keys(animate).forEach(a => {
+                                    dom.style[a] = animate[a] 
+                                })
+                            }, delay) 
+                        }
+                    })
+                }, { threshold: 0.1 })
+                    
+                observer.observe(dom)
+            } else {
+                setTimeout(()=> {
+                    // Animacion de entrada
+                    Object.keys(animate).forEach(a => {
+                        dom.style[a] = animate[a] 
+                    })
+                }, delay)
+            }
+
+            // porque los estilos default se añaden al animar ??
+            /*if(style && Object.keys(style).length > 0){
+                styleTimeout=setTimeout(()=> {
+                    Object.keys(style).forEach(a => {
+                        dom.style[a] = style[a] 
+                    })
+                }, duration)
+            }*/
+
         },
         onbeforeremove: ({attrs, dom})=> {
             let { exit={} } = attrs
@@ -382,6 +440,11 @@ function Animate() {
         },
         view: ({attrs, children})=>{
             duration = attrs.duration || 500
+
+            if(attrs.animation){
+                attrs.from = animations[attrs.animation]?.from || {}
+                attrs.to = animations[attrs.animation]?.to || {}
+            }
 
             return m("div", {
 

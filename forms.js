@@ -1,6 +1,7 @@
 import { FlexCol, FlexRow, Box } from "./layout.js"
 import { Text } from "./texts.js"
 import { Icon, Button } from './elements.js'
+import { config } from "./config.js"
 
 
 export {
@@ -9,12 +10,11 @@ export {
 }
 
 // repensar si añadir localize a estas funciones !!
-
 function FormLabel(){
 
     let labelStyle = `font-weight:normal;display: block;
-    color: black; font-size: 1em;font-family: Poppins;
-    margin-bottom: 0.5em;
+    color: black; font-size: 1em;font-family: ${config.fontFamily};
+    margin-bottom: 0.15em;
     white-space: normal;`
 
     return {
@@ -46,10 +46,10 @@ function Checkbox(){
 
     return {
         view:(vnode)=>{
-            let {data, name, onchange,label, checked} = vnode.attrs
+            let {data, name, onchange,label, checked, vertical=false} = vnode.attrs
 
             return [
-                m(FlexRow,
+                m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row" },
                     m("input",{
                         type:'checkbox',
                         checked: data && name ? data[name] : checked,

@@ -1,14 +1,33 @@
+import { config } from "./config.js"
 import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 
 
 export { 
     Segment,  Span, RippleEffect,
-    Button, Icon,    
+    Button, Icon, Img,    
     Sidebar, Label, 
     Message,  Card,  Checkbox, Spinner, 
     BreadCrumb,
     Table, TableHead, TableBody, TableRow, TableCell
+}
+
+
+
+function Img(){
+    return {
+        view:(vnode) => {
+            return [
+                m("img",{
+                    src: vnode.attrs.src,
+                    id: vnode.attrs.id,
+                    style: vnode.attrs.style,
+                    onload: vnode.attrs.onload,
+                    alt:vnode.attrs.alt
+                })
+            ]
+        }
+    }
 }
 
 
@@ -48,17 +67,17 @@ function Segment(){
 
     return {
         view:(vnode)=>{
-            let {type='default'} = vnode.attrs
+            let {type='default'} = vnode.attrs || {}
 
             return m(Div,{
                     padding:'1rem',
                     borderRadius: '1em',
                     transition: 'all .2s ease',
                     ...types[type] || types.primary,
-                    ...(vnode.attrs.basic && {border: 'none'}),
-                    ...(vnode.attrs.attach && attach[vnode.attrs.attach]),
-                    ...(vnode.attrs.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
-                    ...vnode.attrs.style
+                    ...(vnode.attrs?.basic && {border: 'none'}),
+                    ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
+                    ...(vnode.attrs?.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 },
             vnode.children)
         }
@@ -84,7 +103,7 @@ function Table(){
     return {
         view:(vnode)=>{
             return m("table",{
-                style:tableStyle,
+                style:{ ...tableStyle, ...vnode.attrs.style},
             }, 
                 // use rows and
                 vnode.attrs.header ? m(TableHead,  
@@ -189,6 +208,7 @@ function TableCell(){
                 style: {
                     textAlign:'left',
                     padding:'1em',
+                    fontFamily: config.fontFamily,
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -296,9 +316,9 @@ function RippleEffect() {
 function Button(){
 
     let types = {
-        primary: {
+        primary: config.button.primary || {
             color: 'white',
-            border: '1px solid white',
+            //border: '1px solid white',
             background: '#1b1c1d'
         },
         secondary: {
@@ -351,7 +371,7 @@ function Button(){
         default: {
             paddingLeft:`1.5em`,
             paddingRight:'1.5em',
-            fontSize:'1.1em',
+            fontSize:'1em',
             minHeight:'40px',
             minWidth:'40px'
         }
@@ -369,12 +389,13 @@ function Button(){
                     display:'flex',
                     alignItems:'center',
                     justifyContent:'center',
-                    fontFamily:'Poppins',
+                    fontFamily: config.fontFamily,
                     minHeight:'40px',
                     width: fluid ? '100%': 'auto',
                     userSelect:'none',
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
+                    gap: "5px",
                     ...disabled && {
                         opacity:'0.5',
                         cursor: 'not-allowed',
@@ -391,8 +412,8 @@ function Button(){
                 onmouseup:(e)=> (brightness=100),
             }, 
                 icon ? [
-                    m(Icon,{ icon:icon, size: size || 'small', color: types[type].color || "black" }),
-                    m(Box, { width:'5px' })
+                    m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
+                    // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
             )
@@ -422,7 +443,7 @@ function Icon(){
         'tiny':'font-size:16px',
         'small':'font-size:18px;',
         'medium':'',
-        'large':'font-size:26px',
+        'large':'font-size:28px',
         'huge':'font-size:32px',
         'massive':'font-size:50px'
     }
@@ -499,6 +520,11 @@ function Label(){
             color: "white",
             border: "1px solid #4b5563"
         },
+        tertiary: {
+            backgroundColor: "#e8e8e8",
+            color: "#00000099",
+            border: "1px solid #e8e8e8",
+        },
         positive: {
             backgroundColor: "#00c853",
             color: "white",
@@ -538,6 +564,9 @@ function Label(){
 
     // follow the fontSizes of H2, Text and SmallText
     let sizes = {
+        'small': {
+            fontSize:'0.6em',
+        },
         'default': {
             fontSize:'0.875em',
         },
@@ -634,9 +663,9 @@ function Card(){
             return [
                 m("div",{
                     style:{
-                        height:'100%',
+                        //height:'100%', width:'100%', // hay que meter la card siempre en un contenedor !!
                         border:'2px solid rgb(224, 224, 224)',
-                        cursor:'pointer', height:'100%', background: type == 'secondary' ? '#e0e0e0': 'white', //border:'1px solid lightgrey',
+                        cursor:'pointer', background: type == 'secondary' ? '#e0e0e0': 'white', //border:'1px solid lightgrey',
                         borderRadius:'1em', position:'relative', padding: !photo ? '1em':'0em',
                         ...(style || vnode.attrs)
                     },
