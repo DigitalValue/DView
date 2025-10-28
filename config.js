@@ -6,7 +6,7 @@ export { config, setConfig }
 
 let config = {
 
-    fontFamily: 'Poppins, Karla, Raleway',
+    fontFamily: 'Poppins, Karla, Raleway, Lato, sans-serif',
     h1: {},
     h2: {},
     h3: {},
