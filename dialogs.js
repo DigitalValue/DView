@@ -380,7 +380,8 @@ function ModalContent(){
                 style:{
                     padding:'1em',
                     overflowY:'auto',
-                    maxHeight:'50vh'
+                    maxHeight:'50vh',
+                    ...vnode.attrs
                 }
             }, vnode.children)
         }

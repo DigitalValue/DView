@@ -82,6 +82,7 @@ function Input(){
         border-radius: .28571429rem;
         -webkit-box-shadow: 0 0 0 0 transparent inset;
         box-shadow: 0 0 0 0 transparent inset;
+        font-family: ${config.fontFamily};
     `
     
 
