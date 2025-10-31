@@ -282,12 +282,13 @@ function openDialog(Component, options = {}) {
     document.body.appendChild(elem);
 
     m.mount(elem, {
-        onbeforeremove: () => {
-            console.log('removing')
+        onremove: ()=> {
+            console.log("ELIMINAR")
         },
         view: () => m(Component, {
             ...(options.attrs ? options.attrs : {}),
             onCancel: (e) => {
+                m.mount(elem, null)
                 elem.remove()
             }
         })
