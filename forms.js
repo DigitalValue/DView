@@ -96,7 +96,7 @@ function Input(){
                     label ? 
                     [
                         m(FormLabel,{required: required, info:info}, label),
-                        m(Box,{height:'0.2em'})
+                        // m(Box,{height:'0.2em'})
                     ] : null,
 
                     m(type =='textarea'? "textarea": "input", {
@@ -192,13 +192,19 @@ function TranslationInput(){
 function Dropdown(){
     // beautiful dropdown style
     let dropdownStyle = {
-        padding:'1em',
-        border:'1px solid lightgrey',
-        borderRadius:'0.5em',
-        cursor:'pointer',
-        display:'flex',
-        justifyContent:'space-between',
-        alignItems:'center'
+        cursor: 'pointer',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        lineHeight: '1.21429em',
+        padding: '0.5em 1em',
+        fontSize: '1em',
+        background: 'rgb(255, 255, 255)',
+        border: '1px solid rgba(34, 36, 38, 0.15)',
+        color: 'rgba(0, 0, 0, 0.87)',
+        borderRadius: '0.285714rem',
+        boxShadow: 'transparent 0px 0px 0px 0px inset',
+        fontFamily: config.fontFamily || ""
     }
 
     return {
