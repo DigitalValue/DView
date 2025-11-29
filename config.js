@@ -6,6 +6,11 @@ export { config, setConfig }
 
 let config = {
 
+    primaryColor: '', // to do !!
+    secondaryColor: '',
+    accentColor: '',
+    background: '#f5f5f5',
+
     fontFamily: 'Poppins, Karla, Raleway, Lato, sans-serif',
     h1: {},
     h2: {},
@@ -15,8 +20,15 @@ let config = {
         // primary : {
         //     background: '#e8def8'
         // }
+    },
+    
+    app: {
+        appBar: {
+            //background:'#ffffff'
+        },
+        //background: ''
+        
     }
-
 }
 
 function setConfig(newConfig) {
