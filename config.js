@@ -10,13 +10,14 @@ let config = {
     h1: {},
     h2: {},
     h3: {},
-    p : {},
+    defaultFont : {},
+    smallFont : {},
+    formLabel: {},
     button : {
         // primary : {
         //     background: '#e8def8'
         // }
     }
-
 }
 
 function setConfig(newConfig) {

@@ -88,6 +88,7 @@ function Text(){
                     lineHeight: '1.4',
                     margin: 0,
                     fontFamily: config.fontFamily,
+                    ...config.defaultFont || {},
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -104,6 +105,7 @@ function SmallText(){
                     lineHeight: "1.25rem",
                     margin: 0,
                     fontFamily: config.fontFamily,
+                    ...config.smallFont || {},
                     ...vnode.attrs
                 }
             }, vnode.children)

@@ -496,7 +496,6 @@ function Animate() {
 }
 
 
-
 function CssStyle(){
     return {
         view:(vnode)=>{

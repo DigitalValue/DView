@@ -449,6 +449,9 @@ function Icon(){
     }
 
     return {
+        /*oninit:(vnode)=>{
+            
+        },*/
         view:(vnode)=>{
             let {onclick} = vnode.attrs
 

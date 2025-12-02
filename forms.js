@@ -1,29 +1,42 @@
-import { FlexCol, FlexRow, Box } from "./layout.js"
-import { Text } from "./texts.js"
+import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
+import { Text, SmallText } from "./texts.js"
 import { Icon, Button } from './elements.js'
 import { config } from "./config.js"
 
 
 export {
     FormLabel, Input, TranslationInput, Dropdown,
-    IntegerInput, Switch, InfoTooltip, Checkbox
+    IntegerInput, Switch, InfoTooltip, Checkbox,
+    HtmlDropdown, DateSelector
 }
+
+
 
 // repensar si añadir localize a estas funciones !!
 function FormLabel(){
+    let labelStyle = {
+        fontWeight:'normal',
+        display: 'block',
+        color: 'black',
+        fontSize: '1em',
+        fontFamily: config.fontFamily,
+        marginBottom: '0.2em',
+        whiteSpace: 'normal',
+    }
 
-    let labelStyle = `font-weight:normal;display: block;
-    color: black; font-size: 1em;font-family: ${config.fontFamily};
-    margin-bottom: 0.15em;
-    white-space: normal;`
 
     return {
         view:(vnode)=>{
-            let {label, required, info} = vnode.attrs
+            let { required, info} = vnode.attrs
+
+            if(config.formLabel && typeof config.formLabel == 'object'){
+                Object.assign(labelStyle, config.formLabel)
+            }
             
             return [
                 m(FlexRow,
-                    m("label",{style:labelStyle}, vnode.children ),
+                    // añadido typeof en caso de que se pase la string con es/va
+                    m("label",{ style:labelStyle }, typeof vnode.children?.[0] == 'object' ? null : vnode.children ),
                     required ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*'): null,
 
                     info 
@@ -35,6 +48,25 @@ function FormLabel(){
         }
     }
 }
+
+
+// estilos básicos comunes, se pueden sobreescribir desde config (falta programar)
+let baseStyle = {
+    lineHeight: '1.21428571em',
+    fontSize: '1em',
+    background: '#fff',
+    padding: '.67857143em 1em',
+    borderRadius: '.28571429rem',
+    border: '1px solid #ccc',
+    color: 'rgba(0, 0, 0, .87)',
+}
+
+
+let focusedStyle = {
+    border: '1.2px solid grey',
+    boxShadow: '0 0 0 0 transparent inset, 0 0 0 0 transparent',
+}
+
 
 function Checkbox(){
 
@@ -73,40 +105,50 @@ function Checkbox(){
 
 
 function Input(){
-    let inputStyle = `line-height: 1.21428571em;
-        padding: .67857143em 1em;
-        font-size: 1em;
-        background: #fff;
-        border: 1px solid rgba(34, 36, 38, .15);
-        color: rgba(0, 0, 0, .87);
-        border-radius: .28571429rem;
-        -webkit-box-shadow: 0 0 0 0 transparent inset;
-        box-shadow: 0 0 0 0 transparent inset;
-    `
     
-
     return {
+        oninit:(vnode)=> {
+            if(config.form && config.form.baseStyle){
+                Object.assign(baseStyle, config.form.baseStyle)
+            }
+        },
         view: (vnode)=>{
             let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info, onkeyup} = vnode.attrs
 
             return [
-                m(FlexCol,{width:'100%'},
+
+                // TO DO: editar el estilo de focus
+                /*m("style", `
+                    input, textarea > :focus, textarea:focus {
+                        border: ${focusedStyle.border} !important;
+                        box-shadow: ${focusedStyle.boxShadow} !important;
+                    }    
+                `),*/
+
+                m(FlexCol,{ width:'100%'}, // pensar otra manera sin necesidad de meter width: 100%
 
                     label ? 
                     [
                         m(FormLabel,{required: required, info:info}, label),
-                        m(Box,{height:'0.2em'})
+                        //m(Box,{height:'0.2em'})
                     ] : null,
 
                     m(type =='textarea'? "textarea": "input", {
                         readonly: readonly || false,
                         rows:rows,
-                        style: inputStyle + (vnode.attrs.style ? vnode.attrs.style : ''),
+                        style:  {
+                            ...baseStyle,
+                            ...(vnode.attrs.style || {})
+                        },
                         oninput:(e)=>{
                             oninput ? oninput(e): ''
-
                             data && name ? data[name] = e.target.value : ''
                         },
+                        /*
+                        onfocus:(e)=> {
+                            e.target.style.border = focusedStyle.border
+                            e.target.style.boxShadow = focusedStyle.boxShadow
+                        },*/
                         ...( value ? {value:value}:{} ),
                         ...( data && data[name] ? {value:data[name]}:{} ),
                         ...type && type != 'textarea' ? {type:type}: {},
@@ -136,12 +178,22 @@ function TranslationInput(){
 
     return {
         oninit:(vnode)=> {
+            let {data, name} = vnode.attrs
             if(vnode.attrs.languages){
                 languages = vnode.attrs.languages.map((e)=> e.id || e)
             }
 
             if(vnode.attrs.initialLang){
                 selectedlang = languages.findIndex((e)=> e == vnode.attrs.initialLang) || 0
+            }
+
+            if(data && name && data[name] && typeof data[name] == "object" && !data[name]?.[languages[selectedlang]]) {
+                for(let i = 0; i < languages.length; i++) {
+                    if(data[name]?.[languages[i]]) {
+                        selectedlang = i
+                        return
+                    }
+                }
             }
         },
         view:(vnode)=>{
@@ -156,12 +208,13 @@ function TranslationInput(){
             }
 
             
-            return m(FlexCol,{width:'100%', },
+            return m(FlexCol, { width:'100%' }, // quitar 100%
+
                 label ? m(FormLabel,{ required:required, info:info }, label) : null,
 
                 m(FlexRow,
                     m(Input,{
-                        style:"flex-grow:2;border-radius:0em;",
+                        style: { flexGrow:1, marginRight:'0.5em'},
                         rows: rows,
                         required:required,
                         data: data[name],
@@ -171,7 +224,7 @@ function TranslationInput(){
                     
                     m(Button,{
                         type:'default',
-                        style:{borderRadius:'0em',border:'1px solid #22242626', flexGrow:1, background:'white'},
+                        style:{ borderRadius:'0em',border:'1px solid #22242626', flexGrow:1, background:'white'},
                         onclick:(e)=>{
                             selectedlang++
                             if(selectedlang>languages.length-1){
@@ -191,7 +244,7 @@ function TranslationInput(){
 function Dropdown(){
     // beautiful dropdown style
     let dropdownStyle = {
-        padding:'1em',
+        padding:'.67857143em 1em',
         border:'1px solid lightgrey',
         borderRadius:'0.5em',
         cursor:'pointer',
@@ -202,17 +255,17 @@ function Dropdown(){
 
     return {
         view:(vnode)=>{
-            let {data, name, label,  onchange, info, required, value, style={}} = vnode.attrs
+            let { data, name, label,  onchange, info, required, value, style={}} = vnode.attrs
+
 
             return [
 
-                m(FlexCol,
+                m(FlexCol,{width:'100%', ...vnode.attrs.style},
                     label ? m(FormLabel,{info:info, required:required}, label): null,
 
                     m("select",{
                         style: {
-                            ...dropdownStyle,
-                            ...style
+                            ...baseStyle
                         },
                         onchange:(e)=>{
                             data && name !=undefined ? data[name] = e.target.value: ''
@@ -220,7 +273,7 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true },"Selecciona una opción"),
+                        m("option",{ disabled:true, selected:true },"Selecciona una opción"),
 
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
@@ -236,6 +289,186 @@ function Dropdown(){
         }
     }
 }
+
+
+function DateSelector() {
+    let open = false;
+
+    return {
+        view: (vnode) => {
+            let { data, name, label, onchange} = vnode.attrs
+
+            return [
+                m(FlexCol,
+                    m(FormLabel, label),
+
+                    m(Tappable, {
+                        onclick:(e)=> {
+                            open = !open
+                        },
+                        style: {
+                            ...baseStyle,
+                            position: 'relative',
+                            cursor: 'pointer',
+                        }
+                    },  
+                        m(FlexRow, { justifyContent:'space-between', alignItems:'center'},
+                            m(Text,{
+                                maxWidth:'80%',
+                                overflow:'hidden',
+                                textOverflow:'ellipsis',
+                                whiteSpace:'nowrap',
+                                color: data && name && data[name] ? 'black' : 'grey',
+                            },  
+                                data && name && data[name] ? new Date(data[name]).toDateString() :
+                                "Selecciona fecha"
+                            ),     
+
+                            m(Icon, {
+                                icon: 'calendar_today',
+                                color:'rgba(34, 36, 38)'
+                            })
+                        ),
+
+                        open ? 
+                        m(Div, {
+                            position: 'absolute',
+                            left:'0px',
+                            top:'100%',
+                            right: '0px',
+                            boxShadow: '0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15)',
+                            background:'#fff',
+                            zIndex:1000,
+                            marginTop:'0.2em',
+                            padding:'1em',
+                        },
+                            m(DatePicker)
+
+                        ): null,
+                    )
+                )
+            ]
+        }
+    }
+
+
+    function DatePicker(){ 
+
+        let view = 'year' // days, month, years
+
+        let selectedDate = new Date();
+
+        return { 
+            view: (vnode)=> {
+                return m(FlexCol,
+                    m(Text, "Date Picker Placeholder"),
+
+                    view == 'year' ? 
+                    m(Button, {
+                        onclick:()=> view = 'months'
+                    }, "Go to months view")
+                    : null
+
+
+                        
+                )
+            }
+        }
+
+    }
+}
+
+
+// dropdown sin utilizar el select html
+function HtmlDropdown() {
+    let open = false;
+
+    return {
+        view: (vnode) => {
+            let { data, name, label, onchange} = vnode.attrs
+
+            return [
+                m(FlexCol,
+                    m(FormLabel, label),
+
+                    m(Tappable, {
+                        style: {
+                             ...(open 
+                            ? {
+                                borderBottomLeftRadius:'0em',
+                                borderBottomRightRadius:'0em',
+                            } : {}),
+                            ...baseStyle,
+                            position: 'relative'
+                        },
+                        onclick:(e)=> open = !open
+                    },
+                        m(FlexRow, { justifyContent:'space-between', alignItems:'center'},
+                            
+                            m(Text, {
+                                maxWidth:'80%',
+                                overflow:'hidden',
+                                textOverflow:'ellipsis',
+                                whiteSpace:'nowrap',
+                                color:  data && name && data[name] ? 'black' : 'grey',
+
+                            }, data && name && data[name] ? data[name] : 'Selecciona'),
+
+                            // is there a built-in icon without using a library??
+
+                            m(Icon, { icon: open ? 'keyboard_arrow_up' : 'keyboard_arrow_down', color:'rgba(34, 36, 38)' }
+                        )),
+
+                        open ?
+                        m(FlexCol, {
+                            border:'1px solid #ccc',
+                            borderRadius:'0.5em',
+                            borderTopLeftRadius:'0em',
+                            borderTopRightRadius:'0em',
+                            position: 'absolute',
+                            left:'0px',
+                            top:'100%',
+                            right: '0px',
+                            boxShadow: '0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15)',
+                            background:'#fff',
+                            zIndex:1000,
+                        }, vnode.children.map((o)=>
+                            m(Tappable, {
+                                style: {
+                                    padding: '0.5em 1em',
+                                    cursor: 'pointer',
+                                },
+                                hover: {
+                                    background: '#f0f0f0'
+                                },
+                                onclick:(e)=>{
+                                    e.preventDefault()
+                                    e.stopPropagation()
+
+                                    if(data && name != undefined) {
+                                        data[name] = o.value != undefined ? o.value : o
+                                    }
+
+                                    open = !open
+
+                                    if(onchange) onchange(o)
+                                        
+                                    open = false
+                                }
+                            }, m(SmallText, o.label || o))
+                        ))
+                        : null
+                
+                    )
+
+                )
+
+            ]
+        }
+    }
+}
+
+
 
 
 function Switch() {
@@ -298,28 +531,23 @@ function Switch() {
 // input that only gets integers
 function IntegerInput(){ 
 
-    let inputStyle = `line-height: 1.21428571em;
-        padding: .67857143em 1em;
-        font-size: 1em;
-        background: #fff;
-        border: 1px solid rgba(34, 36, 38, .15);
-        color: rgba(0, 0, 0, .87);
-        border-radius: .28571429rem;
-        -webkit-box-shadow: 0 0 0 0 transparent inset;
-        box-shadow: 0 0 0 0 transparent inset;`
-
     let on = false;
 
     return {
         view: (vnode)=>{
-            let { data, name, max, min=0, label, onchange, jump=1, required } = vnode.attrs
+            let { data, name, max, min=0, label, onchange, jump=1, required, style = {} } = vnode.attrs
             
             return [
                 m(FlexCol,
                     label ? m(FormLabel, {required:required}, label) : null,
 
 
-                    m("div",{style: inputStyle}, 
+                    m("div",{
+                        style: {
+                            ...baseStyle,
+                            ...style
+                        }
+                    }, 
                         m(FlexRow,{alignItems:'center',justifyContent:'space-between'},
                             m("div",
                                 data && name && data[name] ? data[name]: 0,
