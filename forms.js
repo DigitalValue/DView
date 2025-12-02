@@ -130,7 +130,6 @@ function Input(){
                     label ? 
                     [
                         m(FormLabel,{required: required, info:info}, label),
-                        //m(Box,{height:'0.2em'})
                     ] : null,
 
                     m(type =='textarea'? "textarea": "input", {
@@ -242,17 +241,7 @@ function TranslationInput(){
 
 
 function Dropdown(){
-    // beautiful dropdown style
-    let dropdownStyle = {
-        padding:'.67857143em 1em',
-        border:'1px solid lightgrey',
-        borderRadius:'0.5em',
-        cursor:'pointer',
-        display:'flex',
-        justifyContent:'space-between',
-        alignItems:'center'
-    }
-
+    
     return {
         view:(vnode)=>{
             let { data, name, label,  onchange, info, required, value, style={}} = vnode.attrs
