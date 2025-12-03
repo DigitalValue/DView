@@ -2,6 +2,7 @@ import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 import { Icon, Button } from './elements.js'
 import { config } from "./config.js"
+import { localize, translateSALT } from "../util.js"
 
 
 export {
@@ -172,14 +173,15 @@ function Input(){
 
 function TranslationInput(){
 
-    let languages=['es','va']
+    let languages=['und','es','va']
     let selectedlang=0
 
     return {
         oninit:(vnode)=> {
-            let {data, name} = vnode.attrs
-            if(vnode.attrs.languages){
-                languages = vnode.attrs.languages.map((e)=> e.id || e)
+            let { data, name, defaultLanguages } = vnode.attrs 
+
+            if(defaultLanguages){
+                languages = defaultLanguages.map((e)=> e.id || e)
             }
 
             if(vnode.attrs.initialLang){
@@ -194,45 +196,137 @@ function TranslationInput(){
                     }
                 }
             }
+
         },
         view:(vnode)=>{
-            let {data, name, label, required, type, rows, info} = vnode.attrs
+            let {data, name, label, required, type, rows, info, onfocusout } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
-            if(!data[name]){
-                data[name] = {}
-            } else if(typeof data[name] == 'string'){
-                data[name] = {'es':data[name]}
-            }
-
             
-            return m(FlexCol, { width:'100%' }, // quitar 100%
+            let value = data[name]
+
+            return m(FlexCol,{width:'100%', },
 
                 label ? m(FormLabel,{ required:required, info:info }, label) : null,
 
                 m(FlexRow,
-                    m(Input,{
-                        style: { flexGrow:1, marginRight:'0.5em'},
+                    m(Input, {
+                        style: { flexGrow: 2, borderRadius: ".28571429rem 0em 0em .28571429rem" },
                         rows: rows,
                         required:required,
-                        data: data[name],
-                        name: languages[selectedlang],
+                        data: typeof value !== "object" ? data : data[name],
+                        name: typeof value !== "object" ? name : languages[selectedlang],
+                        oninput: (e)=> {
+                            if (!e.target.value.length && typeof value == "object") delete data[name][languages[selectedlang]]
+                        },
                         type: type,
+                        onfocusout: onfocusout
                     }),
                     
                     m(Button,{
                         type:'default',
-                        style:{ borderRadius:'0em',border:'1px solid #22242626', flexGrow:1, background:'white'},
+                        style:{
+                            background:'white',
+                            borderRadius:'0em .28571429rem .28571429rem 0em',
+                            minWidth: "80px", border:'1px solid #22242626', 
+                            flexGrow:1,  
+                            fontFamily: "Poppins, Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;"
+                        },
                         onclick:(e)=>{
-                            selectedlang++
-                            if(selectedlang>languages.length-1){
-                                selectedlang=0
+                            if(typeof value !== "object") {
+                                data[name] = { und: value }
                             }
-
-                            if(vnode.attrs.changedLang) vnode.attrs.changedLang(languages[selectedlang])
+                            else {
+                                selectedlang++
+                                if(selectedlang > languages.length-1) {
+                                    selectedlang=0
+                                }
+    
+                                if(vnode.attrs.changedLang) vnode.attrs.changedLang(languages[selectedlang])
+                            }
                         }
-                    }, languages[selectedlang])
+                    },
+                        typeof value !== "object"
+                        ? m(Icon, { icon: "language", color: "gray", size: "small" })
+                        : languages[selectedlang]
+                    )
+                ),
+                
+                m(FlexRow, { justifyContent: "space-between", alignItems: "center", paddingTop: "3px" }, 
+                    m(FlexRow, { gap: "1rem", marginRight: "auto"}, 
+                        languages.map((l, i) => {
+                            if(typeof value == "object" && data[name] && data[name][l] && data[name][l].length)
+                                return m(Tappable, {
+                                    onclick: ()=> { selectedlang = i },
+                                    style: {
+                                        color: selectedlang == i ? "black" : "gray",
+                                        cursor: "pointer"
+                                    }
+                                }, m(SmallText, l))
+                        })
+                    ),
+
+                    m(FlexRow, { gap: "10px", alignItems: "center" }, [
+
+                        // Convertir en string
+                        value && value.und && Object.keys(value).length === 1
+                        ? [
+                            m(Tappable, {
+                                onclick: ()=> {
+                                    data[name] = value.und
+                                }
+                            },
+                                m(SmallText, localize({
+                                    und: "Convertir en string",
+                                    en: "Convert to string",
+                                    eu: "Kate bihurtu"
+                                }))
+                            ),
+
+                            m("span", "|")
+                        ]
+                        : null,
+
+                        // Traducir al valenciano
+                        typeof value !== "object"
+                        ? null 
+                        : m(Icon, {
+                            icon: "language",
+                            color: "green",
+                            size: "small",
+                            onclick: async ()=> {
+                                if (data[name]?.va?.length)
+                                    return alert("Ya hay una traducción disponible. Por favor borra la existente antes de continuar.")
+    
+                                let text
+                                if (typeof data[name] === "string")
+                                    text = data[name]
+                                else if (data[name].es)
+                                    text = data[name].es
+                                else
+                                    text = data[name].und
+                                if (!text)
+                                    return alert("No hay texto que traducir")
+    
+                                if (confirm("¿Seguro que deseas traducir este campo al valenciano?")) {
+                                    let resp = await translateSALT(text)
+                                    if (resp) {
+                                        if (typeof data[name] === "string") {
+                                            data[name] = {
+                                                und: data[name],
+                                                va: resp
+                                            }
+                                        }
+                                        else
+                                            data[name].va = resp
+    
+                                        m.redraw()
+                                    }
+                                }
+                            }
+                        })
+                    ])
                 )
             )
         }
