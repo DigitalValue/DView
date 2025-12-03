@@ -29,8 +29,8 @@ function FormLabel(){
         view:(vnode)=>{
             let { required, info} = vnode.attrs
 
-            if(config.formLabel && typeof config.formLabel == 'object'){
-                Object.assign(labelStyle, config.formLabel)
+            if( typeof config.form?.formLabel == 'object'){
+                Object.assign(labelStyle, config.form.formLabel)
             }
             
             return [
@@ -53,9 +53,9 @@ function FormLabel(){
 // estilos básicos comunes, se pueden sobreescribir desde config (falta programar)
 let baseStyle = {
     lineHeight: '1.21428571em',
-    fontSize: '1em',
+    fontSize: '1rem',
     background: '#fff',
-    padding: '.67857143em 1em',
+    padding: '.67857143rem 1rem',
     borderRadius: '.28571429rem',
     border: '1px solid #ccc',
     color: 'rgba(0, 0, 0, .87)',
@@ -63,7 +63,7 @@ let baseStyle = {
 
 
 let focusedStyle = {
-    border: '1.2px solid grey',
+    outline: '-webkit-focus-ring-color auto 1px',
     boxShadow: '0 0 0 0 transparent inset, 0 0 0 0 transparent',
 }
 
@@ -279,39 +279,98 @@ function Dropdown(){
     }
 }
 
-
+/*
+* 
+* input que solo se utiliza para fechas en formato yyyy/mm/dd
+*
+*/
 function DateSelector() {
-    let open = false;
+    
+    let year = '';
+    let month = '';
+    let day = '';
+    let focused = false;
+
+    let writing = '';
 
     return {
         view: (vnode) => {
-            let { data, name, label, onchange} = vnode.attrs
+            let { data, name, label, onchange, required} = vnode.attrs
 
             return [
-                m(FlexCol,
-                    m(FormLabel, label),
+                m(FlexCol,{width:'100%'},
+                    m(FormLabel,{required}, label),
 
                     m(Tappable, {
+                        clickout:(e)=> {
+                            if(!focused) return
+
+                            document.getElementById('date-input').blur()
+                            focused = false
+                            m.redraw()
+                        },
                         onclick:(e)=> {
-                            open = !open
+                            e.stopPropagation()
+                            // how can i focus the hidden input here??
+                            if(focused){
+                                focused = false
+                                document.getElementById('date-input').blur()
+                            } else {
+                                focused = true
+                                document.getElementById('date-input').focus()
+                            }
                         },
                         style: {
                             ...baseStyle,
+                            ...focused && focusedStyle,
                             position: 'relative',
                             cursor: 'pointer',
                         }
                     },  
                         m(FlexRow, { justifyContent:'space-between', alignItems:'center'},
-                            m(Text,{
-                                maxWidth:'80%',
-                                overflow:'hidden',
-                                textOverflow:'ellipsis',
-                                whiteSpace:'nowrap',
-                                color: data && name && data[name] ? 'black' : 'grey',
-                            },  
-                                data && name && data[name] ? new Date(data[name]).toDateString() :
-                                "Selecciona fecha"
-                            ),     
+                            // hidden input 
+                            m("input", {
+                                style: {
+                                    maxWidth: '80%',
+                                    overflow:'hidden',
+                                    textOverflow:'ellipsis',
+                                    border:'none',
+                                    outline:'none',
+                                    whiteSpace:'nowrap',
+                                    userSelect:'none',
+                                    margin: 0,
+                                    //fontSize:'1.4rem',
+                                    color: data && name && data[name] ? 'black' : 'grey',
+                                },
+                                id: 'date-input',
+                                placeholder: 'yyyy/mm/dd',
+                                type: 'text',
+                                maxlength: 10,
+                                value: (year ? `${year}${month ? '/'+ month : ''}${day ? '/'+ day : ''}` : ''),
+                                oninput:(e)=>  {
+                                    let val = e.target.value.replace(/[^0-9]/g, '')
+                                    
+                                    year = val.slice(0,4)
+                                    month = val.slice(4,6)
+
+                                    day = val.slice(6,8)
+
+                                    if(data && name){
+                                        data[name] = `${year}/${month}${day ? '/'+ day : ''}`
+                                        console.log('DATA DATE', data[name])
+                                    }
+                                },
+                                /*
+                                onchange:(e)=> {
+                                    if(data && name) {
+                                        data[name] = `${year}/${month}/${day}`
+                                    }
+                                }*/
+                            }), 
+                            
+                            year && focused ? 
+                            m("span", {style:"position:absolute; bottom:-20px;font-size:0.9em; color:grey;"} , 'yyyy/mm/dd'): null,
+   
 
                             m(Icon, {
                                 icon: 'calendar_today',
@@ -319,51 +378,11 @@ function DateSelector() {
                             })
                         ),
 
-                        open ? 
-                        m(Div, {
-                            position: 'absolute',
-                            left:'0px',
-                            top:'100%',
-                            right: '0px',
-                            boxShadow: '0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15)',
-                            background:'#fff',
-                            zIndex:1000,
-                            marginTop:'0.2em',
-                            padding:'1em',
-                        },
-                            m(DatePicker)
-
-                        ): null,
+                        
                     )
                 )
             ]
         }
-    }
-
-
-    function DatePicker(){ 
-
-        let view = 'year' // days, month, years
-
-        let selectedDate = new Date();
-
-        return { 
-            view: (vnode)=> {
-                return m(FlexCol,
-                    m(Text, "Date Picker Placeholder"),
-
-                    view == 'year' ? 
-                    m(Button, {
-                        onclick:()=> view = 'months'
-                    }, "Go to months view")
-                    : null
-
-
-                        
-                )
-            }
-        }
-
     }
 }
 
@@ -374,21 +393,29 @@ function HtmlDropdown() {
 
     return {
         view: (vnode) => {
-            let { data, name, label, onchange} = vnode.attrs
+            let { data, name, label, onchange, required} = vnode.attrs
 
             return [
-                m(FlexCol,
-                    m(FormLabel, label),
+                m(FlexCol,{width:'100%'},
+                    m(FormLabel,{required}, label),
 
                     m(Tappable, {
                         style: {
+                            /*
                              ...(open 
                             ? {
                                 borderBottomLeftRadius:'0em',
                                 borderBottomRightRadius:'0em',
-                            } : {}),
+                            } : {}),*/
                             ...baseStyle,
+                            ...open && focusedStyle,
                             position: 'relative'
+                        },
+                        clickout:(e)=> {
+                            if(open){
+                                open = false
+                                m.redraw()
+                            }
                         },
                         onclick:(e)=> open = !open
                     },
@@ -426,6 +453,7 @@ function HtmlDropdown() {
                                 style: {
                                     padding: '0.5em 1em',
                                     cursor: 'pointer',
+                                    ...config.form?.dropdown?.option
                                 },
                                 hover: {
                                     background: '#f0f0f0'
@@ -444,7 +472,7 @@ function HtmlDropdown() {
                                         
                                     open = false
                                 }
-                            }, m(SmallText, o.label || o))
+                            }, m(Text, o.label || o))
                         ))
                         : null
                 
@@ -456,8 +484,6 @@ function HtmlDropdown() {
         }
     }
 }
-
-
 
 
 function Switch() {
