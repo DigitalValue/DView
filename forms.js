@@ -117,6 +117,7 @@ function Input(){
                         rows:rows,
                         style:  {
                             ...(config.form?.baseStyle),
+                            fontFamily: config.fontFamily,
                             //...(config.fonts?.default || config.defaultFont || {}),
                             ...(vnode.attrs.style || {})
                         },
