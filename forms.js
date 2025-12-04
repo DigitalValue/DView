@@ -13,9 +13,10 @@ export {
 
 
 
+
 // repensar si añadir localize a estas funciones !!
 function FormLabel(){
-    let labelStyle = {
+    let style = {
         fontWeight:'normal',
         display: 'block',
         color: 'black',
@@ -25,20 +26,20 @@ function FormLabel(){
         whiteSpace: 'normal',
     }
 
-
     return {
         view:(vnode)=>{
             let { required, info} = vnode.attrs
 
-            if( typeof config.form?.formLabel == 'object'){
-                Object.assign(labelStyle, config.form.formLabel)
-            }
-            
             return [
                 m(FlexRow,
-                    // añadido typeof en caso de que se pase la string con es/va
-                    m("label",{ style:labelStyle }, typeof vnode.children?.[0] == 'object' ? null : vnode.children ),
-                    required ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*'): null,
+                    // label debería ser Text ??
+                    m("label", { style:config.form?.formLabel || style }, 
+                        typeof vnode.children?.[0] == 'object' ? null : vnode.children 
+                    ),
+                    
+                    required 
+                    ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*') 
+                    : null,
 
                     info 
                     ? m(InfoTooltip,{text:info})
@@ -48,24 +49,6 @@ function FormLabel(){
             ]
         }
     }
-}
-
-
-// estilos básicos comunes, se pueden sobreescribir desde config (falta programar)
-let baseStyle = {
-    lineHeight: '1.21428571em',
-    fontSize: '1rem',
-    background: '#fff',
-    padding: '.67857143rem 1rem',
-    borderRadius: '.28571429rem',
-    border: '1px solid #ccc',
-    color: 'rgba(0, 0, 0, .87)',
-}
-
-
-let focusedStyle = {
-    outline: '-webkit-focus-ring-color auto 1px',
-    boxShadow: '0 0 0 0 transparent inset, 0 0 0 0 transparent',
 }
 
 
@@ -82,7 +65,8 @@ function Checkbox(){
             let {data, name, onchange,label, checked, vertical=false} = vnode.attrs
 
             return [
-                m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row" },
+                m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
+                    
                     m("input",{
                         type:'checkbox',
                         checked: data && name ? data[name] : checked,
@@ -95,9 +79,9 @@ function Checkbox(){
                             onchange ? onchange(e): ''
                         }
                     }),
-                    m(Box,{width:'0.5em'}),
 
-                    m("label", label)
+                   
+                    m(Text, label)
                 )
             ]
         }
@@ -108,11 +92,6 @@ function Checkbox(){
 function Input(){
     
     return {
-        oninit:(vnode)=> {
-            if(config.form && config.form.baseStyle){
-                Object.assign(baseStyle, config.form.baseStyle)
-            }
-        },
         view: (vnode)=>{
             let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info, onkeyup} = vnode.attrs
 
@@ -128,8 +107,8 @@ function Input(){
 
                 m(FlexCol,{ width:'100%'}, // pensar otra manera sin necesidad de meter width: 100%
 
-                    label ? 
-                    [
+                    label 
+                    ? [
                         m(FormLabel,{required: required, info:info}, label),
                     ] : null,
 
@@ -137,7 +116,8 @@ function Input(){
                         readonly: readonly || false,
                         rows:rows,
                         style:  {
-                            ...baseStyle,
+                            ...(config.form?.baseStyle),
+                            //...(config.fonts?.default || config.defaultFont || {}),
                             ...(vnode.attrs.style || {})
                         },
                         oninput:(e)=>{
@@ -348,7 +328,7 @@ function Dropdown(){
 
                     m("select",{
                         style: {
-                            ...baseStyle
+                            ...(config.form?.baseStyle)
                         },
                         onchange:(e)=>{
                             data && name !=undefined ? data[name] = e.target.value: ''
@@ -415,8 +395,8 @@ function DateSelector() {
                             }
                         },
                         style: {
-                            ...baseStyle,
-                            ...focused && focusedStyle,
+                            ...(config.form?.baseStyle),
+                            ...focused && (config.form?.focusStyle || {}),
                             position: 'relative',
                             cursor: 'pointer',
                         }
@@ -435,6 +415,7 @@ function DateSelector() {
                                     margin: 0,
                                     //fontSize:'1.4rem',
                                     color: data && name && data[name] ? 'black' : 'grey',
+                                    //...(config.fonts?.default || config.defaultFont || {}),
                                 },
                                 id: 'date-input',
                                 placeholder: 'yyyy/mm/dd',
@@ -501,8 +482,8 @@ function HtmlDropdown() {
                                 borderBottomLeftRadius:'0em',
                                 borderBottomRightRadius:'0em',
                             } : {}),*/
-                            ...baseStyle,
-                            ...open && focusedStyle,
+                            ...(config.form?.baseStyle),
+                            ...open && (config.form?.focusStyle || {}),
                             position: 'relative'
                         },
                         clickout:(e)=> {
@@ -653,7 +634,7 @@ function IntegerInput(){
 
                     m("div",{
                         style: {
-                            ...baseStyle,
+                            ...(config.form?.baseStyle),
                             ...style
                         }
                     }, 
