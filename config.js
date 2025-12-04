@@ -1,14 +1,27 @@
 
 // fichero de configuración ??
 // idea para configurar diferentes estilos? de momento no se añade !!
-export let config = {
 
+export { config, setConfig }
+
+let config = {
+
+    fontFamily: 'Poppins, Karla, Raleway, Lato, sans-serif',
     h1: {},
     h2: {},
     h3: {},
     p : {},
     button : {
-        
+        // primary : {
+        //     background: '#e8def8'
+        // }
+        // secondary : {
+        //}
+        //
     }
 
+}
+
+function setConfig(newConfig) {
+    Object.assign(config, newConfig)
 }

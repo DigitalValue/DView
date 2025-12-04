@@ -2,7 +2,7 @@
 
 import { config } from "./config.js"
 
-export { H1, H2, H3, Text, SmallText, TinyText }
+export { H1, H2, H3, H4, Text, SmallText, TinyText }
 
 
 
@@ -64,12 +64,27 @@ function H3(){
     }
 }
 
+function H4(){
+    return {
+        view:(vnode)=>{
+            return m("h4",{
+                style: {
+                    marginTop: 0,
+                    marginBottom: 0,
+                    fontFamily: config.fontFamily,
+                    ...vnode.attrs
+                }
+            }, vnode.children)
+        }
+    }
+}
+
 function Text(){
     return{ 
         view:(vnode)=>{
             return m("p",{
                 style:{
-                    fontSize: '1.1rem',
+                    fontSize: '1rem',
                     lineHeight: '1.4',
                     margin: 0,
                     fontFamily: config.fontFamily,

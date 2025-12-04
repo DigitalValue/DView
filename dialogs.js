@@ -6,7 +6,7 @@ import { H2 } from "./texts.js";
 
 
 export { 
-    alertDialog, confirmDialog, promptDialog, 
+    alertDialog, confirmDialog, promptDialog, openDialog,
     Modal, ModalContent, ModalHeader, ModalFooter 
 }
 
@@ -82,6 +82,7 @@ function alertDialog(options={
     then:()=>{}, 
     multiple:false, 
     fluid:false,
+    size:"tiny",
     dom:(el)=>el // devuelve el elemento
 }){
 
@@ -130,7 +131,7 @@ function alertDialog(options={
                 setTimeout(resolve, 300)
             })
         },
-        view:()=> m(Modal, { size:'tiny' },
+        view:()=> m(Modal, { size: options.size || 'tiny' },
                 types[options.type] || options.title ? 
                 m(ModalHeader,
                     m(Icon,{icon: types[options.type]?.icon, color: types[options.type]?.color }),
@@ -269,6 +270,31 @@ function promptDialog(options={
     })
 }
 
+// Crea un dialogo con un componente custom
+function openDialog(Component, options = {}) {
+    if (!Component) return 
+    
+    var elem = document.createElement("div")
+
+    elem.style = 'position:fixed;inset:0px;z-index:100000'
+    elem.id = Math.random() * 10000 + ''
+
+    document.body.appendChild(elem);
+
+    m.mount(elem, {
+        onremove: ()=> {
+            console.log("ELIMINAR")
+        },
+        view: () => m(Component, {
+            ...(options.attrs ? options.attrs : {}),
+            onCancel: (e) => {
+                m.mount(elem, null)
+                elem.remove()
+            }
+        })
+    })
+}
+
 
 function Modal(){
     let modalStyle = {
@@ -318,7 +344,7 @@ function Modal(){
             return m("div", {
                 style: dimmerStyle
             }, m("div",{
-                    style:modalStyle,
+                    style:{ ...modalStyle, ...vnode.attrs.style },
                     tabindex: -1,
                     oncreate:({dom})=> { 
                         if(vnode.attrs.animate){
@@ -355,7 +381,8 @@ function ModalContent(){
                 style:{
                     padding:'1em',
                     overflowY:'auto',
-                    maxHeight:'50vh'
+                    maxHeight:'50vh',
+                    ...vnode.attrs
                 }
             }, vnode.children)
         }

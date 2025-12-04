@@ -103,7 +103,7 @@ function Table(){
     return {
         view:(vnode)=>{
             return m("table",{
-                style:tableStyle,
+                style:{ ...tableStyle, ...vnode.attrs.style},
             }, 
                 // use rows and
                 vnode.attrs.header ? m(TableHead,  
@@ -208,6 +208,7 @@ function TableCell(){
                 style: {
                     textAlign:'left',
                     padding:'1em',
+                    fontFamily: config.fontFamily,
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -370,7 +371,7 @@ function Button(){
         default: {
             paddingLeft:`1.5em`,
             paddingRight:'1.5em',
-            fontSize:'1.1em',
+            fontSize:'1em',
             minHeight:'40px',
             minWidth:'40px'
         }
@@ -394,6 +395,7 @@ function Button(){
                     userSelect:'none',
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
+                    gap: "5px",
                     ...disabled && {
                         opacity:'0.5',
                         cursor: 'not-allowed',
@@ -410,8 +412,8 @@ function Button(){
                 onmouseup:(e)=> (brightness=100),
             }, 
                 icon ? [
-                    m(Icon,{ icon:icon, size: size || 'small', color: types[type].color || "black" }),
-                    m(Box, { width:'5px' })
+                    m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
+                    // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
             )
@@ -518,6 +520,11 @@ function Label(){
             color: "white",
             border: "1px solid #4b5563"
         },
+        tertiary: {
+            backgroundColor: "#e8e8e8",
+            color: "#00000099",
+            border: "1px solid #e8e8e8",
+        },
         positive: {
             backgroundColor: "#00c853",
             color: "white",
@@ -557,6 +564,9 @@ function Label(){
 
     // follow the fontSizes of H2, Text and SmallText
     let sizes = {
+        'small': {
+            fontSize:'0.6em',
+        },
         'default': {
             fontSize:'0.875em',
         },

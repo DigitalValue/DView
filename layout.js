@@ -44,7 +44,8 @@ function Container(){
 
                 m("div",{
                     class: "container",
-                 }, m(Div,{
+                 }, 
+                    m(Div,{
                         //width: getWidth(),
                         paddingTop:'1em',
                         paddingBottom:'1em',
@@ -525,3 +526,5 @@ function CssStyle(){
         }
     }
 }
+
+
