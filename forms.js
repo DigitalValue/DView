@@ -374,7 +374,7 @@ function DateSelector() {
 
             return [
                 m(FlexCol,{width:'100%'},
-                    m(FormLabel,{required}, label),
+                    m(FormLabel,{ required }, label),
 
                     m(Tappable, {
                         clickout:(e)=> {
@@ -414,6 +414,7 @@ function DateSelector() {
                                     whiteSpace:'nowrap',
                                     userSelect:'none',
                                     margin: 0,
+
                                     //fontSize:'1.4rem',
                                     color: data && name && data[name] ? 'black' : 'grey',
                                     //...(config.fonts?.default || config.defaultFont || {}),
@@ -445,8 +446,7 @@ function DateSelector() {
                             }), 
                             
                             year && focused ? 
-                            m("span", {style:"position:absolute; bottom:-20px;font-size:0.9em; color:grey;"} , 'yyyy/mm/dd'): null,
-   
+                            m(SmallText, {style:{position:'absolute', bottom:'-20px', color:'grey'}} , 'yyyy/mm/dd'): null,
 
                             m(Icon, {
                                 icon: 'calendar_today',

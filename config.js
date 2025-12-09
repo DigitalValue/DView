@@ -63,7 +63,6 @@ let config = {
         formLabel: {
             fontSize: '1em', // misma fontSize que default !! Mantener ratio!!
             lineHeight: '1.21428571em',
-
             fontWeight:'normal',
             display: 'block',
             color: 'black',
