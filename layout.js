@@ -217,6 +217,7 @@ function Tappable(){
 
     function checkclickout(e){
         if (!elem.contains(e.target) ) {
+            e.redraw = true
             clickout()
         }
     }
@@ -232,7 +233,6 @@ function Tappable(){
                         document.body.removeEventListener('click', checkclickout)
                         document.body.addEventListener("click", checkclickout)
                     }
-                    
                 },
                 onremove:(e)=> document.body.removeEventListener('click', checkclickout),
                 onmouseenter:(e)=> {
@@ -494,7 +494,6 @@ function Animate() {
         }
     }
 }
-
 
 
 function CssStyle(){
