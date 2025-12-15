@@ -1,7 +1,7 @@
-import { H2 } from "../widgets.js"
+
 import { config } from "./config.js"
 import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
-import { Text, SmallText } from "./texts.js"
+import { Text, SmallText, H2 } from "./texts.js"
 
 
 export { 
