@@ -1,3 +1,4 @@
+import { H2 } from "../widgets.js"
 import { config } from "./config.js"
 import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
@@ -14,16 +15,23 @@ export {
 
 
 
+// cachea la imagen al mostrarse
 function Img(){
+    let image = new Image()
+
+
     return {
+        oninit: (vnode)=>{
+            image.src = vnode.attrs.src
+        },
         view:(vnode) => {
             return [
                 m("img",{
-                    src: vnode.attrs.src,
+                    src: image.src,
                     id: vnode.attrs.id,
                     style: vnode.attrs.style,
                     onload: vnode.attrs.onload,
-                    alt:vnode.attrs.alt
+                    alt: vnode.attrs.alt
                 })
             ]
         }
@@ -500,9 +508,20 @@ function Message(){
 
     return {
         view:(vnode)=>{
-            return m("div", {
-                style: messageStyle
-            }, vnode.children)
+            return m(Segment,{
+                  type:'secondary',
+                }, 
+                m(FlexRow, {alignItems: 'center', gap:'1em'},
+                    m(Icon, {icon:'info', size:'mini'}),
+
+                    vnode.attrs.header || vnode.attrs.message ? 
+                    m(FlexCol, {},
+                        vnode.attrs.header && m(H2, {marginBottom:'0.5em'}, vnode.attrs.header),
+                        vnode.attrs.message && m(SmallText, {}, vnode.attrs.message)
+                    ):
+                    m(SmallText, vnode.children )
+                )
+            )
         }
     }
 }

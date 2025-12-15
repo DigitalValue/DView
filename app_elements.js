@@ -24,17 +24,24 @@ function AppBar() {
                 ...config.app?.appBar,
                 ...vnode.attrs
             }, 
+
                 vnode.attrs.leading ? 
                 m(Tappable, {
-                    onclick: vnode.attrs.leading.onclick
+                    onclick: ()=>{
+                      if(vnode.attrs.leading?.onclick){
+                        vnode.attrs.leading.onclick()
+                      } else {
+                        window.history.back();  
+                      }
+                    }
                 },
                     m(LucideIcon, {
-                        icon: vnode.attrs.leading.icon,
+                        icon: vnode.attrs.leading.icon || 'move-left',
                         width: '24',
                         height: '24',
                         style: {
                             display: 'block',
-                            color: config.app?.appBar?.color || '#000000',
+                            color: config.app?.appBar?.color || 'white',
                             ...vnode.attrs.leading.style
                         }
                     })
@@ -121,31 +128,32 @@ function LucideIcon(){
 
     return {
         oninit: (vnode) => {
-            // check if lucide is loaded
-            if(!window.lucide){
-                console.log('loading lucide script...')
-                loadScript(
-                    'https://unpkg.com/lucide@latest'
-                )
-            } else {
-                isLoaded = true;
-            }
+          // check if lucide is loaded
+          if(!window.lucide){
+            console.log('loading lucide script...')
+            loadScript(
+                'https://unpkg.com/lucide@latest'
+            )
+          } else {
+            isLoaded = true;
+          }
         },
         oncreate: (vnode) => {
-            if(window.lucide){
-                window.lucide.createIcons();
-            }
+          if(window.lucide){
+            window.lucide.createIcons();
+          }
         },
         view: (vnode) => {
-            return m("i", {
-                "data-lucide": vnode.attrs.icon,
-                width: vnode.attrs.width || 24,
-                height: vnode.attrs.height || 24,
-                style: {
-                    display: 'inline-block',
-                    ...vnode.attrs.style
-                }
-            })
+          return m("i", {
+            "data-lucide": vnode.attrs.icon,
+            width: vnode.attrs.width || 24,
+            height: vnode.attrs.height || 24,
+            onclick: vnode.attrs.onclick,
+            style: {
+              display: 'inline-block',
+              ...vnode.attrs.style
+            }
+          })
         }
     }
 }

@@ -279,6 +279,10 @@ function openDialog(Component, options = {}) {
     elem.style = 'position:fixed;inset:0px;z-index:100000'
     elem.id = Math.random() * 10000 + ''
 
+    let attrs = options.attrs || {}
+    
+
+
     document.body.appendChild(elem);
 
     m.mount(elem, {
@@ -287,7 +291,11 @@ function openDialog(Component, options = {}) {
         },
         view: () => m(Component, {
             ...(options.attrs ? options.attrs : {}),
-            onCancel: (e) => {
+            onCancel: (e) => { // cambiar esto por close en algún momento !!
+                m.mount(elem, null)
+                elem.remove()
+            },
+            close: (e) => {
                 m.mount(elem, null)
                 elem.remove()
             }
