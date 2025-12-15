@@ -360,7 +360,7 @@ function Modal(){
                     }
                 },  
                     vnode.attrs.header ?
-                    m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey', padding:'1em', alignItems:'center'},
+                    m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey',  alignItems:'center'},
                         m(H2,{marginBottom:0}, vnode.attrs.header),
 
                         m(Icon,{size:'large', style:"cursor:pointer", icon:'cancel', onclick: vnode.attrs.close})
@@ -394,7 +394,7 @@ function ModalHeader(){
 
     return {
         view:(vnode)=>{
-            return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', fontWeight:'bold', ...vnode.attrs},
+            return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', ...vnode.attrs},
                 vnode.children
             )
         }

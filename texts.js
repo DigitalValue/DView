@@ -18,13 +18,10 @@ function H1(){
         view:(vnode)=>{
             return m("h1",{
                 style: {
-                    fontSize:'2.5rem',
-                    lineHeight:'2.25',
                     fontFamily: config.fontFamily,
-                    //fontWeight:'lighter', 
-                    marginTop: 0,
-                    marginBottom:0,
-                    ...vnode.attrs?.style || vnode.attrs
+                    margin:0,
+                    ...(config.fonts.h1 || {}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 },
                 //class: vnode.attrs.class
             }, vnode.children)
@@ -37,12 +34,10 @@ function H2(){
         view:(vnode)=>{
             return m("h2",{
                 style: {
-                    fontSize: '1.5rem',
-                    lineHeight:'1.5',
-                    marginBottom:0,
                     fontFamily: config.fontFamily,
-                    marginTop:0,
-                    ...vnode.attrs
+                    margin:0,
+                    ...(config.fonts.h2 || {}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 }
             }, vnode.children)
         }
@@ -54,10 +49,10 @@ function H3(){
         view:(vnode)=>{
             return m("h3",{
                 style: {
-                    marginTop: 0,
-                    marginBottom: 0,
                     fontFamily: config.fontFamily,
-                    ...vnode.attrs
+                    margin:0,
+                    ...(config.fonts.h3 || {}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 }
             }, vnode.children)
         }
@@ -69,10 +64,10 @@ function H4(){
         view:(vnode)=>{
             return m("h4",{
                 style: {
-                    marginTop: 0,
-                    marginBottom: 0,
                     fontFamily: config.fontFamily,
-                    ...vnode.attrs
+                    margin: 0,
+                    ...(config.fonts.h4 || {}),
+                    ...(vnode.attrs?.style || vnode.attrs)
                 }
             }, vnode.children)
         }
@@ -83,12 +78,10 @@ function Text(){
     return{ 
         view:(vnode)=>{
             return m("p",{
-                style:{
-                    fontSize: '1rem',
-                    lineHeight: '1.4',
-                    margin: 0,
+                style: {
                     fontFamily: config.fontFamily,
-                    ...vnode.attrs
+                    ...(config.fonts.default || config.defaultFont || {}),
+                    ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
         }
@@ -100,11 +93,9 @@ function SmallText(){
         view:(vnode)=>{
             return m("p",{
                 style: {
-                    fontSize: "0.875rem",
-                    lineHeight: "1.25rem",
-                    margin: 0,
                     fontFamily: config.fontFamily,
-                    ...vnode.attrs
+                    ...(config.fonts.small || config.smallFont || {}),
+                    ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
         }
