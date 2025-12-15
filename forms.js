@@ -420,7 +420,7 @@ function DateSelector() {
                                     //...(config.fonts?.default || config.defaultFont || {}),
                                 },
                                 id: 'date-input',
-                                placeholder: 'yyyy/mm/dd',
+                                placeholder: 'aaaa/mm/dd',
                                 type: 'text',
                                 maxlength: 10,
                                 value: (year ? `${year}${month ? '/'+ month : ''}${day ? '/'+ day : ''}` : ''),
@@ -446,7 +446,7 @@ function DateSelector() {
                             }), 
                             
                             year && focused ? 
-                            m(SmallText, {style:{position:'absolute', bottom:'-20px', color:'grey'}} , 'yyyy/mm/dd'): null,
+                            m(SmallText, {style:{position:'absolute', bottom:'-20px', color:'grey'}} , 'aaaa/mm/dd'): null,
 
                             m(Icon, {
                                 icon: 'calendar_today',
