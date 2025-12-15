@@ -632,7 +632,6 @@ function IntegerInput(){
                 m(FlexCol,
                     label ? m(FormLabel, {required:required}, label) : null,
 
-
                     m("div",{
                         style: {
                             ...(config.form?.baseStyle),
