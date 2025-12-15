@@ -2,7 +2,7 @@ import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 import { Icon, Button } from './elements.js'
 import { config } from "./config.js"
-import { localize, translateSALT } from "../util.js"
+import { localize, translateSALT } from "./util.js"
 
 
 export {
@@ -33,7 +33,12 @@ function FormLabel(){
             return [
                 m(FlexRow,
                     // label debería ser Text ??
-                    m("label", { style:config.form?.formLabel || style }, 
+                    m("label", {
+                        style: {
+                            ...(config.form?.formLabel || style),
+                            fontFamily: config.fontFamily
+                        }
+                    }, 
                         typeof vnode.children?.[0] == 'object' ? null : vnode.children 
                     ),
                     
@@ -98,13 +103,6 @@ function Input(){
             return [
 
                 // TO DO: editar el estilo de focus
-                /*m("style", `
-                    input, textarea > :focus, textarea:focus {
-                        border: ${focusedStyle.border} !important;
-                        box-shadow: ${focusedStyle.boxShadow} !important;
-                    }    
-                `),*/
-
                 m(FlexCol,{ width:'100%'}, // pensar otra manera sin necesidad de meter width: 100%
 
                     label 
@@ -116,8 +114,8 @@ function Input(){
                         readonly: readonly || false,
                         rows:rows,
                         style:  {
-                            ...(config.form?.baseStyle),
                             fontFamily: config.fontFamily,
+                            ...(config.form?.baseStyle),
                             //...(config.fonts?.default || config.defaultFont || {}),
                             ...(vnode.attrs.style || {})
                         },
@@ -127,11 +125,7 @@ function Input(){
                             oninput ? oninput(e): ''
                             data && name ? data[name] = e.target.value : ''
                         },
-                        /*
-                        onfocus:(e)=> {
-                            e.target.style.border = focusedStyle.border
-                            e.target.style.boxShadow = focusedStyle.boxShadow
-                        },*/
+
                         ...( value ? {value:value}:{} ),
                         ...( data && data[name] ? {value:data[name]}:{} ),
                         ...type && type != 'textarea' ? {type:type}: {},
@@ -141,6 +135,18 @@ function Input(){
                         ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
                         ...title ? {title: title} : {},
                         ...placeholder ? {placeholder: placeholder} : {},
+                        ...(Object.entries(config.form?.focusStyle || {}).length && {
+                            onfocus:(e)=>{
+                                Object.entries(config.form.focusStyle).forEach(([key, value])=>{
+                                    e.target.style[key] = value
+                                })
+                            },
+                            onblur:(e)=>{
+                                Object.entries(config.form.baseStyle).forEach(([key, value])=>{
+                                    e.target.style[key] = value
+                                })
+                            }
+                        }),
                         ...onkeyup ? {onkeyup: onkeyup} : {},
                         onchange:(e)=>{
                             if(onchange) onchange(e)

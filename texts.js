@@ -19,6 +19,7 @@ function H1(){
             return m("h1",{
                 style: {
                     fontFamily: config.fontFamily,
+                    margin:0,
                     ...(config.fonts.h1 || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 },
@@ -34,6 +35,7 @@ function H2(){
             return m("h2",{
                 style: {
                     fontFamily: config.fontFamily,
+                    margin:0,
                     ...(config.fonts.h2 || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 }
@@ -48,6 +50,7 @@ function H3(){
             return m("h3",{
                 style: {
                     fontFamily: config.fontFamily,
+                    margin:0,
                     ...(config.fonts.h3 || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 }
@@ -62,6 +65,7 @@ function H4(){
             return m("h4",{
                 style: {
                     fontFamily: config.fontFamily,
+                    margin: 0,
                     ...(config.fonts.h4 || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 }

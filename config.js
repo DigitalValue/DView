@@ -71,11 +71,19 @@ let config = {
         }
     },
 
-    button : {
-        // primary : {
-        //     background: '#e8def8'
-        // }
+    elements: {
+        segment: {
+
+        },
+        button: {
+            // primary : {
+            //     background: '#e8def8'
+            // }        
+        }
+
     },
+
+    
     
     app: {
         appBar: {
@@ -87,8 +95,6 @@ let config = {
 }
 
 function setConfig(newConfig) {
-
-    console.log('Setting new config for dview components', newConfig)
 
     mergeDeep(config, newConfig)
    

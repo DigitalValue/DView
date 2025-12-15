@@ -1,4 +1,3 @@
-
 import { config } from "./config.js"
 import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
 import { Text, SmallText, H2 } from "./texts.js"
@@ -84,7 +83,10 @@ function Segment(){
                     ...types[type] || types.primary,
                     ...(vnode.attrs?.basic && {border: 'none'}),
                     ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
-                    ...(vnode.attrs?.raised && { boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'}),
+                    ...(vnode.attrs?.raised && { 
+                        boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'
+                    }),
+                    ...(config.elements?.segment || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 },
             vnode.children)
@@ -324,7 +326,7 @@ function RippleEffect() {
 function Button(){
 
     let types = {
-        primary: config.button.primary || {
+        primary: config.button?.primary || {
             color: 'white',
             //border: '1px solid white',
             background: '#1b1c1d'
@@ -513,7 +515,7 @@ function Message(){
 
                     vnode.attrs.header || vnode.attrs.message ? 
                     m(FlexCol, {},
-                        vnode.attrs.header && m(H2, {marginBottom:'0.5em'}, vnode.attrs.header),
+                        vnode.attrs.header && m(Text, {marginBottom:'0.5em', fontWeight:'bold'}, vnode.attrs.header),
                         vnode.attrs.message && m(SmallText, {}, vnode.attrs.message)
                     ):
                     m(SmallText, vnode.children )

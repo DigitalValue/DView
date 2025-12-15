@@ -40,6 +40,7 @@ async function translateSALT(text, mode = "spa-cat_valencia") {
     return "ERROR AL TRADUCIR"
 }
 
+// 
 function localize(localized, lang = null) {
     if (!localized) return '';
     if (typeof localized == 'string' || typeof localized == 'number') return localized
