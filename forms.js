@@ -8,7 +8,7 @@ import { localize, translateSALT } from "../util.js"
 export {
     FormLabel, Input, TranslationInput, Dropdown,
     IntegerInput, Switch, InfoTooltip, Checkbox,
-    HtmlDropdown, DateSelector
+    HtmlIntegerInput, HtmlDropdown, DateSelector
 }
 
 
@@ -122,6 +122,8 @@ function Input(){
                             ...(vnode.attrs.style || {})
                         },
                         oninput:(e)=>{
+                            console.log
+
                             oninput ? oninput(e): ''
                             data && name ? data[name] = e.target.value : ''
                         },
@@ -374,7 +376,7 @@ function DateSelector() {
 
             return [
                 m(FlexCol,{width:'100%'},
-                    m(FormLabel,{required}, label),
+                    m(FormLabel,{ required }, label),
 
                     m(Tappable, {
                         clickout:(e)=> {
@@ -414,6 +416,7 @@ function DateSelector() {
                                     whiteSpace:'nowrap',
                                     userSelect:'none',
                                     margin: 0,
+
                                     //fontSize:'1.4rem',
                                     color: data && name && data[name] ? 'black' : 'grey',
                                     //...(config.fonts?.default || config.defaultFont || {}),
@@ -445,8 +448,7 @@ function DateSelector() {
                             }), 
                             
                             year && focused ? 
-                            m("span", {style:"position:absolute; bottom:-20px;font-size:0.9em; color:grey;"} , 'yyyy/mm/dd'): null,
-   
+                            m(SmallText, {style:{position:'absolute', bottom:'-20px', color:'grey'}} , 'yyyy/mm/dd'): null,
 
                             m(Icon, {
                                 icon: 'calendar_today',
@@ -675,6 +677,76 @@ function IntegerInput(){
                                     
                                     }
                                 })
+                            )
+                        )
+                    )
+                )
+            ]
+        }
+    }
+}
+
+
+function HtmlIntegerInput(){ 
+
+    let inputStyle = `line-height: 1.21428571em;
+        padding: .67857143em 1em;
+        font-size: 1em;
+        background: #fff;
+        border: 1px solid rgba(34, 36, 38, .15);
+        color: rgba(0, 0, 0, .87);
+        border-radius: .28571429rem;
+        -webkit-box-shadow: 0 0 0 0 transparent inset;
+        box-shadow: 0 0 0 0 transparent inset;`
+
+    let on = false;
+
+    return {
+        view: (vnode)=>{
+            let { data, name, max, min=0, label, onchange, jump=1, required } = vnode.attrs
+            
+
+            console.log('redraw', data[name], data && name && data[name])
+
+            return [
+                m(FlexCol,
+                    label ? m(FormLabel, {required:required}, label) : null,
+
+
+                    m("div",{style: inputStyle}, 
+                        m(FlexRow,{alignItems:'center',justifyContent:'space-between'},
+                            m("div",
+                                data && name != undefined && data[name] != undefined ? data[name]: 0,
+                                // se le puede pasar elementos dentro
+                                vnode.children 
+                            ),
+
+                            m(FlexRow,{gap:'1em'},
+                                m(Tappable,{
+                                    icon:'remove',
+                                    color: data[name] && data[name] > 0 && data[name]>min ? 'black' : 'lightgrey',
+                                    onclick:(e)=>{
+                                        if((min == undefined || data[name]>min) &&  data[name] && data[name] > 0){
+                                            data[name] -= jump
+                                            
+                                            if(onchange) onchange(-1)
+                                        }
+                                    }
+                                }, m(Text,{fontSize:'1.3rem'}, '-') ),
+
+                                m(Tappable,{
+                                    icon:'add',
+                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey': 'black',
+                                    onclick:(e)=>{
+                                        if(!data[name]) data[name] = 0
+
+                                        if(max == undefined || data[name] < max){
+                                            data[name] += Number(jump)
+                                            console.log('data[name]', data[name])
+                                            if(onchange) onchange(1)
+                                        }
+                                    }
+                                }, m(Text,{fontSize:'1.3rem'}, '+'))
                             )
                         )
                     )
