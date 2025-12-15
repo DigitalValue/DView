@@ -142,8 +142,8 @@ function Input(){
                                 })
                             },
                             onblur:(e)=>{
-                                Object.entries(config.form.baseStyle).forEach(([key, value])=>{
-                                    e.target.style[key] = value
+                                Object.entries(config.form.focusStyle).forEach(([key, value])=>{
+                                    e.target.style[key] = config.form.baseStyle[key] || ""
                                 })
                             }
                         }),
@@ -188,7 +188,7 @@ function TranslationInput(){
 
         },
         view:(vnode)=>{
-            let {data, name, label, required, type, rows, info, onfocusout } = vnode.attrs
+            let {data, name, label, required, type, rows, info, onfocusout, onchange } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
@@ -210,7 +210,8 @@ function TranslationInput(){
                             if (!e.target.value.length && typeof value == "object") delete data[name][languages[selectedlang]]
                         },
                         type: type,
-                        onfocusout: onfocusout
+                        onfocusout: onfocusout,
+                        onchange: onchange
                     }),
                     
                     m(Button,{
