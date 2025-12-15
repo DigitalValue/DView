@@ -33,7 +33,12 @@ function FormLabel(){
             return [
                 m(FlexRow,
                     // label debería ser Text ??
-                    m("label", { style:config.form?.formLabel || style }, 
+                    m("label", {
+                        style: {
+                            ...(config.form?.formLabel || style),
+                            fontFamily: config.fontFamily
+                        }
+                    }, 
                         typeof vnode.children?.[0] == 'object' ? null : vnode.children 
                     ),
                     
@@ -94,12 +99,6 @@ function Input(){
     return {
         view: (vnode)=>{
             let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info, onkeyup} = vnode.attrs
-
-            console.log('config focus', config.form,
-
-                
-
-            )
 
             return [
 
