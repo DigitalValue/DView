@@ -381,7 +381,17 @@ function Animate() {
         'opacity': {
             from: { opacity: 0 },
             to: { opacity: 1 }
-        }
+        },
+
+        'slideDown': {
+            from: {
+                maxHeight: '0px',
+                overflow:'hidden'
+            },
+            to: {
+                maxHeight: '1000px'
+            },
+        },
     }
 
     let observer;
