@@ -47,7 +47,7 @@ function localize(localized, lang = null) {
     if (typeof localized != 'object') return 'ERR translation:'+typeof localized; //???
     if (Object.entries(localized).length === 0) return  '';  //???
 
-    if (lang===null && Page && Page.lang) lang=Page.lang
+    //if (lang===null && Page && Page.lang) lang=Page.lang
 
     if (lang === 'va' && !localized[lang]) lang = 'ca'; // va === ca
     else if (lang === 'ca' && !localized[lang]) lang = 'va'; // va === ca
