@@ -9,7 +9,7 @@ export {
     Sidebar, Label, 
     Message,  Card,  Checkbox, Spinner, 
     BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell
+    Table, TableHead, TableBody, TableRow, TableCell, TableFooter
 }
 
 
@@ -74,7 +74,7 @@ function Segment(){
 
     return {
         view:(vnode)=>{
-            let {type='default'} = vnode.attrs || {}
+            let {type='default'} = vnode.attrs || {}
 
             return m(Div,{
                     padding:'1rem',
@@ -104,6 +104,7 @@ function Table(){
         boxShadow: "none",
         borderRadius: "0.28571429rem",
         textAlign: "left",
+        tableLayout: "auto",
         color: "rgba(0,0,0,.87)",
         borderCollapse: "separate",
         borderSpacing: "0",
@@ -113,7 +114,11 @@ function Table(){
     return {
         view:(vnode)=>{
             return m("table",{
-                style:{ ...tableStyle, ...vnode.attrs.style},
+                style:{ 
+                    ...tableStyle, 
+                    ...config.elements?.table?.table || {},
+                    ...vnode.attrs.style
+                },
             }, 
                 // use rows and
                 vnode.attrs.header ? m(TableHead,  
@@ -154,6 +159,7 @@ function TableHead(){
         cursor: "auto",
         background: "#24303f",
         textAlign: "inherit",
+        lineHeight:2,
         color: "white",
         borderTopRadius:'1em',
         verticalAlign: "middle",
@@ -172,7 +178,11 @@ function TableHead(){
     return {
         view:(vnode)=>{
             return m("thead",{
-                style: style
+                style: {
+                    ...style,
+                    ...config.elements?.table?.head || {},
+                    ...vnode.attrs.style
+                }
             }, vnode.children
             )
         }
@@ -185,6 +195,20 @@ function TableBody(){
         view:(vnode)=>{
             return m("tbody",{
                 style:  {
+                    ...config.elements?.table?.body || {},
+                    ...vnode.attrs
+                }
+            }, vnode.children)
+        }
+    }
+}
+
+function TableFooter(){
+    return {
+        view: (vnode) => {
+            return m("tfoot", {
+                style: {
+                    ...config.elements?.table?.footer || {},
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -215,10 +239,12 @@ function TableCell(){
 
             return m(header ? "th" : "td",{
                 colspan: vnode.attrs.colspan,
+                onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
                 style: {
                     textAlign:'left',
                     padding:'1em',
                     fontFamily: config.fontFamily,
+                    ...config.elements?.table?.cell || {},
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -491,34 +517,55 @@ function Span(){
 
 function Message(){
 
-    let messageStyle = {
-        position: "relative",
-        minHeight: "1em",
-        margin: "0 0",
-        background: "#f8ffff",
-        padding: "1em 1.5em",
-        lineHeight: "1.4285em",
-        color: "#276f86",
-        borderRadius: "1em",
-        boxShadow: "0 0 0 2px #a9d5de inset,0 0 0 0 transparent"
+    let types = {
+        'error': {
+            background:'#fef2f2',
+            color:'#B91C1C',
+        },
+        'info': {
+            background:'white',
+            color:'black',
+        }
     }
+    
 
     // set different types 
 
     return {
         view:(vnode)=>{
+            let { type='info' } = vnode.attrs
+
             return m(Segment,{
+                    style: {
+                        ...types[type] || {}
+                    },
                   type:'secondary',
                 }, 
                 m(FlexRow, {alignItems: 'center', gap:'1em'},
-                    m(Icon, {icon:'info', size:'mini'}),
+                    m(Icon, {
+                        icon:type=='error' ? 'error':'info', 
+                        size: 'small', 
+                        color: type == 'error' ? 'red': 'black'
+                    }),
 
                     vnode.attrs.header || vnode.attrs.message ? 
-                    m(FlexCol, {},
-                        vnode.attrs.header && m(Text, {marginBottom:'0.5em', fontWeight:'bold'}, vnode.attrs.header),
-                        vnode.attrs.message && m(SmallText, {}, vnode.attrs.message)
-                    ):
-                    m(SmallText, vnode.children )
+                    m(FlexCol, 
+                        
+                        vnode.attrs.header && m(Text, {
+                            marginBottom:'0.5em', 
+                            fontWeight:'bold', 
+                            
+                        }, vnode.attrs.header),
+
+                        vnode.attrs.message && 
+                        m(Text, {
+                            //color: type == 'error' ? '#7f1d1d': 'black'
+                        }, vnode.attrs.message)
+
+                    ) :
+                    m(Text,{
+                        //color: type == 'error' ? '#7f1d1d': 'black'
+                    }, vnode.children )
                 )
             )
         }
@@ -550,14 +597,14 @@ function Label(){
             border: "1px solid #e8e8e8",
         },
         positive: {
-            backgroundColor: "#00c853",
-            color: "white",
-            border: "1px solid #00c853"
+            backgroundColor: "#dcfce7",
+            color: "#166534",
+            border: "1px solid #dcfce7"
         },
         negative: {
-            backgroundColor: "#db2828",
-            color: "white",
-            border: "1px solid #db2828"
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            border: "1px solid #fee2e2"
         },
         blue: {
             backgroundColor: "#2185d0",
@@ -612,7 +659,7 @@ function Label(){
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        
+                        width:'fit-content',
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
