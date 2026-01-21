@@ -1,7 +1,7 @@
 import { Button, Icon } from "./elements.js";
 import { Input } from "./forms.js";
 import { Box, Div, FlexRow } from "./layout.js";
-import { H2 } from "./texts.js";
+import { H2, Text } from "./texts.js";
 
 
 
@@ -49,7 +49,7 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
       view:()=>  m(Modal, {size: options.size || 'tiny'},
               m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
               
-              m(Div,{padding:'1em'}, m.trust(options.message)),
+              m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
               
               m(ModalFooter,
 
@@ -139,7 +139,7 @@ function alertDialog(options={
                     m(H2,{marginTop:0}, options.title ||  types[options.type]?.text )
                 ):  null,
 
-                m(ModalContent, m(Div,{padding:'1em'}, m.trust(options.message))),
+                m(ModalContent, m(Div,{padding:'1em'}, m(Text, m.trust(options.message)))),
 
                 m(ModalFooter,
                     m(Button, {
@@ -315,6 +315,7 @@ function Modal(){
         borderRadius:'1em',
         left:'50%',
         top:'50%',
+        maxWidth:'90%',
         transform:'translate(-50%,-50%)',
         zIndex:1001,
         display:'flex',
@@ -390,7 +391,7 @@ function ModalContent(){
                     padding:'1em',
                     overflowY:'auto',
                     maxHeight:'50vh',
-                    ...vnode.attrs
+                    ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
         }
