@@ -372,7 +372,7 @@ function Modal(){
                     m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey',  alignItems:'center'},
                         m(H2,{marginBottom:0}, vnode.attrs.header),
 
-                        m(Icon,{size:'large', style:"cursor:pointer", icon:'cancel', onclick: vnode.attrs.close})
+                        m(Icon,{size:'', style:"cursor:pointer", icon:'cancel', color: "#db2828", onclick: vnode.attrs.close})
                     ) : null,
 
                     vnode.children
