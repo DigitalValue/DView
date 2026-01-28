@@ -98,7 +98,7 @@ function Input(){
     
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, placeholder, value, info, onkeyup} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, disabled, placeholder, value, info, onkeyup} = vnode.attrs
 
             return [
 
@@ -135,6 +135,7 @@ function Input(){
                         ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
                         ...title ? {title: title} : {},
                         ...placeholder ? {placeholder: placeholder} : {},
+                        disabled: disabled || false,
                         ...(Object.entries(config.form?.focusStyle || {}).length && {
                             onfocus:(e)=>{
                                 Object.entries(config.form.focusStyle).forEach(([key, value])=>{
