@@ -67,13 +67,14 @@ function Checkbox(){
 
     return {
         view:(vnode)=>{
-            let {data, name, onchange,label, checked, vertical=false} = vnode.attrs
+            let {data, name, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
                 m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
                     
                     m("input",{
                         type:'checkbox',
+                        disabled,
                         checked: data && name ? data[name] : checked,
                         style: checkboxStyle,
                         onchange:(e)=>{
@@ -329,7 +330,7 @@ function Dropdown(){
     
     return {
         view:(vnode)=>{
-            let { data, name, label,  onchange, info, required, value, style={}} = vnode.attrs
+            let { data, name, label,  onchange, disabled=false, info, required, value, style={}} = vnode.attrs
 
 
             return [
@@ -338,6 +339,7 @@ function Dropdown(){
                     label ? m(FormLabel,{info:info, required:required}, label): null,
 
                     m("select",{
+                        disabled,
                         style: {
                             ...(config.form?.baseStyle)
                         },
