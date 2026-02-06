@@ -55,6 +55,7 @@ let config = {
             borderRadius: '.28571429rem',
             border: '1px solid #ccc',
             color: 'rgba(0, 0, 0, .87)',
+            resize: "vertical"
         },
         focusStyle: {
             outline: '-webkit-focus-ring-color auto 1px',
