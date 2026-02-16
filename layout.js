@@ -503,7 +503,7 @@ function Animate() {
                 style: {
                     ...attrs?.style,
                     ...attrs?.from,
-                    transition: `${duration}ms`
+                    transition: attrs.transition || `${duration}ms`
                 },
                 class: attrs?.class || attrs?.className || ''
             }, children)

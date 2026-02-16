@@ -1,3 +1,4 @@
+import { config } from "./config.js";
 import { Button, Icon } from "./elements.js";
 import { Input } from "./forms.js";
 import { Box, Div, FlexRow } from "./layout.js";
@@ -6,8 +7,8 @@ import { H2, Text } from "./texts.js";
 
 
 export { 
-    alertDialog, confirmDialog, promptDialog, openDialog,
-    Modal, ModalContent, ModalHeader, ModalFooter 
+    alertDialog, confirmDialog, promptDialog, openDialog, 
+    Modal, ModalContent, ModalHeader, ModalFooter, Dimmer
 }
 
 
@@ -312,7 +313,7 @@ function Modal(){
         position:'absolute',
         backgroundColor:'white',
         margin:'0 auto',
-        borderRadius:'1em',
+        borderRadius:config.borderRadius || '1em',
         left:'50%',
         top:'50%',
         maxWidth:'90%',
@@ -321,7 +322,8 @@ function Modal(){
         display:'flex',
         flexDirection:'column',
         maxWidth:'90%',
-        transition: 'all 0.3s ease-out'
+        transition: 'all 0.3s ease-out',
+        outline: 'none'
     }
 
     let sizes = {
@@ -334,7 +336,7 @@ function Modal(){
         backgroundColor: '#000000a8',
         transition:'animate ease-in',
         position:'fixed',
-        fontFamily:'Poppins',
+        fontFamily: config.fontFamily || 'Poppins',
         inset:'0px',
         zIndex:'1000',
     }
@@ -352,7 +354,8 @@ function Modal(){
 
             return m("div", {
                 style: dimmerStyle
-            }, m("div",{
+            }, 
+                m("div",{
                     style:{ ...modalStyle, ...vnode.attrs.style },
                     tabindex: -1,
                     oncreate:({dom})=> { 
@@ -403,7 +406,9 @@ function ModalHeader(){
 
     return {
         view:(vnode)=>{
-            return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', ...vnode.attrs},
+            return m(FlexRow,{
+                borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', ...vnode.attrs
+            },
                 vnode.children
             )
         }
@@ -414,8 +419,34 @@ function ModalHeader(){
 function ModalFooter(){
     return {
         view:(vnode)=>{
-            return m(FlexRow,{ borderTop:'2px solid lightgrey', justifyContent:'end', padding:'1em'},
+            return m(FlexRow,{ borderTop:'2px solid lightgrey', justifyContent:'end', padding:'1em', gap:'1em'},
                 vnode.children
+            )
+        }
+    }
+}
+
+
+function Dimmer(){
+
+    let dimmerStyle = {
+        position: "absolute",
+        inset:0,
+        display:'flex',
+        flexDirection:'column',
+        alignItems:'center',
+        justifyContent:'center',
+        zIndex:100
+    }
+
+
+    return {
+        view: (vnode)=> {
+            let {inverted} = vnode.attrs 
+
+            return m(Div,{ background: inverted ? 'rgba(255,255,255,.85)':'rgba(0,0,0,.85)', ...dimmerStyle},
+                vnode.children
+
             )
         }
     }

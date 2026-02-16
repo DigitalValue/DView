@@ -54,6 +54,7 @@ let config = {
             padding: '.67857143rem 1rem',
             borderRadius: '.28571429rem',
             border: '1px solid #ccc',
+            borderColor:'#ccc',
             color: 'rgba(0, 0, 0, .87)',
             resize: "vertical"
         },
@@ -97,8 +98,13 @@ let config = {
 
 function setConfig(newConfig) {
 
+    console.log('newConfig', newConfig)
+
     mergeDeep(config, newConfig)
-   
+
+    console.log('config', config)
+
+
     function isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item));
     }

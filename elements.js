@@ -9,7 +9,8 @@ export {
     Sidebar, Label, 
     Message,  Card,  Checkbox, Spinner, 
     BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell, TableFooter
+    Table, TableHead, TableBody, TableRow, TableCell, TableFooter,
+    SVGIcon
 }
 
 
@@ -76,19 +77,21 @@ function Segment(){
         view:(vnode)=>{
             let {type='default'} = vnode.attrs || {}
 
+            console.log('config', config.elements?.segment)
+
             return m(Div,{
-                    padding:'1rem',
-                    borderRadius: '1em',
-                    transition: 'all .2s ease',
-                    ...types[type] || types.primary,
-                    ...(vnode.attrs?.basic && {border: 'none'}),
-                    ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
-                    ...(vnode.attrs?.raised && { 
-                        boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'
-                    }),
-                    ...(config.elements?.segment || {}),
-                    ...(vnode.attrs?.style || vnode.attrs)
-                },
+                padding:'1rem',
+                borderRadius: '1em',
+                transition: 'all .2s ease',
+                ...types[type] || types.primary,
+                ...(vnode.attrs?.basic && {border: 'none'}),
+                ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
+                ...(vnode.attrs?.raised && { 
+                    boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'
+                }),
+                ...(config.elements?.segment || {}),
+                ...(vnode.attrs?.style || vnode.attrs)
+            },
             vnode.children)
         }
     }
@@ -438,6 +441,7 @@ function Button(){
                         boxShadow:'none'
                     },
                     ...types[type] || types.primary,
+                    ...config.elements?.button,
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
@@ -523,7 +527,6 @@ function Message(){
             color:'#B91C1C',
         },
         'info': {
-            background:'white',
             color:'black',
         }
     }
@@ -539,7 +542,7 @@ function Message(){
                     style: {
                         ...types[type] || {}
                     },
-                  type:'secondary',
+                    type:'secondary',
                 }, 
                 m(FlexRow, {alignItems: 'center', gap:'1em'},
                     m(Icon, {
@@ -971,3 +974,154 @@ function Sidebar() {
 }
 
 
+
+
+function SVGIcon(){
+
+    const Icons = {
+        arrow_left: [
+            m("path", { d: "m12 19-7-7 7-7" }),
+            m("path", { d: "M19 12H5" })
+        ],
+        calendar: [
+            m("path", { d: "M8 2v4" }),
+            m("path", { d: "M16 2v4" }),
+            m("rect", { width: "18", height: "18", x: "3", y: "4", rx: "2" }),
+            m("path", { d: "M3 10h18" })
+        ],
+        chevron_right: [
+            m("path", { d: "m9 18 6-6-6-6" })
+        ],
+        circle_check: [
+            m("circle", { cx: "12", cy: "12", r: "10" }),
+            m("path", { d: "m9 12 2 2 4-4" })
+        ],
+        clock: [
+            m("circle", { cx: "12", cy: "12", r: "10" }),
+            m("polyline", { points: "12 6 12 12 16 14" })
+        ],
+        close:[
+            m("path", { d: "M18 6 6 18" }),
+            m("path", { d: "m6 6 12 12" })
+        ],
+        edit: [
+            m("path", { d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
+            m("path", { d: "M18.375 2.625a1.5 1.5 0 1 1 2.121 2.121L12 13.243l-3 0.757 0.757-3Z" })
+        ],
+        edit_v2: [
+            m("path", { d: "M12 20h9" }),
+            m("path", { d: "M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" })
+        ],
+        eye_open:[
+            m("path", { d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" }),
+            m("circle", { cx: "12", cy: "12", r: "3" })
+        ],
+        eye_closed:[
+            m("path", { d: "m4 4 16 16" }),
+            m("path", { d: "M10.58 10.58a2 2 0 0 0 2.83 2.83" }),
+            m("path", { d: "M9.88 5.09A10.94 10.94 0 0 1 12 5c4.5 0 8.27 2.94 9.54 7a10.66 10.66 0 0 1-2.38 3.88" }),
+            m("path", { d: "M6.61 6.61A10.82 10.82 0 0 0 2.46 12a10.66 10.66 0 0 0 4.13 5.37" }),
+            m("path", { d: "M14.12 14.12A3 3 0 0 1 9.88 9.88" })
+        ],
+        group: [
+            m("circle", { cx: "12", cy: "8", r: "3" }),
+            m("path", { d: "M6 20c0-3.313 2.686-6 6-6s6 2.687 6 6" }),
+            m("circle", { cx: "5", cy: "9", r: "2" }),
+            m("path", { d: "M1.5 20c0-2.2 1.8-4 4-4" }),
+            m("circle", { cx: "19", cy: "9", r: "2" }),
+            m("path", { d: "M22.5 20c0-2.2-1.8-4-4-4" })
+        ],
+        kiosk: [
+            m("rect", { x: "5", y: "2", width: "14", height: "20", rx: "2" }),
+            m("rect", { x: "8", y: "5", width: "8", height: "5", rx: "1" }),
+            m("path", { d: "M8 14h8" }),
+            m("path", { d: "M8 17h8" }),
+            m("path", { d: "M9 22v-2" }),
+            m("path", { d: "M15 22v-2" }),
+            m("path", { d: "M3 18h2" }),
+            m("path", { d: "M19 18h2" })
+        ],
+        mail: [
+            m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
+            m("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" })
+        ],
+        map_pin: [
+            m("path", { d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" }),
+            m("circle", { cx: "12", cy: "10", r: "3" })
+        ],
+        phone: [
+            m("path", { d: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" })
+        ],
+        qr: [
+            m("rect", { x: "3", y: "3", width: "6", height: "6", rx: "1" }),
+            m("rect", { x: "15", y: "3", width: "6", height: "6", rx: "1" }),
+            m("rect", { x: "3", y: "15", width: "6", height: "6", rx: "1" }),
+            m("path", { d: "M11 11h2" }),
+            m("path", { d: "M15 11h2" }),
+            m("path", { d: "M11 15h2" }),
+            m("path", { d: "M13 13h2" }),
+            m("path", { d: "M17 15h2" }),
+            m("path", { d: "M15 17h2" }),
+            m("path", { d: "M19 19h2" })
+        ],
+        search: [
+            m("path", { d: "m21 21-4.34-4.34" }),
+            m("circle", { cx: "11", cy: "11", r: "8" })
+        ],
+        settings: [
+            m("circle", { cx: "12", cy: "12", r: "3" }),
+            m("path", { d: "M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1.04-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1.04H3a2 2 0 0 1 0-4h.05A1.7 1.7 0 0 0 4.6 8.92a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9A1.7 1.7 0 0 0 10.04 3H10a2 2 0 0 1 4 0h-.04A1.7 1.7 0 0 0 15 4.56h.04a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9A1.7 1.7 0 0 0 20.95 10H21a2 2 0 0 1 0 4h-.05A1.7 1.7 0 0 0 19.4 15z" })
+        ],
+        stats: [
+            m("path", { d: "M3 3v18h18" }),
+            m("rect", { x: "7", y: "13", width: "3", height: "5", rx: "1" }),
+            m("rect", { x: "12", y: "10", width: "3", height: "8", rx: "1" }),
+            m("rect", { x: "17", y: "7", width: "3", height: "11", rx: "1" })
+        ],
+        tv: [
+            m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
+            m("path", { d: "M8 21h8" }),
+            m("path", { d: "M12 19v2" }),
+            m("path", { d: "m9 2 3 3 3-3" })
+        ],
+        user: [
+            m("circle", { cx: "12", cy: "8", r: "4" }),
+            m("path", { d: "M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8" })
+        ],
+        web: [
+            m("circle", { cx: "12", cy: "12", r: "9" }),
+            m("path", { d: "M3 12h18" }),
+            m("path", { d: "M12 3a14 14 0 0 1 0 18" }),
+            m("path", { d: "M12 3a14 14 0 0 0 0 18" }),
+            m("path", { d: "M5.5 7.5h13" }),
+            m("path", { d: "M5.5 16.5h13" })
+        ],
+        X: [
+            m("path", { d: "M18 6 6 18" }),
+            m("path", { d: "m6 6 12 12" })
+        ]
+
+    }
+
+
+    return {
+        view: ({attrs}) => {
+            const iconName = attrs.icon || "search"
+            const iconNodes = Icons[iconName] || Icons.search
+
+            return m("svg",{
+                width: attrs.width || 18 ,
+                height: attrs.height || attrs.width || 18,
+                viewBox: "0 0 24 24",
+                xmlns: "http://www.w3.org/2000/svg",
+                fill: attrs.filled ? attrs.color : 'none',
+                stroke: attrs.color || 'black',
+                "stroke-width": attrs.strokeWidth || 2,
+                "stroke-linecap": attrs.strokeLinecap || "round",
+                "stroke-linejoin": attrs.strokeLinejoin || "round",
+                style: attrs.style,
+                onclick: attrs.onclick
+            }, iconNodes)
+        }
+    }
+}
