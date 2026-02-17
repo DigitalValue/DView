@@ -1,5 +1,5 @@
 import { config } from "./config.js";
-import { Button, Icon } from "./elements.js";
+import { Button, Icon, SVGIcon } from "./elements.js";
 import { Input } from "./forms.js";
 import { Box, Div, FlexRow } from "./layout.js";
 import { H2, Text } from "./texts.js";
@@ -375,7 +375,13 @@ function Modal(){
                     m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey',  alignItems:'center'},
                         m(H2,{marginBottom:0}, vnode.attrs.header),
 
-                        m(Icon,{size:'', style:"cursor:pointer", icon:'cancel', color: "#db2828", onclick: vnode.attrs.close})
+                        m(SVGIcon,{
+                            width:26, height:26, 
+                            style:"cursor:pointer", 
+                            icon:'circle_close', 
+                            color: "#db2828",
+                            onclick: vnode.attrs.close
+                        })
                     ) : null,
 
                     vnode.children
