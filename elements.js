@@ -1041,6 +1041,11 @@ function SVGIcon(){
             m("circle", { cx: "19", cy: "9", r: "2" }),
             m("path", { d: "M22.5 20c0-2.2-1.8-4-4-4" })
         ],
+        info: [
+            m("circle", { cx: "12", cy: "12", r: "10" }),
+            m("path", { d: "M12 16v-4" }),
+            m("path", { d: "M12 8h.01" })
+        ],
         kiosk: [
             m("rect", { x: "5", y: "2", width: "14", height: "20", rx: "2" }),
             m("rect", { x: "8", y: "5", width: "8", height: "5", rx: "1" }),
@@ -1050,6 +1055,11 @@ function SVGIcon(){
             m("path", { d: "M15 22v-2" }),
             m("path", { d: "M3 18h2" }),
             m("path", { d: "M19 18h2" })
+        ],
+        log_out: [
+            m("path", { d: "m16 17 5-5-5-5" }),
+            m("path", { d: "M21 12H9" }),
+            m("path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" })
         ],
         mail: [
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
