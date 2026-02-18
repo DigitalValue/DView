@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visor iconos</title>
+    <script src="https://components.digitalvalue.es/lib/mithril.min.js"></script>
+</head>
+
+<body
+    style="margin:0;height:100vh;background:radial-gradient(1200px 600px at 10% -10%, #eef3f6 0%, #f7f7f8 50%),radial-gradient(1200px 600px at 110% 10%, #eef0ff 0%, #f7f7f8 45%);color:#1f2937;font-family:'Space Grotesk','Satoshi','Avenir Next',system-ui,sans-serif;">
+    <div id="app" style="height:100%;"></div>
+
+    <script type="module">
+        import { SVGIcon } from "./elements.js";
+        import { FlexCol, FlexRow } from "./layout.js";
+        import { Text, H2, SmallText } from "./texts.js";
+
+        const iconNames = [
+            "arrow_left",
+            "calendar",
+            "chevron_right",
+            "chevron_left",
+            "circle_check",
+            "circle_close",
+            "clock",
+            "close",
+            "edit",
+            "edit_v2",
+            "eye_open",
+            "eye_closed",
+            "group",
+            "kiosk",
+            "mail",
+            "map_pin",
+            "phone",
+            "qr",
+            "search",
+            "save",
+            "settings",
+            "stats",
+            "tv",
+            "user",
+            "web",
+            "whatsapp",
+            "X"
+        ];
+
+        function IconViewer() {
+            let query = "";
+            let toastMessage = "";
+            let toastTimer = null;
+
+            function copySnippet(iconName) {
+                const snippet = `m(SVGIcon,{\n    width:26, height:26,\n    style:\"cursor:pointer\",\n    icon:'${iconName}',\n    color: \"#db2828\",\n    onclick: () => {console.log('${iconName}')}\n})`;
+
+                const showToast = () => {
+                    toastMessage = `Copiado: ${iconName}`;
+                    clearTimeout(toastTimer);
+                    toastTimer = setTimeout(() => {
+                        toastMessage = "";
+                        m.redraw();
+                    }, 1600);
+                    m.redraw();
+                };
+
+                navigator.clipboard.writeText(snippet).then(showToast).catch(() => {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = snippet;
+                    textarea.style.position = "fixed";
+                    textarea.style.left = "-9999px";
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textarea);
+                    showToast();
+                });
+            }
+
+            return {
+                view: () => {
+                    const filtered = iconNames.filter((name) =>
+                        name.toLowerCase().includes(query.trim().toLowerCase())
+                    );
+
+                    return m(FlexCol, { minHeight: "100vh", height: "100vh", justifyContent: "flex-start", alignItems: "center", overflow: "hidden" }, [
+                        m(FlexCol, { maxWidth: "1400px", width: "100%", height: "100%", gap: "1rem", padding: "2rem", boxSizing: "border-box", minHeight: "0" }, [
+                            // HEADER (arriba fijo en el layout)
+                            m(FlexCol, { width: "100%", gap: "6px", flex: "0 0 auto" }, [
+                                m(H2, "Visor de iconos"),
+                                m(SmallText, "Busca y clickea el icono para copiar el snippet de uso de cada icono.")
+                            ]),
+                            // TOOLBAR (arriba, sin encogerse aunque no haya cards)
+                            m(FlexRow, { gap: "12px", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", flex: "0 0 auto", minHeight: "48px" }, [
+                                m("div", { style: { flex: "1 1 520px",  maxWidth: "900px" } }, [
+                                    m("input", {
+                                        type: "search",
+                                        placeholder: "Buscar icono...",
+                                        value: query,
+                                        oninput: (e) => {
+                                            query = e.target.value;
+                                        },
+                                        style: {
+                                            width: "100%",
+                                            boxSizing: "border-box",
+                                            padding: "12px 14px",
+                                            border: "1px solid #e5e7eb",
+                                            borderRadius: "12px",
+                                            fontSize: "14px",
+                                            outline: "none",
+                                            background: "#ffffff",
+                                            boxShadow: "0 6px 18px rgba(0,0,0,0.04)"
+                                        }
+                                    })
+                                ]),
+                                m("div", { style: { flex: "0 0 auto", whiteSpace: "nowrap" } }, [
+                                    m(SmallText, `${filtered.length} / ${iconNames.length}`)
+                                ])
+                            ]),
+
+                            // GRID WRAP (único scrollY)
+                            m("div", { style: { flex: "1 1 auto", minHeight: "0", width: "100%" } }, [
+                                m("div", {
+                                    style: {
+                                        height: "100%",
+                                        overflowY: "auto",
+                                        overflowX: "hidden",
+                                        paddingRight: "6px",
+                                        display: "grid",
+                                        // gridTemplateColumns: "repeat(6,minmax(0,1fr))",
+                                        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+
+                                        gap: "14px",
+                                        alignContent: "start"
+                                    }
+                                }, filtered.length
+                                    ? filtered.map((icon) =>
+                                        m("div", {
+                                            key: icon,
+                                            onclick: () => copySnippet(icon),
+                                            style: {
+                                                background: "#ffffff",
+                                                border: "1px solid #e5e7eb",
+                                                borderRadius: "16px",
+                                                padding: "16px 14px",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: "10px",
+                                                cursor: "pointer",
+                                                boxShadow: "0 6px 18px rgba(0,0,0,0.04)",
+                                                height: "150px",
+                                            }
+                                        }, [
+                                            m("div", { style: { width: "56px", height: "56px", borderRadius: "12px", background: "#e6f0f3", display: "flex", alignItems: "center", justifyContent: "center", } }, [
+                                                m(SVGIcon, {
+                                                    width: 36,
+                                                    height: 36,
+                                                    style: "cursor:pointer",
+                                                    icon: icon,
+                                                    color: "#1c4c5b"
+                                                })
+                                            ]),
+                                            m(Text, { style: { fontWeight: "600", color: "#1f2937" } }, icon),
+                                        ])
+                                    )
+                                    : [
+                                        m("div", {
+                                            style: {
+                                                gridColumn: "1 / -1",
+                                                height: "100%",
+                                                minHeight: "240px",
+                                                border: "1px dashed #d6dde8",
+                                                borderRadius: "16px",
+                                                background: "rgba(255,255,255,0.6)",
+                                                display: "grid",
+                                                placeItems: "center",
+                                                color: "#64748b",
+                                                padding: "24px",
+                                                boxSizing: "border-box"
+                                            }
+                                        }, "No hay resultados con ese filtro.")
+                                    ]
+                                )
+                            ])
+                        ]),
+
+                        // TOAST
+                        m("div", {
+                            style: {
+                                position: "fixed",
+                                right: "18px",
+                                bottom: "18px",
+                                background: "#0f172a",
+                                color: "#f8fafc",
+                                padding: "10px 14px",
+                                borderRadius: "12px",
+                                fontSize: "16px",
+                                opacity: toastMessage ? "1" : "0",
+                                transform: toastMessage ? "translateY(0)" : "translateY(8px)",
+                                transition: "opacity 0.2s ease,transform 0.2s ease",
+                                boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+                                pointerEvents: "none"
+                            }
+                        }, toastMessage)
+                    ]);
+                }
+            };
+        }
+
+        m.mount(document.getElementById("app"), IconViewer);
+    </script>
+</body>
+
+</html>
