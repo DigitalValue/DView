@@ -95,7 +95,7 @@ function FlexRow(){
             return m("div",{
                 style:{
                     display:'flex',
-                    ...vnode.attrs
+                    ...vnode.attrs?.style || vnode.attrs 
                 }
             }, vnode.children)
         }
