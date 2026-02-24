@@ -55,6 +55,7 @@ let config = {
             borderRadius: '.28571429rem',
             border: '1px solid #ccc',
             color: 'rgba(0, 0, 0, .87)',
+            outline:'none'
         },
         focusStyle: {
             outline: '-webkit-focus-ring-color auto 1px',
@@ -76,6 +77,12 @@ let config = {
         //     background: '#e8def8'
         // }
     },
+
+    elements: {
+        label: {
+
+        }
+    },
     
     app: {
         appBar: {
@@ -84,6 +91,9 @@ let config = {
         //background: ''
         
     }
+
+
+
 }
 
 function setConfig(newConfig) {

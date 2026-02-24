@@ -1,7 +1,7 @@
-import { H2 } from "../widgets.js"
+
 import { config } from "./config.js"
 import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
-import { Text, SmallText } from "./texts.js"
+import { Text, SmallText, H2 } from "./texts.js"
 
 
 export { 
@@ -270,20 +270,22 @@ function RippleEffect() {
     return {
       view : (vnode)=> {
         type = vnode.attrs.type || 'dark'
-
+        
         return m("div",{
           id : vnode.attrs.id || null,
+          ...vnode.attrs,
           style : {
             position : "relative",
             overflow : "hidden",
             ...vnode.attrs.style
           },
           onmousedown : (e)=> {
-            //Datos para que el ripple aparezca donde se hace click
-  
+            // Datos para que el ripple aparezca donde se hace click
             const item = e.currentTarget.getBoundingClientRect()
             x = `${e.clientX - item.left}px`;
             y = `${e.clientY - item.top}px`;
+
+            console.log('onmousedown')
   
             rippleEffect = true  
             time1 = new Date().getTime()
@@ -324,15 +326,17 @@ function RippleEffect() {
 function Button(){
 
     let types = {
-        primary: config.button.primary || {
+        primary: {
             color: 'white',
             //border: '1px solid white',
-            background: '#1b1c1d'
+            background: '#1b1c1d',
+            ...config.elements?.button?.primary || {}
         },
         secondary: {
             color: '#4b4b4b',
             border: '1px solid #4b4b4b',
-            background: 'white'
+            background: 'white',
+            ...config.elements?.button?.secondary || {}
         },
         positive: {
             color: 'white',
@@ -403,6 +407,7 @@ function Button(){
                     userSelect:'none',
                     filter:`brightness(${brightness}%)`,
                     borderRadius:'1em',
+                    userSelect:'none',
                     gap: "5px",
                     ...disabled && {
                         opacity:'0.5',
@@ -530,17 +535,20 @@ function Label(){
         default: {
             backgroundColor: "#1b1c1d",
             color: "white",
-            border: "1px solid #e8e8e8"
+            border: "1px solid #e8e8e8",
+            ...config.elements?.label?.default || {}
         },
         primary: {
             backgroundColor: "#1b1c1d",
             color: "white",
-            border: "1px solid #1b1c1d"
+            border: "1px solid #1b1c1d",
+            ...config.elements?.label?.primary || {}
         },
         secondary: {
             backgroundColor: "#4b5563",
             color: "white",
-            border: "1px solid #4b5563"
+            border: "1px solid #4b5563",
+            ...config.elements?.label?.secondary || {}
         },
         tertiary: {
             backgroundColor: "#e8e8e8",
@@ -610,7 +618,6 @@ function Label(){
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
@@ -800,9 +807,10 @@ function BreadCrumb(){
 function Spinner(){
     // can you create different sizes, only sizes
     let sizes = {
+        
         small: {
             width: 20,
-            height: 20
+            height: 20,
         },
         medium: {
             width: 40,
@@ -828,7 +836,9 @@ function Spinner(){
 
     return {
         view:(vnode)=>{
-            let {color, size = 'small'}= vnode.attrs
+            let {color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
+
+            console.log('color', color)
 
             
            return [
@@ -845,19 +855,20 @@ function Spinner(){
                 }`),
                     
                 m(Div,{
-                    "display": "inline-flex",
+                    display: "inline-flex",
                     justifyContent: "center",
-                    "position": "relative",
-                    "width": `${sizes[size].width*2}px`,
-                    "height": `${sizes[size].height*2}px`,
+                    alignItems: "center",
+                    position: "relative",
+                    width: `${sizes[size].width*2}px`,
+                    height: `${sizes[size].height*2}px`,
                 },
                     
                     m(Div,{
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].height}px`,
+                            ...sizes[size],
+                            
                             "animation-delay": "-0.45s"
                         }
                     }),
@@ -866,8 +877,7 @@ function Spinner(){
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].height}px`,
+                            ...sizes[size],
                             "animation-delay": "-0.3s"
                         }
                     })

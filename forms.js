@@ -2,7 +2,7 @@ import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 import { Icon, Button } from './elements.js'
 import { config } from "./config.js"
-import { localize, translateSALT } from "../util.js"
+import { localize, translateSALT } from "./util.js"
 
 
 export {
@@ -98,10 +98,11 @@ function Input(){
             return [
 
                 // TO DO: editar el estilo de focus
-                /*m("style", `
+                /*
+                config.form.focusStyle &&
+                m("style", `
                     input, textarea > :focus, textarea:focus {
-                        border: ${focusedStyle.border} !important;
-                        box-shadow: ${focusedStyle.boxShadow} !important;
+                        ${config.form?.focusStyle}
                     }    
                 `),*/
 
@@ -116,20 +117,28 @@ function Input(){
                         readonly: readonly || false,
                         rows:rows,
                         style:  {
-                            ...(config.form?.baseStyle),
+                            transition:' box-shadow 0.1s ease-in-out, outline 0.1s ease-in-out',
                             fontFamily: config.fontFamily,
                             //...(config.fonts?.default || config.defaultFont || {}),
-                            ...(vnode.attrs.style || {})
+                            ...(vnode.attrs.style || {}),
+                            ...(config.form?.baseStyle),
+                            ...(config.form?.input || {}),
                         },
                         oninput:(e)=>{
                             oninput ? oninput(e): ''
                             data && name ? data[name] = e.target.value : ''
                         },
-                        /*
+                        
                         onfocus:(e)=> {
-                            e.target.style.border = focusedStyle.border
-                            e.target.style.boxShadow = focusedStyle.boxShadow
-                        },*/
+                            Object.keys(config.form?.focusStyle || {}).forEach((key)=>{
+                                e.target.style[key] = config.form.focusStyle[key]
+                            })
+                        },
+                        onblur:(e)=>{
+                            Object.keys(config.form?.focusStyle || {}).forEach((key)=>{
+                                e.target.style[key] = config.form.baseStyle[key]
+                            })
+                        },
                         ...( value ? {value:value}:{} ),
                         ...( data && data[name] ? {value:data[name]}:{} ),
                         ...type && type != 'textarea' ? {type:type}: {},

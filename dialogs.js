@@ -1,13 +1,13 @@
 import { Button, Icon } from "./elements.js";
 import { Input } from "./forms.js";
-import { Box, Div, FlexRow } from "./layout.js";
-import { H2 } from "./texts.js";
+import { Animate, Box, Div, FlexRow } from "./layout.js";
+import { H2, Text } from "./texts.js";
 
 
 
 export { 
-    alertDialog, confirmDialog, promptDialog, openDialog,
-    Modal, ModalContent, ModalHeader, ModalFooter 
+    alertDialog, confirmDialog, promptDialog, openDialog, showSnackbar, openPopup,
+    Modal, ModalContent, ModalHeader, ModalFooter, 
 }
 
 
@@ -290,10 +290,71 @@ function openDialog(Component, options = {}) {
             onCancel: (e) => {
                 m.mount(elem, null)
                 elem.remove()
+            },
+            close: (e) => {
+                m.mount(elem, null)
+                elem.remove()
             }
         })
     })
 }
+
+
+// cuadrado que sale debajo de la pantalla, está bien para móviles !!
+function showSnackbar({message, duration = 3000, fixed = false, id, background = '#1a1a1a'} = {}){
+
+    var elem = document.createElement("div")
+
+    elem.style = 'position:fixed;inset:0px;z-index:100000'
+    elem.id = id || Math.random() * 10000 + ''
+    document.body.appendChild(elem);
+
+    m.mount(elem, {
+        view: () =>  m(Animate,{
+            from: { transform: 'translateY(100%)' },
+            to: { transform: 'translateY(0%)' },
+            duration: duration || 300,
+            oncreate:(vnode)=>{
+                if(!fixed){
+                    setTimeout(() => {
+                        vnode.dom.style.transform = 'translateY(100%)';
+
+                        setTimeout(()=>{
+                            m.mount(elem, null)
+                            elem.remove()
+                        }, duration || 300 )
+                    }, 2000);
+                }
+            },
+            style: {
+                background: background,
+                padding:'1rem',
+                position:'fixed',
+                bottom:0, minHeight:'60px', 
+                display:'flex', alignItems:'center', justifyContent:'center',
+                zIndex:10, left:0, right:0
+            }
+        },  m(Text, {color:'white'}, message)
+        )
+    })
+
+
+}
+
+
+// abre una ventana pop up
+function openPopup(url){
+    const width = 500;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
+    // window features for popup
+    const windowFeatures = `scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`;
+    const popup = window.open(url, "popup", windowFeatures);
+    return popup;
+};
+
 
 
 function Modal(){
