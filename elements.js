@@ -79,7 +79,8 @@ function Segment(){
 
             return m(Div,{
                 padding:'1rem',
-                borderRadius: '1em',
+                borderRadius: config.borderRadius || '1em',
+                position:'relative',
                 transition: 'all .2s ease',
                 ...types[type] || types.primary,
                 ...(vnode.attrs?.basic && {border: 'none'}),
@@ -353,12 +354,12 @@ function RippleEffect() {
 function Button(){
 
     let types = {
-        primary: config.button?.primary || {
+        primary: config.elements?.button?.primary || {
             color: 'white',
             //border: '1px solid white',
             background: '#1b1c1d'
         },
-        secondary: config.button?.secondary ||
+        secondary: config.elements?.button?.secondary ||
         {
             color: '#4b4b4b',
             border: '1px solid #4b4b4b',
@@ -427,6 +428,7 @@ function Button(){
                     display:'flex',
                     alignItems:'center',
                     justifyContent:'center',
+                    fontWeight:'normal',
                     fontFamily: config.fontFamily,
                     minHeight:'40px',
                     width: fluid ? '100%': 'auto',
@@ -439,8 +441,8 @@ function Button(){
                         cursor: 'not-allowed',
                         boxShadow:'none'
                     },
-                    ...types[type] || types.primary,
                     ...config.elements?.button,
+                    ...types[type] || types.primary,
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
@@ -991,11 +993,30 @@ function SVGIcon(){
             m("rect", { width: "18", height: "18", x: "3", y: "4", rx: "2" }),
             m("path", { d: "M3 10h18" })
         ],
+        credit_card: [
+            m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
+            m("path", { d: "M2 10h20" }),
+            m("path", { d: "M6 15h4" })
+        ],
+       
+        card: [
+            m("rect", { x: "4", y: "3", width: "16", height: "18", rx: "2" }),
+            m("path", { d: "M4 13h16" }),
+            m("circle", { cx: "9", cy: "8", r: "1.8" }),
+            m("path", { d: "m20 13-4.2-4.2a2 2 0 0 0-2.8 0L9 13" }),
+            m("path", { d: "M8 17h8" })
+        ],
         chevron_right: [
             m("path", { d: "m9 18 6-6-6-6" })
         ],
         chevron_left:[
             m("path", { d: "m15 18-6-6 6-6" })
+        ],
+        chevron_down:[
+            m("path", { d: "m6 9 6 6 6-6" })
+        ],
+        chevron_up: [
+            m("path", { d: "m18 15-6-6-6 6" })
         ],
         circle_check: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
@@ -1051,6 +1072,11 @@ function SVGIcon(){
             m("path", { d: "M6.61 6.61A10.82 10.82 0 0 0 2.46 12a10.66 10.66 0 0 0 4.13 5.37" }),
             m("path", { d: "M14.12 14.12A3 3 0 0 1 9.88 9.88" })
         ],
+        gallery: [
+            m("rect", { x: "3", y: "4", width: "18", height: "16", rx: "2" }),
+            m("circle", { cx: "9", cy: "9", r: "1.5" }),
+            m("path", { d: "m21 15-4-4a2 2 0 0 0-2.8 0L7 18" })
+        ],
         group: [
             m("circle", { cx: "12", cy: "8", r: "3" }),
             m("path", { d: "M6 20c0-3.313 2.686-6 6-6s6 2.687 6 6" }),
@@ -1079,6 +1105,14 @@ function SVGIcon(){
             m("path", { d: "M21 12H9" }),
             m("path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" })
         ],
+        list: [
+            m("path", { d: "M8 6h13" }),
+            m("path", { d: "M8 12h13" }),
+            m("path", { d: "M8 18h13" }),
+            m("circle", { cx: "3", cy: "6", r: "1" }),
+            m("circle", { cx: "3", cy: "12", r: "1" }),
+            m("circle", { cx: "3", cy: "18", r: "1" })
+        ],
         mail: [
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
             m("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" })
@@ -1089,6 +1123,12 @@ function SVGIcon(){
         ],
         phone: [
             m("path", { d: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" })
+        ],
+        print: [
+            m("polyline", { points: "6 9 6 2 18 2 18 9" }),
+            m("path", { d: "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" }),
+            m("rect", { x: "6", y: "14", width: "12", height: "8", rx: "1" }),
+            m("circle", { cx: "18", cy: "12", r: "1" })
         ],
         qr: [
             m("rect", { x: "3", y: "3", width: "6", height: "6", rx: "1" }),

@@ -385,12 +385,18 @@ function Animate() {
 
         'slideDown': {
             from: {
-                maxHeight: '0px',
-                overflow:'hidden'
+                display:'grid',
+                gridTemplateRows:'0fr',
             },
             to: {
-                maxHeight: '1000px'
+                display:'grid',
+                gridTemplateRows:'1fr'
             },
+            exit: {
+                display:'grid',
+                gridTemplateRows:'0fr',
+            },
+
         },
     }
 

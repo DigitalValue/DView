@@ -280,10 +280,6 @@ function openDialog(Component, options = {}) {
     elem.style = 'position:fixed;inset:0px;z-index:100000'
     elem.id = Math.random() * 10000 + ''
 
-    let attrs = options.attrs || {}
-    
-
-
     document.body.appendChild(elem);
 
     m.mount(elem, {
