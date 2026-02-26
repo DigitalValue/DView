@@ -99,7 +99,7 @@ function Table(){
     let tableStyle = {
         width: "100%",
         background: "#fff",
-        margin: "1em 0",
+        //margin: "1em 0", quitado
         border: "1px solid rgba(34,36,38,.15)",
         boxShadow: "none",
         borderRadius: "0.28571429rem",
@@ -171,7 +171,8 @@ function TableHead(){
         borderTopLeftRadius: '1em',
         borderTopRightRadius: '1em',
         position: 'sticky',
-        top: 0
+        top: 0,
+        zIndex:2
     }
     
 
@@ -245,6 +246,9 @@ function TableCell(){
                     padding:'1em',
                     fontFamily: config.fontFamily,
                     ...config.elements?.table?.cell || {},
+                    ...header ? {
+                        ...config.elements?.table?.headerCell 
+                    }: {},
                     ...vnode.attrs
                 }
             }, vnode.children)

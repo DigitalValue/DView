@@ -74,8 +74,6 @@ function Container(){
 function FlexCol(){
     return {
         view:(vnode)=>{
-            /// let {justifyContent, alignItems} = vnode.attrs
-
 
             return m("div",{
                 style:{
@@ -95,7 +93,7 @@ function FlexRow(){
             return m("div",{
                 style:{
                     display:'flex',
-                    ...vnode.attrs
+                     ...vnode.attrs?.style || vnode.attrs 
                 }
             }, vnode.children)
         }
