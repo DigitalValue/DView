@@ -112,7 +112,7 @@ function Input(){
                     ] : null,
 
                     m(type =='textarea'? "textarea": "input", {
-                        readonly: readonly || false,
+                        readonly: readonly || false, // es lo mismo que disabbled==
                         rows:rows,
                         style:  {
                             fontFamily: config.fontFamily,
@@ -137,18 +137,31 @@ function Input(){
                         ...title ? {title: title} : {},
                         ...placeholder ? {placeholder: placeholder} : {},
                         disabled: disabled || false,
-                        ...(Object.entries(config.form?.focusStyle || {}).length && {
+
+                        ...((Object.entries(config.form?.focusStyle || {}).length || vnode.attrs.onfocus) && {
                             onfocus:(e)=>{
-                                Object.entries(config.form.focusStyle).forEach(([key, value])=>{
+                                console.log('config', config.form.focusStyle)
+
+                                Object.entries(config.form?.focusStyle).forEach(([key, value])=>{
                                     e.target.style[key] = value
                                 })
+
+                                if(vnode.attrs.onfocus){
+                                    vnode.attrs.onfocus(e)
+                                }
                             },
                             onblur:(e)=>{
-                                Object.entries(config.form.focusStyle).forEach(([key, value])=>{
+                                Object.entries(config.form?.focusStyle).forEach(([key, value])=>{
                                     e.target.style[key] = config.form.baseStyle[key] || ""
                                 })
+
+                                if(vnode.attrs.onblur){
+                                    vnode.attrs.onblur(e)
+                                }
                             }
                         }),
+
+
                         ...onkeyup ? {onkeyup: onkeyup} : {},
                         onchange:(e)=>{
                             if(onchange) onchange(e)
