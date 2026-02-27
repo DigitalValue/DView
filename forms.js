@@ -7,7 +7,7 @@ import { localize, translateSALT } from "./util.js"
 
 export {
     FormLabel, Input, TranslationInput, Dropdown,
-    IntegerInput, Switch, InfoTooltip, Checkbox,
+    IntegerInput, Switch, InfoTooltip, Checkbox, RadioButtons,
     HtmlIntegerInput, HtmlDropdown, DateSelector
 }
 
@@ -140,7 +140,7 @@ function Input(){
 
                         ...((Object.entries(config.form?.focusStyle || {}).length || vnode.attrs.onfocus) && {
                             onfocus:(e)=>{
-                                console.log('config', config.form.focusStyle)
+                                // console.log('config', config.form.focusStyle)
 
                                 Object.entries(config.form?.focusStyle).forEach(([key, value])=>{
                                     e.target.style[key] = value
@@ -371,6 +371,66 @@ function Dropdown(){
                                 : data[name] == o 
                                 : value
                         }, o.label || o))
+                    )
+                )
+            ]
+        }
+    }
+}
+
+function RadioButtons() {
+    
+    return {
+        view:(vnode)=>{
+            let { data, name, label, onchange, disabled=false, info, required } = vnode.attrs
+
+
+            return [
+                m(FlexCol,{width:'100%', gap: "5px", ...vnode.attrs.style},
+
+                    label ? m(FormLabel,{info:info, required:required}, label): null,
+
+                    m(FlexCol, { gap: "10px" },
+                        vnode.children.map((o)=> m(Tappable, {
+                            style: {
+                                display: "flex",
+                                gap: "5px",
+                                alignItems: "center"
+                            },
+                            onclick: ()=> {
+                                if(disabled)
+                                    return
+
+                                let value = o.value != undefined ? o.value : o
+
+                                if(data && name)
+                                    data[name] = value
+
+                                if(onchange && typeof onchange == "function")
+                                    onchange(value)
+                            }
+                        },
+
+                            m(FlexRow, {
+                                style: {
+                                    width: "20px",
+                                    height: "20px",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    borderRadius: "100px",
+                                    border: "1px solid lightgray"
+                                }
+                            },
+                                m(Div, { style: {
+                                    background: data && name && data[name] == (o.value != undefined ? o.value : o) ? disabled ? "gray" : "#2185d0" : "white",
+                                    width: "10px",
+                                    height: "10px",
+                                    borderRadius: "100px"
+                                }})
+                            ),
+
+                            m(Text, o.label || o))
+                        )
                     )
                 )
             ]
