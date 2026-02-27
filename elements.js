@@ -356,52 +356,78 @@ function RippleEffect() {
 * type: primary, secondary, danger
 */
 function Button(){
+    let hover = {
+        filter: 'brightness(80%)',
+    }
+
+    let onmousedown = {
+        filter: 'brightness(70%)',
+    }
+
 
     let types = {
-        primary: config.elements?.button?.primary || {
+        primary: {
             color: 'white',
             //border: '1px solid white',
-            background: '#1b1c1d'
+            background: '#1b1c1d',
+            hover,
+            onmousedown,
+            ...config.elements?.button?.primary
         },
-        secondary: config.elements?.button?.secondary ||
-        {
+        secondary: {
             color: '#4b4b4b',
             border: '1px solid #4b4b4b',
-            background: 'white'
+            background: 'white',
+            hover,
+            onmousedown,
+            ...config.elements?.button?.secondary 
         },
         positive: {
             color: 'white',
             border: '1px solid #00c853',
-            background: '#00c853'
+            background: '#00c853',
+            hover,
+            onmousedown
         },
         negative: {
             color: '#db2828',
             border: '1px solid #db2828',
-            background: 'transparent'
+            background: 'transparent',
+            hover,
+            onmousedown
         },
         default: {
             color: '#4b4b4b',
             border: '1px solid #4b4b4b',
-            background: 'transparent'
+            background: 'transparent',
+            hover,
+            onmousedown
         },
         blue: {
             color: 'white',
             border: '1px solid #2185d0',
-            background: '#2185d0'
+            background: '#2185d0',
+            hover,
+            onmousedown
         },
         danger: {
             color: 'red',
             border: '1px solid red',
-            background: 'white'
+            background: 'white',
+            hover,
+            onmousedown
         },
         glass: {
             color: '#1a1a1a',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+            hover,
+            onmousedown
         }
     }
+
 
     let sizes= {
         small: {
@@ -420,14 +446,14 @@ function Button(){
         }
     }
     
-    let brightness = 100;
-
     return {
+        
         view:(vnode)=>{
             let { type='primary', onclick, disabled, fluid, icon, size } = vnode.attrs
             
-            return m("div",{
-                style:{
+            // REPASAR ESTO, MUCHAS CONDICIONES
+            return m(Tappable, { 
+                style: {
                     cursor:'pointer',
                     display:'flex',
                     alignItems:'center',
@@ -437,7 +463,7 @@ function Button(){
                     minHeight:'40px',
                     width: fluid ? '100%': 'auto',
                     userSelect:'none',
-                    filter:`brightness(${brightness}%)`,
+                    filter:`brightness(100%)`,
                     borderRadius:'1em',
                     gap: "5px",
                     ...disabled && {
@@ -450,11 +476,15 @@ function Button(){
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
-                onclick:!disabled && onclick,
-                onmouseover:(e)=> !disabled && (brightness=80), // mejorar esto !!
-                onmouseout:(e)=> (brightness=100),
-                onmousedown:(e)=> (brightness=60),
-                onmouseup:(e)=> (brightness=100),
+                onclick: !disabled && onclick,
+                hover: !disabled && {
+                    ...config.elements?.button?.hover,
+                    ...types[type]?.hover
+                },
+                onmousedown: !disabled && {
+                    ...config.elements?.button?.onmousedown,
+                    ...types[type]?.onmousedown
+                }
             }, 
                 icon ? [
                     m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),

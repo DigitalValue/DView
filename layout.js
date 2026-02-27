@@ -194,8 +194,8 @@ function ViewPortComponent() {
             return m("div", {
                 ...attrs,
                 callback: null,
-                style: { ...attrs.style, visibility: on ? 'visible' : 'hidden' }
-            }, children)
+                style: { ...attrs.style }
+            }, on  && children)
         }
     }
 }
