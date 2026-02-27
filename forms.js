@@ -347,7 +347,6 @@ function Dropdown(){
 
 
             return [
-
                 m(FlexCol,{width:'100%', ...vnode.attrs.style},
                     label ? m(FormLabel,{info:info, required:required}, label): null,
 
@@ -362,7 +361,7 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true, selected:true },"Selecciona una opción"),
+                        m("option",{ disabled:true, selected:true }, "Selecciona..."),
 
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
