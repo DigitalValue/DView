@@ -225,7 +225,7 @@ function Tappable(){
 
     return {
         view:(vnode)=>{
-            return m( vnode.attrs.rippleEffect ? RippleEffect : "div",{
+            return m("div",{
                 oncreate:({dom})=> { 
                     elem = dom;
                     
@@ -356,8 +356,9 @@ function Animate() {
 
     let animations = {
         'scaleIn': {
-            from: { transform: 'scale(0)' },
-            to: { transform: 'scale(1)' }
+            from: { transform: 'scale(0.7)', opacity:0.8 },
+            to: { transform: 'scale(1)', opacity:1 },
+            exit: {opacity: 0, transform: 'scale(0.8)'}
         },
 
         'fadeUpIn': {
@@ -368,6 +369,10 @@ function Animate() {
             to: {
                 opacity: 1,
                 transform: 'translateY(0)'
+            },
+            exit: {
+                opacity: 0,
+                transform: 'translateY(20px)'
             }
         },
 
@@ -383,7 +388,17 @@ function Animate() {
         'opacity': {
             from: { opacity: 0 },
             to: { opacity: 1 }
-        }
+        },
+
+        'slideDown': {
+            from: {
+                maxHeight: '0px',
+                overflow:'hidden'
+            },
+            to: {
+                maxHeight: '1000px'
+            },
+        },
     }
 
     let observer;
@@ -453,6 +468,7 @@ function Animate() {
             if(attrs.animation){
                 attrs.from = animations[attrs.animation]?.from || {}
                 attrs.to = animations[attrs.animation]?.to || {}
+                attrs.exit = animations[attrs.animation]?.exit || {}
             }
 
             return m("div", {
@@ -496,7 +512,7 @@ function Animate() {
                 style: {
                     ...attrs?.style,
                     ...attrs?.from,
-                    transition: `${duration}ms`
+                    transition: attrs.transition || `${duration}ms`
                 },
                 class: attrs?.class || attrs?.className || ''
             }, children)

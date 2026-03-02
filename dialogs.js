@@ -1,14 +1,16 @@
-import { Button, Icon } from "./elements.js";
+import { config } from "./config.js";
+import { Button, Icon, SVGIcon } from "./elements.js";
 import { Input } from "./forms.js";
 import { Animate, Box, Div, FlexRow } from "./layout.js";
 import { H2, Text } from "./texts.js";
 
 
 
-export { 
-    alertDialog, confirmDialog, promptDialog, openDialog, showSnackbar, openPopup,
-    Modal, ModalContent, ModalHeader, ModalFooter, 
-}
+export {
+    alertDialog, confirmDialog,  openDialog,
+    Dimmer, Modal, ModalContent, ModalFooter,  ModalHeader, 
+    openPopup, promptDialog, showSnackbar
+};
 
 
 
@@ -49,7 +51,7 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
       view:()=>  m(Modal, {size: options.size || 'tiny'},
               m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
               
-              m(Div,{padding:'1em'}, m.trust(options.message)),
+              m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
               
               m(ModalFooter,
 
@@ -139,7 +141,7 @@ function alertDialog(options={
                     m(H2,{marginTop:0}, options.title ||  types[options.type]?.text )
                 ):  null,
 
-                m(ModalContent, m(Div,{padding:'1em'}, m.trust(options.message))),
+                m(ModalContent, m(Div,{padding:'1em'}, m(Text, m.trust(options.message)))),
 
                 m(ModalFooter,
                     m(Button, {
@@ -279,6 +281,10 @@ function openDialog(Component, options = {}) {
     elem.style = 'position:fixed;inset:0px;z-index:100000'
     elem.id = Math.random() * 10000 + ''
 
+    let attrs = options.attrs || {}
+    
+
+
     document.body.appendChild(elem);
 
     m.mount(elem, {
@@ -287,7 +293,11 @@ function openDialog(Component, options = {}) {
         },
         view: () => m(Component, {
             ...(options.attrs ? options.attrs : {}),
-            onCancel: (e) => {
+            onCancel: (e) => { // cambiar esto por close en algún momento !!
+                m.mount(elem, null)
+                elem.remove()
+            },
+            close: (e) => {
                 m.mount(elem, null)
                 elem.remove()
             },
@@ -365,15 +375,17 @@ function Modal(){
         position:'absolute',
         backgroundColor:'white',
         margin:'0 auto',
-        borderRadius:'1em',
+        borderRadius:config.borderRadius || '1em',
         left:'50%',
         top:'50%',
+        maxWidth:'90%',
         transform:'translate(-50%,-50%)',
         zIndex:1001,
         display:'flex',
         flexDirection:'column',
         maxWidth:'90%',
-        transition: 'all 0.3s ease-out'
+        transition: 'all 0.3s ease-out',
+        outline: 'none'
     }
 
     let sizes = {
@@ -386,7 +398,7 @@ function Modal(){
         backgroundColor: '#000000a8',
         transition:'animate ease-in',
         position:'fixed',
-        fontFamily:'Poppins',
+        fontFamily: config.fontFamily || 'Poppins',
         inset:'0px',
         zIndex:'1000',
     }
@@ -404,7 +416,8 @@ function Modal(){
 
             return m("div", {
                 style: dimmerStyle
-            }, m("div",{
+            }, 
+                m("div",{
                     style:{ ...modalStyle, ...vnode.attrs.style },
                     tabindex: -1,
                     oncreate:({dom})=> { 
@@ -424,7 +437,13 @@ function Modal(){
                     m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey',  alignItems:'center'},
                         m(H2,{marginBottom:0}, vnode.attrs.header),
 
-                        m(Icon,{size:'large', style:"cursor:pointer", icon:'cancel', onclick: vnode.attrs.close})
+                        m(SVGIcon,{
+                            width:26, height:26, 
+                            style:"cursor:pointer", 
+                            icon:'circle_close', 
+                            color: "#db2828",
+                            onclick: vnode.attrs.close
+                        })
                     ) : null,
 
                     vnode.children
@@ -443,7 +462,7 @@ function ModalContent(){
                     padding:'1em',
                     overflowY:'auto',
                     maxHeight:'50vh',
-                    ...vnode.attrs
+                    ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
         }
@@ -455,7 +474,9 @@ function ModalHeader(){
 
     return {
         view:(vnode)=>{
-            return m(FlexRow,{borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', ...vnode.attrs},
+            return m(FlexRow,{
+                borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', ...vnode.attrs
+            },
                 vnode.children
             )
         }
@@ -466,8 +487,34 @@ function ModalHeader(){
 function ModalFooter(){
     return {
         view:(vnode)=>{
-            return m(FlexRow,{ borderTop:'2px solid lightgrey', justifyContent:'end', padding:'1em'},
+            return m(FlexRow,{ borderTop:'2px solid lightgrey', justifyContent:'end', padding:'1em', gap:'1em'},
                 vnode.children
+            )
+        }
+    }
+}
+
+
+function Dimmer(){
+
+    let dimmerStyle = {
+        position: "absolute",
+        inset:0,
+        display:'flex',
+        flexDirection:'column',
+        alignItems:'center',
+        justifyContent:'center',
+        zIndex:100
+    }
+
+
+    return {
+        view: (vnode)=> {
+            let {inverted} = vnode.attrs 
+
+            return m(Div,{ background: inverted ? 'rgba(255,255,255,.85)':'rgba(0,0,0,.85)', ...dimmerStyle},
+                vnode.children
+
             )
         }
     }
