@@ -307,13 +307,14 @@ function Modal(){
         width:'850px',
         margin:0,
         position:'absolute',
+        flex: '0 0 auto',
         backgroundColor:'white',
         margin:'0 auto',
         borderRadius:config.borderRadius || '1em',
         left:'50%',
-        top:'50%',
+        top:'10vh',
         maxWidth:'90%',
-        transform:'translate(-50%,-50%)',
+        transform:'translateX(-50%)',
         zIndex:1001,
         display:'flex',
         flexDirection:'column',
@@ -395,9 +396,10 @@ function ModalContent(){
                 style:{
                     padding:'1em',
                     overflowY:'auto',
-                    maxHeight:'50vh',
+                    maxHeight:'70vh',
                     ...(vnode.attrs.style || vnode.attrs)
-                }
+                },
+                id: vnode.attrs.id
             }, vnode.children)
         }
     }
