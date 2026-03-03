@@ -395,7 +395,8 @@ function RadioButtons() {
                             style: {
                                 display: "flex",
                                 gap: "5px",
-                                alignItems: "center"
+                                alignItems: "center",
+                                width: "fit-content"
                             },
                             onclick: ()=> {
                                 if(disabled)
