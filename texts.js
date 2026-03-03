@@ -18,6 +18,7 @@ function H1(){
         view:(vnode)=>{
             return m("h1",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
                     margin:0,
                     ...(config.fonts.h1 || {}),
@@ -34,6 +35,7 @@ function H2(){
         view:(vnode)=>{
             return m("h2",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
                     margin:0,
                     ...(config.fonts.h2 || {}),
@@ -79,6 +81,7 @@ function Text(){
         view:(vnode)=>{
             return m("p",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
                     ...(config.fonts.default || config.defaultFont || {}),
                     ...(vnode.attrs.style || vnode.attrs)
