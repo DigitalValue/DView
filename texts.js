@@ -79,6 +79,7 @@ function Text(){
         view:(vnode)=>{
             return m("p",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
                     ...(config.fonts.default || config.defaultFont || {}),
                     ...(vnode.attrs.style || vnode.attrs)
