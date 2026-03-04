@@ -47,7 +47,7 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
               setTimeout(resolve, 300)
           })
       },
-      view:()=>  m(Modal, {size: options.size || 'tiny'},
+      view:()=>  m(Modal, {size: options.size || 'tiny', center:true},
               m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
               
               m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
@@ -131,7 +131,7 @@ function alertDialog(options={
                 setTimeout(resolve, 300)
             })
         },
-        view:()=> m(Modal, { size: options.size || 'tiny' },
+        view:()=> m(Modal, { size: options.size || 'tiny', center:true },
                 types[options.type] || options.title ? 
                 m(ModalHeader,
                     m(Icon,{icon: types[options.type]?.icon, color: types[options.type]?.color }),
@@ -311,10 +311,10 @@ function Modal(){
         backgroundColor:'white',
         margin:'0 auto',
         borderRadius:config.borderRadius || '1em',
+        transform: config.fixedModals ? 'translateX(-50%)': 'translate(-50%,-50%)',
         left:'50%',
-        top:'10vh',
+        top: config.fixedModals ? '10vh': '50%',
         maxWidth:'90%',
-        transform:'translateX(-50%)',
         zIndex:1001,
         display:'flex',
         flexDirection:'column',
@@ -339,16 +339,24 @@ function Modal(){
     }
 
     return {
-        view:(vnode)=>{
+        oninit:(vnode)=>{
             if(vnode.attrs.size){
                 modalStyle.width = sizes[vnode.attrs.size]
                 modalStyle.maxWidth = '90vw'
+            }
+
+            if(vnode.attrs.center){
+                modalStyle.top = '50%',
+                modalStyle.transform = 'translate(-50%,-50%)'
             }
 
             if(vnode.attrs.animate){ 
                 modalStyle.transform = 'translate(-50%,-30%) scale(0.7)'
             }
 
+        },
+        view:(vnode)=>{
+           
             return m("div", {
                 style: dimmerStyle
             }, 
