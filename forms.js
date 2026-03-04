@@ -394,7 +394,7 @@ function RadioButtons() {
                         vnode.children.map((o)=> m(Tappable, {
                             style: {
                                 display: "flex",
-                                gap: "5px",
+                                gap: "0.5em",
                                 alignItems: "center",
                                 width: "fit-content"
                             },
@@ -416,6 +416,8 @@ function RadioButtons() {
                                 style: {
                                     width: "20px",
                                     height: "20px",
+                                    minWidth: "20px",
+                                    minHeight: "20px",
                                     justifyContent: "center",
                                     alignItems: "center",
                                     borderRadius: "100px",
