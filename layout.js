@@ -35,7 +35,7 @@ function Container(){
                         }*/
 
                         @media (width>=1200px ) {
-                            width: 80% !important;
+                            width: 65% !important;
                         }
                     }
                     .container {

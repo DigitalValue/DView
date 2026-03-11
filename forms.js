@@ -43,7 +43,7 @@ function FormLabel(){
                     ),
                     
                     required 
-                    ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*') 
+                    ? m("span", {style:"color:red; margin-left:0.5em; line-height: 1.21429em;"}, '*')
                     : null,
 
                     info 
@@ -63,11 +63,12 @@ function Checkbox(){
         width:'17px', 
         height:'17px',
         cursor:'pointer',
+        marginBottom: "5px"
     }
 
     return {
         view:(vnode)=>{
-            let {data, name, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
+            let {data, name, info, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
                 m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
@@ -87,7 +88,8 @@ function Checkbox(){
                     }),
 
                    
-                    m(Text, label)
+                    m(FormLabel, { info: info, required: required }, label),
+                    
                 )
             ]
         }
@@ -409,8 +411,9 @@ function RadioButtons() {
                         vnode.children.map((o)=> m(Tappable, {
                             style: {
                                 display: "flex",
-                                gap: "5px",
-                                alignItems: "center"
+                                gap: "0.5em",
+                                alignItems: "center",
+                                width: "fit-content"
                             },
                             onclick: ()=> {
                                 if(disabled)
@@ -430,6 +433,8 @@ function RadioButtons() {
                                 style: {
                                     width: "20px",
                                     height: "20px",
+                                    minWidth: "20px",
+                                    minHeight: "20px",
                                     justifyContent: "center",
                                     alignItems: "center",
                                     borderRadius: "100px",
@@ -911,20 +916,35 @@ function InfoTooltip(){
                         0% { opacity:0; }
                         100% { opacity:1; }
                     }
-                    @keyframes scaleOut {
+                    @keyframes fadeout {
                         0% { opacity:1; }
                         100% { opacity:0; }
                     }
                 `),
 
                 // Cambiar esto por un icono de google  ??
-                m("i.blue.question.circle.outline.link.icon.visible", {
-                    class: showingInfo ? 'visible' : '',
-                    onmouseover:(e)=> showingInfo = true,
-                    onmouseout:(e)=> showingInfo = false,
-                    style:"margin-left:5px; position:relative",
+                // m("i.blue.question.circle.outline.link.icon.visible", {
+                //     class: showingInfo ? 'visible' : '',
+                //     onmouseover:(e)=> showingInfo = true,
+                //     onmouseout:(e)=> showingInfo = false,
+                //     style:"margin-left:5px; position:relative",
+                // },
+                m(Tappable, {
+                    onhover: (hovering)=> { showingInfo = hovering },
+                    style: {
+                        marginLeft:"5px",
+                        marginBottom:"5px",
+                        display: "flex",
+                        alignItems: "center",
+                        position: "relative"
+                    }
                 },
-
+                    m(SVGIcon, {
+                        icon: "info",
+                        color: "#2185d0",
+                        width: 16,
+                        height: 16,
+                    }),
 
                     m("div",{
                         class: showingInfo ? 'fadein' : showingInfo != undefined ? 'fadeout':'',
@@ -932,7 +952,7 @@ function InfoTooltip(){
                                tooltipstyle + (inverted ? 'background:#000000de; color:white;' : ''),
                         onmouseover:(e)=> showingInfo = true,
                         onmouseout:(e)=> showingInfo = false,
-                    },m.trust(text || vnode.children))
+                    },  m.trust(text || vnode.children))
                 )
             ]
         }
