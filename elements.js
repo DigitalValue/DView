@@ -1,16 +1,11 @@
 import { config } from "./config.js"
-import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
-import { Text, SmallText, H2 } from "./texts.js"
+import { Box, Div, FlexCol, FlexRow, Tappable } from "./layout.js"
+import { SmallText, Text } from "./texts.js"
 
 
-export { 
-    Segment,  Span, RippleEffect,
-    Button, Icon, Img,    
-    Sidebar, Label, 
-    Message,  Card,  Checkbox, Spinner, 
-    BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell, TableFooter,
-    SVGIcon
+export {
+    BreadCrumb, Button, Card, Checkbox, Icon, Img, Label,
+    Message, RippleEffect, Segment, Sidebar, Span, Spinner, SVGIcon, Table, TableBody, TableCell, TableFooter, TableHead, TableRow
 }
 
 
@@ -304,20 +299,22 @@ function RippleEffect() {
     return {
       view : (vnode)=> {
         type = vnode.attrs.type || 'dark'
-
+        
         return m("div",{
           id : vnode.attrs.id || null,
+          //...vnode.attrs,
           style : {
             position : "relative",
             overflow : "hidden",
             ...vnode.attrs.style
           },
           onmousedown : (e)=> {
-            //Datos para que el ripple aparezca donde se hace click
-  
+            // Datos para que el ripple aparezca donde se hace click
             const item = e.currentTarget.getBoundingClientRect()
             x = `${e.clientX - item.left}px`;
             y = `${e.clientY - item.top}px`;
+
+            console.log('onmousedown')
   
             rippleEffect = true  
             time1 = new Date().getTime()
@@ -472,6 +469,7 @@ function Button(){
                     userSelect:'none',
                     filter:`brightness(100%)`,
                     borderRadius:'1em',
+                    userSelect:'none',
                     gap: "5px",
                     ...disabled && {
                         opacity:'0.5',
@@ -626,18 +624,21 @@ function Label(){
     let types = {
         default: {
             backgroundColor: "#1b1c1d",
-            color: "#334155",
-            border: "1px solid #e8e8e8"
+            color: "white",
+            border: "1px solid #e8e8e8",
+            ...config.elements?.label?.default || {}
         },
         primary: {
             backgroundColor: "#1b1c1d",
             color: "white",
-            border: "1px solid #1b1c1d"
+            border: "1px solid #1b1c1d",
+            ...config.elements?.label?.primary || {}
         },
         secondary: {
             backgroundColor: "#4b5563",
             color: "white",
-            border: "1px solid #4b5563"
+            border: "1px solid #4b5563",
+            ...config.elements?.label?.secondary || {}
         },
         tertiary: {
             backgroundColor: "#e8e8e8",
@@ -707,7 +708,7 @@ function Label(){
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        width:'fit-content',
+                        
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
@@ -897,9 +898,10 @@ function BreadCrumb(){
 function Spinner(){
     // can you create different sizes, only sizes
     let sizes = {
+        
         small: {
             width: 20,
-            height: 20
+            height: 20,
         },
         medium: {
             width: 40,
@@ -925,7 +927,9 @@ function Spinner(){
 
     return {
         view:(vnode)=>{
-            let {color, size = 'small'}= vnode.attrs
+            let {color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
+
+            console.log('color', color)
 
             
            return [
@@ -942,19 +946,20 @@ function Spinner(){
                 }`),
                     
                 m(Div,{
-                    "display": "inline-flex",
+                    display: "inline-flex",
                     justifyContent: "center",
-                    "position": "relative",
-                    "width": `${sizes[size].width*2}px`,
-                    "height": `${sizes[size].height*2}px`,
+                    alignItems: "center",
+                    position: "relative",
+                    width: `${sizes[size].width*2}px`,
+                    height: `${sizes[size].height*2}px`,
                 },
                     
                     m(Div,{
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].height}px`,
+                            ...sizes[size],
+                            
                             "animation-delay": "-0.45s"
                         }
                     }),
@@ -963,8 +968,7 @@ function Spinner(){
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].height}px`,
+                            ...sizes[size],
                             "animation-delay": "-0.3s"
                         }
                     })
@@ -1101,6 +1105,15 @@ function SVGIcon(){
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
         ],
+        google: {
+            viewBox: "0 0 256 262",
+            nodes: [
+                m("path", { d: "M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027", fill: "#4285F4", stroke: "none" }),
+                m("path", { d: "M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1", fill: "#34A853", stroke: "none" }),
+                m("path", { d: "M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782", fill: "#FBBC05", stroke: "none" }),
+                m("path", { d: "M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251", fill: "#EB4335", stroke: "none" })
+            ]
+        },
         shield_error: [
            m("path",{
             d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
@@ -1185,6 +1198,11 @@ function SVGIcon(){
             m("path", { d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" }),
             m("circle", { cx: "12", cy: "10", r: "3" })
         ],
+        lock: [
+            m("rect", {width:"18", height:"11", x:"3", y:"11", rx:"2", ry:"2"}),
+            m("path",{d:"M7 11V7a5 5 0 0 1 10 0v4"})
+        ],
+
         messages: [
             m("path", {
                 d:"M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
@@ -1305,12 +1323,14 @@ function SVGIcon(){
     return {
         view: ({attrs}) => {
             const iconName = attrs.icon || "search"
-            const iconNodes = Icons[iconName] || Icons.search
+            const iconData = Icons[iconName] || Icons.search
+            const iconNodes = Array.isArray(iconData) ? iconData : iconData.nodes
+            const iconViewBox = Array.isArray(iconData) ? "0 0 24 24" : (iconData.viewBox || "0 0 24 24")
 
             return m("svg",{
                 width: attrs.width || 18 ,
                 height: attrs.height || attrs.width || 18,
-                viewBox: "0 0 24 24",
+                viewBox: iconViewBox,
                 xmlns: "http://www.w3.org/2000/svg",
                 fill: attrs.filled ? attrs.color : 'none',
                 stroke: attrs.color || 'black',

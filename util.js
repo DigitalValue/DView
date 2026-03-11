@@ -58,4 +58,19 @@ function localize(localized, lang = null) {
     return 'ERR translation';
 }
 
-export { loadScript, translateSALT, localize }
+
+function trimAccents(text = ''){
+  if (text === null || text === undefined) return '';
+  return String(text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function normalizeStr(text = ''){
+  return trimAccents(text)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+export { loadScript, translateSALT, localize, normalizeStr, trimAccents }
