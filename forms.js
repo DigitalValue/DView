@@ -7,7 +7,7 @@ import { localize, translateSALT } from "./util.js"
 
 export {
     FormLabel, Input, TranslationInput, Dropdown,
-    IntegerInput, Switch, InfoTooltip, Checkbox,
+    IntegerInput, Switch, InfoTooltip, Checkbox, RadioButtons,
     HtmlIntegerInput, HtmlDropdown, DateSelector
 }
 
@@ -360,7 +360,6 @@ function Dropdown(){
 
 
             return [
-
                 m(FlexCol,{width:'100%', ...vnode.attrs.style},
                     label ? m(FormLabel,{info:info, required:required}, label): null,
 
@@ -387,6 +386,66 @@ function Dropdown(){
                                 : data[name] == o 
                                 : value
                         }, o.label || o))
+                    )
+                )
+            ]
+        }
+    }
+}
+
+function RadioButtons() {
+    
+    return {
+        view:(vnode)=>{
+            let { data, name, label, onchange, disabled=false, info, required } = vnode.attrs
+
+
+            return [
+                m(FlexCol,{width:'100%', gap: "5px", ...vnode.attrs.style},
+
+                    label ? m(FormLabel,{info:info, required:required}, label): null,
+
+                    m(FlexCol, { gap: "10px" },
+                        vnode.children.map((o)=> m(Tappable, {
+                            style: {
+                                display: "flex",
+                                gap: "5px",
+                                alignItems: "center"
+                            },
+                            onclick: ()=> {
+                                if(disabled)
+                                    return
+
+                                let value = o.value != undefined ? o.value : o
+
+                                if(data && name)
+                                    data[name] = value
+
+                                if(onchange && typeof onchange == "function")
+                                    onchange(value)
+                            }
+                        },
+
+                            m(FlexRow, {
+                                style: {
+                                    width: "20px",
+                                    height: "20px",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    borderRadius: "100px",
+                                    border: "1px solid lightgray"
+                                }
+                            },
+                                m(Div, { style: {
+                                    background: data && name && data[name] == (o.value != undefined ? o.value : o) ? disabled ? "gray" : "#2185d0" : "white",
+                                    width: "10px",
+                                    height: "10px",
+                                    borderRadius: "100px"
+                                }})
+                            ),
+
+                            m(Text, o.label || o))
+                        )
                     )
                 )
             ]
@@ -507,9 +566,12 @@ function DateSelector() {
 function HtmlDropdown() {
     let open = false;
 
+    let val = ''
+
     return {
         view: (vnode) => {
             let { data, name, label, onchange, required} = vnode.attrs
+
 
             return [
                 m(FlexCol,{width:'100%'},
@@ -535,21 +597,21 @@ function HtmlDropdown() {
                         },
                         onclick:(e)=> open = !open
                     },
-                        m(FlexRow, { justifyContent:'space-between', alignItems:'center'},
+                        m(FlexRow, { justifyContent:'space-between', alignItems:'center', height:'100%'},
                             
                             m(Text, {
                                 maxWidth:'80%',
                                 overflow:'hidden',
                                 textOverflow:'ellipsis',
                                 whiteSpace:'nowrap',
-                                color:  data && name && data[name] ? 'black' : 'grey',
-
-                            }, data && name && data[name] ? data[name] : 'Selecciona'),
+                                color:  data && name && data[name] ? 'black' : 'grey'
+                            }, 
+                            val ? val : data && name && data[name] ? data[name] : 'Selecciona'),
 
                             // is there a built-in icon without using a library??
 
                             m(SVGIcon, { 
-                                icon: open ? 'arrow_up' : 'arrow_down', 
+                                icon: open ? 'chevron_up' : 'chevron_down', 
                                 color:'rgba(34, 36, 38)' 
                             })
                         ),
@@ -583,6 +645,10 @@ function HtmlDropdown() {
 
                                     if(data && name != undefined) {
                                         data[name] = o.value != undefined ? o.value : o
+
+                                        if(o.label){
+                                            val = o.label
+                                        }
                                     }
 
                                     open = !open

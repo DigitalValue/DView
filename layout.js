@@ -5,7 +5,7 @@ export {
     Container,
     Grid, FlexCol, FlexRow, 
     Div, Animate, Tappable, Draggable,
-    Box, CssStyle
+    Box, CssStyle, ViewPortComponent
 }
 
 
@@ -75,8 +75,6 @@ function Container(){
 function FlexCol(){
     return {
         view:(vnode)=>{
-            /// let {justifyContent, alignItems} = vnode.attrs
-
 
             return m("div",{
                 style:{
@@ -169,6 +167,36 @@ function Box(){
                     width: vnode.attrs.width
                 }
             })
+        }
+    }
+}
+
+/**
+ * Componente de utilidad que retrasa el renderizado de sus hijos hasta que
+ * el componente entra en el viewport.
+ */
+function ViewPortComponent() {
+    let on = false
+    return {
+        oncreate: ({ dom, attrs }) => {
+            const { callback } = attrs
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    on = true
+                    m.redraw()
+                    if (typeof callback === "function")
+                        callback()
+                    observer.disconnect()
+                }
+            });
+            observer.observe(dom);
+        },
+        view: ({ children, attrs }) => {
+            return m("div", {
+                ...attrs,
+                callback: null,
+                style: { ...attrs.style }
+            }, on  && children)
         }
     }
 }
@@ -392,12 +420,18 @@ function Animate() {
 
         'slideDown': {
             from: {
-                maxHeight: '0px',
-                overflow:'hidden'
+                display:'grid',
+                gridTemplateRows:'0fr',
             },
             to: {
-                maxHeight: '1000px'
+                display:'grid',
+                gridTemplateRows:'1fr'
             },
+            exit: {
+                display:'grid',
+                gridTemplateRows:'0fr',
+            },
+
         },
     }
 
@@ -421,7 +455,8 @@ function Animate() {
                                 Object.keys(animate).forEach(a => {
                                     dom.style[a] = animate[a] 
                                 })
-                            }, delay) 
+                            }, delay)
+                            observer.disconnect()
                         }
                     })
                 }, { threshold: 0.1 })

@@ -74,7 +74,8 @@ function Segment(){
 
             return m(Div,{
                 padding:'1rem',
-                borderRadius: '1em',
+                borderRadius: config.borderRadius || '1em',
+                position:'relative',
                 transition: 'all .2s ease',
                 ...types[type] || types.primary,
                 ...(vnode.attrs?.basic && {border: 'none'}),
@@ -95,7 +96,7 @@ function Table(){
     let tableStyle = {
         width: "100%",
         background: "#fff",
-        margin: "1em 0",
+        //margin: "1em 0", quitado
         border: "1px solid rgba(34,36,38,.15)",
         boxShadow: "none",
         borderRadius: "0.28571429rem",
@@ -167,7 +168,8 @@ function TableHead(){
         borderTopLeftRadius: '1em',
         borderTopRightRadius: '1em',
         position: 'sticky',
-        top: 0
+        top: 0,
+        zIndex:2
     }
     
 
@@ -241,6 +243,9 @@ function TableCell(){
                     padding:'1em',
                     fontFamily: config.fontFamily,
                     ...config.elements?.table?.cell || {},
+                    ...header ? {
+                        ...config.elements?.table?.headerCell 
+                    }: {},
                     ...vnode.attrs
                 }
             }, vnode.children)
@@ -348,54 +353,78 @@ function RippleEffect() {
 * type: primary, secondary, danger
 */
 function Button(){
+    let hover = {
+        filter: 'brightness(80%)',
+    }
+
+    let onmousedown = {
+        filter: 'brightness(70%)',
+    }
+
 
     let types = {
         primary: {
             color: 'white',
             //border: '1px solid white',
             background: '#1b1c1d',
-            ...config.elements?.button?.primary || {}
+            hover,
+            onmousedown,
+            ...config.elements?.button?.primary
         },
-        secondary: config.button?.secondary ||
-        {
+        secondary: {
             color: '#4b4b4b',
             border: '1px solid #4b4b4b',
             background: 'white',
-            ...config.elements?.button?.secondary || {}
+            hover,
+            onmousedown,
+            ...config.elements?.button?.secondary 
         },
         positive: {
             color: 'white',
             border: '1px solid #00c853',
-            background: '#00c853'
+            background: '#00c853',
+            hover,
+            onmousedown
         },
         negative: {
             color: '#db2828',
             border: '1px solid #db2828',
-            background: 'transparent'
+            background: 'transparent',
+            hover,
+            onmousedown
         },
         default: {
             color: '#4b4b4b',
             border: '1px solid #4b4b4b',
-            background: 'transparent'
+            background: 'transparent',
+            hover,
+            onmousedown
         },
         blue: {
             color: 'white',
             border: '1px solid #2185d0',
-            background: '#2185d0'
+            background: '#2185d0',
+            hover,
+            onmousedown
         },
         danger: {
             color: 'red',
             border: '1px solid red',
-            background: 'white'
+            background: 'white',
+            hover,
+            onmousedown
         },
         glass: {
             color: '#1a1a1a',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             background: 'rgba(255, 255, 255, 0.25)',
             backdropFilter: 'blur(10px)',
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+            hover,
+            onmousedown
         }
     }
+
 
     let sizes= {
         small: {
@@ -414,23 +443,24 @@ function Button(){
         }
     }
     
-    let brightness = 100;
-
     return {
+        
         view:(vnode)=>{
             let { type='primary', onclick, disabled, fluid, icon, size } = vnode.attrs
             
-            return m("div",{
-                style:{
+            // REPASAR ESTO, MUCHAS CONDICIONES
+            return m(Tappable, { 
+                style: {
                     cursor:'pointer',
                     display:'flex',
                     alignItems:'center',
                     justifyContent:'center',
+                    fontWeight:'normal',
                     fontFamily: config.fontFamily,
                     minHeight:'40px',
                     width: fluid ? '100%': 'auto',
                     userSelect:'none',
-                    filter:`brightness(${brightness}%)`,
+                    filter:`brightness(100%)`,
                     borderRadius:'1em',
                     userSelect:'none',
                     gap: "5px",
@@ -439,16 +469,20 @@ function Button(){
                         cursor: 'not-allowed',
                         boxShadow:'none'
                     },
-                    ...types[type] || types.primary,
                     ...config.elements?.button,
+                    ...types[type] || types.primary,
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
-                onclick:!disabled && onclick,
-                onmouseover:(e)=> !disabled && (brightness=80), // mejorar esto !!
-                onmouseout:(e)=> (brightness=100),
-                onmousedown:(e)=> (brightness=60),
-                onmouseup:(e)=> (brightness=100),
+                onclick: !disabled && onclick,
+                hover: !disabled && {
+                    ...config.elements?.button?.hover,
+                    ...types[type]?.hover
+                },
+                onmousedown: !disabled && {
+                    ...config.elements?.button?.onmousedown,
+                    ...types[type]?.onmousedown
+                }
             }, 
                 icon ? [
                     m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
@@ -984,9 +1018,14 @@ function Sidebar() {
 
 
 
+
+
 function SVGIcon(){
 
     const Icons = {
+        arrow_down: [
+
+        ],
         arrow_left: [
             m("path", { d: "m12 19-7-7 7-7" }),
             m("path", { d: "M19 12H5" })
@@ -997,11 +1036,30 @@ function SVGIcon(){
             m("rect", { width: "18", height: "18", x: "3", y: "4", rx: "2" }),
             m("path", { d: "M3 10h18" })
         ],
+        credit_card: [
+            m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
+            m("path", { d: "M2 10h20" }),
+            m("path", { d: "M6 15h4" })
+        ],
+       
+        card: [
+            m("rect", { x: "4", y: "3", width: "16", height: "18", rx: "2" }),
+            m("path", { d: "M4 13h16" }),
+            m("circle", { cx: "9", cy: "8", r: "1.8" }),
+            m("path", { d: "m20 13-4.2-4.2a2 2 0 0 0-2.8 0L9 13" }),
+            m("path", { d: "M8 17h8" })
+        ],
         chevron_right: [
             m("path", { d: "m9 18 6-6-6-6" })
         ],
         chevron_left:[
             m("path", { d: "m15 18-6-6 6-6" })
+        ],
+        chevron_down:[
+            m("path", { d: "m6 9 6 6 6-6" })
+        ],
+        chevron_up: [
+            m("path", { d: "m18 15-6-6-6 6" })
         ],
         circle_check: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
@@ -1013,13 +1071,14 @@ function SVGIcon(){
             m("path",{d:"m9 9 6 6"})
         ],
         clock: [
-            m("circle", { cx: "12", cy: "12", r: "10" }),
-            m("polyline", { points: "12 6 12 12 16 14" })
+            m("circle", {cx:"12", cy:"12", r:"10"}),
+            m("path", {d:"M12 6v6l4 2"})
         ],
         close:[
             m("path", { d: "M18 6 6 18" }),
             m("path", { d: "m6 6 12 12" })
         ],
+        
         edit: [
             m("path", { d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
             m("path", { d: "M18.375 2.625a1.5 1.5 0 1 1 2.121 2.121L12 13.243l-3 0.757 0.757-3Z" })
@@ -1034,12 +1093,15 @@ function SVGIcon(){
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
         ],
-        google: [
-            m("path", {d:"M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"}),
-            m("path", {d:"M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"}),
-            m("path", {d:"M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"}),
-            m("path", {d:"M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"})
-        ],
+        google: {
+            viewBox: "0 0 256 262",
+            nodes: [
+                m("path", { d: "M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027", fill: "#4285F4", stroke: "none" }),
+                m("path", { d: "M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1", fill: "#34A853", stroke: "none" }),
+                m("path", { d: "M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782", fill: "#FBBC05", stroke: "none" }),
+                m("path", { d: "M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251", fill: "#EB4335", stroke: "none" })
+            ]
+        },
         shield_error: [
            m("path",{
             d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
@@ -1062,6 +1124,11 @@ function SVGIcon(){
             m("path", { d: "M9.88 5.09A10.94 10.94 0 0 1 12 5c4.5 0 8.27 2.94 9.54 7a10.66 10.66 0 0 1-2.38 3.88" }),
             m("path", { d: "M6.61 6.61A10.82 10.82 0 0 0 2.46 12a10.66 10.66 0 0 0 4.13 5.37" }),
             m("path", { d: "M14.12 14.12A3 3 0 0 1 9.88 9.88" })
+        ],
+        gallery: [
+            m("rect", { x: "3", y: "4", width: "18", height: "16", rx: "2" }),
+            m("circle", { cx: "9", cy: "9", r: "1.5" }),
+            m("path", { d: "m21 15-4-4a2 2 0 0 0-2.8 0L7 18" })
         ],
         group: [
             m("circle", { cx: "12", cy: "8", r: "3" }),
@@ -1091,6 +1158,14 @@ function SVGIcon(){
             m("path", { d: "M21 12H9" }),
             m("path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" })
         ],
+        list: [
+            m("path", { d: "M8 6h13" }),
+            m("path", { d: "M8 12h13" }),
+            m("path", { d: "M8 18h13" }),
+            m("circle", { cx: "3", cy: "6", r: "1" }),
+            m("circle", { cx: "3", cy: "12", r: "1" }),
+            m("circle", { cx: "3", cy: "18", r: "1" })
+        ],
         mail: [
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
             m("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" })
@@ -1099,17 +1174,35 @@ function SVGIcon(){
             m("path", { d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" }),
             m("circle", { cx: "12", cy: "10", r: "3" })
         ],
-        password: [
-
-        ],
-
         lock: [
             m("rect", {width:"18", height:"11", x:"3", y:"11", rx:"2", ry:"2"}),
             m("path",{d:"M7 11V7a5 5 0 0 1 10 0v4"})
         ],
 
+        messages: [
+            m("path", {
+                d:"M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+            }),
+            m("path", {
+                d:"M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"
+            })
+        ],
+        notebook:[
+            m("path", {d:"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"}),
+            m("path", {d:"M2 6h4"}),
+            m("path", {d:"M2 10h4"}),
+            m("path", {d:"M2 14h4"}),
+            m("path", {d:"M2 18h4"}),
+            m("path", {d:"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"})
+        ],
         phone: [
             m("path", { d: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" })
+        ],
+        print: [
+            m("polyline", { points: "6 9 6 2 18 2 18 9" }),
+            m("path", { d: "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" }),
+            m("rect", { x: "6", y: "14", width: "12", height: "8", rx: "1" }),
+            m("circle", { cx: "18", cy: "12", r: "1" })
         ],
         qr: [
             m("rect", { x: "3", y: "3", width: "6", height: "6", rx: "1" }),
@@ -1150,11 +1243,21 @@ function SVGIcon(){
             m("rect", { x: "12", y: "10", width: "3", height: "8", rx: "1" }),
             m("rect", { x: "17", y: "7", width: "3", height: "11", rx: "1" })
         ],
+        sign_in : [
+            m("path", { d: "m8 17-5-5 5-5" }),
+            m("path", { d: "M3 12h12" }),
+            m("path", { d: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" })
+        ],
         tv: [
             m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
             m("path", { d: "M8 21h8" }),
             m("path", { d: "M12 19v2" }),
             m("path", { d: "m9 2 3 3 3-3" })
+        ],
+        trash: [
+            m("path", {d:"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}),
+            m("path", {d:"M3 6h18"}),
+            m("path", {d:"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"})
         ],
         user: [
             m("circle", { cx: "12", cy: "8", r: "4" }),
@@ -1183,12 +1286,14 @@ function SVGIcon(){
     return {
         view: ({attrs}) => {
             const iconName = attrs.icon || "search"
-            const iconNodes = Icons[iconName] || Icons.search
+            const iconData = Icons[iconName] || Icons.search
+            const iconNodes = Array.isArray(iconData) ? iconData : iconData.nodes
+            const iconViewBox = Array.isArray(iconData) ? "0 0 24 24" : (iconData.viewBox || "0 0 24 24")
 
             return m("svg",{
                 width: attrs.width || 18 ,
                 height: attrs.height || attrs.width || 18,
-                viewBox: "0 0 24 24",
+                viewBox: iconViewBox,
                 xmlns: "http://www.w3.org/2000/svg",
                 fill: attrs.filled ? attrs.color : 'none',
                 stroke: attrs.color || 'black',

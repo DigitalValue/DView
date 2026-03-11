@@ -61,13 +61,13 @@ function AppBar() {
                 ) : m('div', {style: {width: '24px', height: '24px'}}),
 
             m(FlexCol,
-
+                
               vnode.attrs.title 
-              ? m(H2, vnode.attrs.title ) 
+              ? m(H2,{textAlign:'right'}, vnode.attrs.title ) 
               : null,
 
               vnode.attrs.subtitle 
-              ? m(Text,  vnode.attrs.subtitle)
+              ? m(Text, {textAlign:'right'},  vnode.attrs.subtitle)
               : null
             ),
             

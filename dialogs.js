@@ -64,11 +64,10 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
 
                 m(Button, {
                     type:'negative',
-                    onclick:()=>{options.then ? options.then(false):null; elem.remove()}}, options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cancelar',va:'Cancel·lar'})
-                ),
-
-            
-                
+                    onclick:()=>{options.then ? options.then(false):null; elem.remove()}
+                },   
+                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cancelar',va:'Cancel·lar'})
+                )
               )
           )
     })
@@ -152,7 +151,8 @@ function alertDialog(options={
                         fluid:options.fluid,
                         type:'negative'
                     },
-                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"}))
+                    m(Text,options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"}))
+                    )
                 )
             )
     })
@@ -280,10 +280,6 @@ function openDialog(Component, options = {}) {
 
     elem.style = 'position:fixed;inset:0px;z-index:100000'
     elem.id = Math.random() * 10000 + ''
-
-    let attrs = options.attrs || {}
-    
-
 
     document.body.appendChild(elem);
 
