@@ -326,7 +326,8 @@ function Modal(){
     let sizes = {
         'small':'500px',
         'big':'850px',
-        'tiny': '300px'
+        'tiny': '300px',
+        'fullscreen': '90vw'
     }
     
     let dimmerStyle = {
@@ -349,10 +350,10 @@ function Modal(){
                 modalStyle.top = '50%',
                 modalStyle.transform = 'translate(-50%,-50%)'
             }
-
+            /*
             if(vnode.attrs.animate){ 
                 modalStyle.transform = 'translate(-50%,-30%) scale(0.7)'
-            }
+            }*/
 
         },
         view:(vnode)=>{
@@ -364,11 +365,11 @@ function Modal(){
                     style:{ ...modalStyle, ...vnode.attrs.style },
                     tabindex: -1,
                     oncreate:({dom})=> { 
-                        if(vnode.attrs.animate){
+                        /*if(vnode.attrs.animate){
                             setTimeout(()=>{
                                 dom.style.transform = 'translate(-50%,-40%) scale(1)'
                             }, 100)
-                        }
+                        }*/
                         
                         setTimeout(()=>dom.focus(),50)
                     },

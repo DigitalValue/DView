@@ -106,8 +106,7 @@ function Input(){
             return [
 
                 // TO DO: editar el estilo de focus
-                m(FlexCol,{ width:'100%'}, // pensar otra manera sin necesidad de meter width: 100%
-
+                m(FlexCol,{}, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
                         m(FormLabel,{required: required, info:info}, label),

@@ -79,7 +79,8 @@ function FlexCol(){
                 style:{
                     display:'flex',
                     flexDirection:'column',
-                    ...vnode.attrs?.style || vnode.attrs 
+                    ...(vnode.attrs?.style),
+                    ...(vnode.attrs)
                 }, 
             }, vnode.children)
         }
