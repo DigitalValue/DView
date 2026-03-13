@@ -61,7 +61,9 @@ function Checkbox(){
 
     let checkboxStyle = {
         width:'17px', 
+        minWidth:'17px', 
         height:'17px',
+        minHeight:'17px',
         cursor:'pointer',
         marginBottom: "5px"
     }
@@ -108,7 +110,9 @@ function Input(){
             return [
 
                 // TO DO: editar el estilo de focus
-                m(FlexCol,{}, // pensar otra manera sin necesidad de meter width: 100%
+                m(FlexCol,{
+                    width: "100%"
+                }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
                         m(FormLabel,{required: required, info:info}, label),
