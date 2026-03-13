@@ -372,8 +372,8 @@ function Dropdown(){
                         disabled,
                         style: {
                             ...(config.form?.baseStyle),
-                            appearance: 'none',
-                            WebkitAppearance: 'none',
+                            // appearance: 'none',
+                            // WebkitAppearance: 'none',
                         },
                         onchange:(e)=>{
                             data && name !=undefined ? data[name] = e.target.value: ''

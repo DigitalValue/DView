@@ -84,7 +84,7 @@ function Text(){
                     userSelect:'none',
                     fontFamily: config.fontFamily,
                     margin: 0,
-                    color:'black',
+                    // color:'black',
                     ...(config.fonts?.text ||  config.defaultFont  || {}),
                     ...(vnode.attrs.style || vnode.attrs)
                 }

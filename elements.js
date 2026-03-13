@@ -4,7 +4,7 @@ import { SmallText, Text } from "./texts.js"
 
 
 export {
-    BreadCrumb, Button, Card, Checkbox, Icon, Img, Label,
+    BreadCrumb, Button, Card, Icon, Img, Label,
     Message, RippleEffect, Segment, Sidebar, Span, Spinner, SVGIcon, Table, TableBody, TableCell, TableFooter, TableHead, TableRow
 }
 
@@ -736,42 +736,6 @@ function Label(){
 }
 
 
-function Checkbox(){
-
-    let checkboxStyle = {
-        width:'17px', 
-        height:'17px',
-        cursor:'pointer',
-    }
-
-    return {
-        view:(vnode)=>{
-            let {data, name, onchange,label, checked} = vnode.attrs
-
-            return [
-                m(FlexRow, {alignItems:'center', gap:'0.5em'},
-                    m("input",{
-                        type:'checkbox',
-                        checked: data && name ? data[name] : checked,
-                        style: checkboxStyle,
-                        onchange:(e)=>{
-                            if(data && name){
-                                data[name] = e.target.checked
-                            }
-
-                            onchange ? onchange(e): ''
-                        }
-                    }),
-                    
-                    label ? m(Text, label) : null
-                    //m("label", localize(label))
-                )
-            ]
-        }
-    }
-}
-
-
 function Card(){
 
     let shadow = 'rgba(50, 50, 93, 0.25) 0px 2px 5px -1px'
@@ -1280,6 +1244,22 @@ function SVGIcon(){
             m("path", { d: "m8 17-5-5 5-5" }),
             m("path", { d: "M3 12h12" }),
             m("path", { d: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" })
+        ],
+        square_menu: [
+            m("rect", {
+                width: 18,
+                height: 18,
+                x: 3,
+                y: 3,
+                rx: 2
+            }),
+            m("path", { d: "M7 8h10" }),
+            m("path", { d: "M7 12h10" }),
+            m("path", { d: "M7 16h10" })
+        ],
+        square_pen: [
+            m("path",{d:"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}),
+            m("path",{d:"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"})
         ],
         tv: [
             m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
