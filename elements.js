@@ -3,11 +3,11 @@ import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
 import { Text, SmallText, H2 } from "./texts.js"
 
 
-export { 
-    Segment,  Span, RippleEffect,
-    Button, Icon, Img,    
-    Sidebar, Label, 
-    Message,  Card,  Checkbox, Spinner, 
+export {
+    Segment, Span, RippleEffect,
+    Button, Icon, Img,
+    Sidebar, Label,
+    Message, Card, Checkbox, Spinner,
     BreadCrumb,
     Table, TableHead, TableBody, TableRow, TableCell, TableFooter,
     SVGIcon
@@ -16,17 +16,17 @@ export {
 
 
 // cachea la imagen al mostrarse
-function Img(){
+function Img() {
     let image = new Image()
 
 
     return {
-        oninit: (vnode)=>{
+        oninit: (vnode) => {
             image.src = vnode.attrs.src
         },
-        view:(vnode) => {
+        view: (vnode) => {
             return [
-                m("img",{
+                m("img", {
                     src: image.src,
                     id: vnode.attrs.id,
                     style: vnode.attrs.style,
@@ -41,7 +41,7 @@ function Img(){
 
 
 
-function Segment(){
+function Segment() {
     let types = {
         primary: {
             backgroundColor: 'white',
@@ -66,38 +66,38 @@ function Segment(){
     }
 
     let attach = {
-        'topAttached': {borderBottomLeftRadius:'0px',borderBottomRightRadius:'0px', borderBottom:'0px'},
-        'bottomAttached': {borderTopLeftRadius:'0px', borderTopRightRadius:'0px'},
-        'leftAttached': {borderBottomRightRadius:'0px',borderTopRightRadius:'0px', borderRight:'0px'},
-        'rightAttached': {borderTopLeftRadius:'0px', borderBottomLeftRadius:'0px'},
-        'attached':{borderRadius:'0px'},
+        'topAttached': { borderBottomLeftRadius: '0px', borderBottomRightRadius: '0px', borderBottom: '0px' },
+        'bottomAttached': { borderTopLeftRadius: '0px', borderTopRightRadius: '0px' },
+        'leftAttached': { borderBottomRightRadius: '0px', borderTopRightRadius: '0px', borderRight: '0px' },
+        'rightAttached': { borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px' },
+        'attached': { borderRadius: '0px' },
     }
 
     return {
-        view:(vnode)=>{
-            let {type='default'} = vnode.attrs || {}
+        view: (vnode) => {
+            let { type = 'default' } = vnode.attrs || {}
 
-            return m(Div,{
-                padding:'1rem',
+            return m(Div, {
+                padding: '1rem',
                 borderRadius: config.borderRadius || '1em',
-                position:'relative',
+                position: 'relative',
                 transition: 'all .2s ease',
                 ...types[type] || types.primary,
-                ...(vnode.attrs?.basic && {border: 'none'}),
+                ...(vnode.attrs?.basic && { border: 'none' }),
                 ...(vnode.attrs?.attach && attach[vnode.attrs.attach]),
-                ...(vnode.attrs?.raised && { 
+                ...(vnode.attrs?.raised && {
                     boxShadow: '0 2px 4px rgba(34, 36, 38, .12), 0 2px 10px rgba(34, 36, 38, .15)'
                 }),
                 ...(config.elements?.segment || {}),
                 ...(vnode.attrs?.style || vnode.attrs)
             },
-            vnode.children)
+                vnode.children)
         }
     }
 }
 
 
-function Table(){
+function Table() {
     let tableStyle = {
         width: "100%",
         background: "#fff",
@@ -110,60 +110,60 @@ function Table(){
         color: "rgba(0,0,0,.87)",
         borderCollapse: "separate",
         borderSpacing: "0",
-        borderRadius:'1em'
+        borderRadius: '1em'
     }
 
     return {
-        view:(vnode)=>{
-            return m("table",{
-                style:{ 
-                    ...tableStyle, 
+        view: (vnode) => {
+            return m("table", {
+                style: {
+                    ...tableStyle,
                     ...config.elements?.table?.table || {},
                     ...vnode.attrs.style
                 },
-            }, 
+            },
                 // use rows and
-                vnode.attrs.header ? m(TableHead,  
-                    vnode.attrs.header.map((cell)=>{
+                vnode.attrs.header ? m(TableHead,
+                    vnode.attrs.header.map((cell) => {
                         return m(TableCell, {
-                                header: true,
-                                colspan: cell.colspan || 1,
-                                style: cell.style || {},
-                                onclick: cell.onclick || null,
-                            }, cell.label || cell)
+                            header: true,
+                            colspan: cell.colspan || 1,
+                            style: cell.style || {},
+                            onclick: cell.onclick || null,
+                        }, cell.label || cell)
                     })
                 ) : null,
 
-                vnode.attrs.body ? m(TableBody,  vnode.attrs.body.map((row)=>
-                    m(TableRow, 
-                        row.map((cell)=>
+                vnode.attrs.body ? m(TableBody, vnode.attrs.body.map((row) =>
+                    m(TableRow,
+                        row.map((cell) =>
                             m(TableCell, {
                                 header: cell.header || false,
                                 colspan: cell.colspan || 1,
                                 style: cell.style || {},
                                 onclick: cell.onclick || null,
-                          }, cell.content || cell.text || cell.label || cell.value || cell)
+                            }, cell.content || cell.text || cell.label || cell.value || cell)
                         )
                     )
                 )) : null,
 
                 vnode.children
-        
+
             )
         }
     }
 }
 
-function TableHead(){
+function TableHead() {
     let style = {
         boxShadow: "none",
-        padding:'1em',
+        padding: '1em',
         cursor: "auto",
         background: "#24303f",
         textAlign: "inherit",
-        lineHeight:2,
+        lineHeight: 2,
         color: "white",
-        borderTopRadius:'1em',
+        borderTopRadius: '1em',
         verticalAlign: "middle",
         fontWeight: 700,
         textTransform: "none",
@@ -174,13 +174,13 @@ function TableHead(){
         borderTopRightRadius: '1em',
         position: 'sticky',
         top: 0,
-        zIndex:2
+        zIndex: 2
     }
-    
+
 
     return {
-        view:(vnode)=>{
-            return m("thead",{
+        view: (vnode) => {
+            return m("thead", {
                 style: {
                     ...style,
                     ...config.elements?.table?.head || {},
@@ -192,12 +192,12 @@ function TableHead(){
     }
 }
 
-function TableBody(){
+function TableBody() {
 
     return {
-        view:(vnode)=>{
-            return m("tbody",{
-                style:  {
+        view: (vnode) => {
+            return m("tbody", {
+                style: {
                     ...config.elements?.table?.body || {},
                     ...vnode.attrs
                 }
@@ -206,7 +206,7 @@ function TableBody(){
     }
 }
 
-function TableFooter(){
+function TableFooter() {
     return {
         view: (vnode) => {
             return m("tfoot", {
@@ -219,39 +219,39 @@ function TableFooter(){
     }
 }
 
-function TableRow(){
+function TableRow() {
     return {
-        view:(vnode)=>{
-            return m("tr",{
-                style:{
-                    ...vnode.attrs
+        view: (vnode) => {
+            return m("tr", {
+                style: {
+                    ...(vnode.attrs.style || vnode.attrs)
                 },
-                onclick : vnode.attrs.onclick ? vnode.attrs.onclick : null,
-                onmouseenter : vnode.attrs.onmouseenter ? vnode.attrs.onmouseenter : null,
-                onmouseleave : vnode.attrs.onmouseleave ? vnode.attrs.onmouseleave : null,
+                onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
+                onmouseenter: vnode.attrs.onmouseenter ? vnode.attrs.onmouseenter : null,
+                onmouseleave: vnode.attrs.onmouseleave ? vnode.attrs.onmouseleave : null,
             }, vnode.children)
         }
-    
+
     }
 }
 
-function TableCell(){
+function TableCell() {
     return {
-        view: (vnode)=>{
-            let {header= false}=vnode.attrs
+        view: (vnode) => {
+            let { header = false } = vnode.attrs
 
-            return m(header ? "th" : "td",{
+            return m(header ? "th" : "td", {
                 colspan: vnode.attrs.colspan,
                 onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
                 style: {
-                    textAlign:'left',
-                    padding:'1em',
+                    textAlign: 'left',
+                    padding: '1em',
                     fontFamily: config.fontFamily,
                     ...config.elements?.table?.cell || {},
                     ...header ? {
-                        ...config.elements?.table?.headerCell 
-                    }: {},
-                    ...vnode.attrs
+                        ...config.elements?.table?.headerCell
+                    } : {},
+                    ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
         }
@@ -264,88 +264,88 @@ function TableCell(){
 // mouseover, mouseout, clickout...
 function RippleEffect() {
     let rippleEffect = false
-    let x,y
+    let x, y
     let type = 'dark'
-  
+
     let background = {
-        dark:'rgb(0,0,0,0.2)',
+        dark: 'rgb(0,0,0,0.2)',
         light: 'rgba(255,255,255,0.3)'
     }
 
     let time1, time2;
 
     function RippleSpan() {
-  
-      return {
-        oncreate : (vnode)=> {
-          setTimeout(()=> {
-            vnode.dom.style.transform = "scale(100)"
-            vnode.dom.style.opacity = "0"
-          },1)
-        },
-        view : ({attrs})=> {
-          return m("span.ripple",{
-            style : {
-              borderRadius : "50%",
-              tranform : "scale(0)",
-              position : "absolute",
-              transition : "1s",
-              backgroundColor : background[type],
-              width : "10px",
-              height : "10px",
-              top : attrs.y,
-              left : attrs.x
+
+        return {
+            oncreate: (vnode) => {
+                setTimeout(() => {
+                    vnode.dom.style.transform = "scale(100)"
+                    vnode.dom.style.opacity = "0"
+                }, 1)
+            },
+            view: ({ attrs }) => {
+                return m("span.ripple", {
+                    style: {
+                        borderRadius: "50%",
+                        tranform: "scale(0)",
+                        position: "absolute",
+                        transition: "1s",
+                        backgroundColor: background[type],
+                        width: "10px",
+                        height: "10px",
+                        top: attrs.y,
+                        left: attrs.x
+                    }
+                })
             }
-          })
         }
-      }
     }
 
     return {
-      view : (vnode)=> {
-        type = vnode.attrs.type || 'dark'
+        view: (vnode) => {
+            type = vnode.attrs.type || 'dark'
 
-        return m("div",{
-          id : vnode.attrs.id || null,
-          style : {
-            position : "relative",
-            overflow : "hidden",
-            ...vnode.attrs.style
-          },
-          onmousedown : (e)=> {
-            //Datos para que el ripple aparezca donde se hace click
-  
-            const item = e.currentTarget.getBoundingClientRect()
-            x = `${e.clientX - item.left}px`;
-            y = `${e.clientY - item.top}px`;
-  
-            rippleEffect = true  
-            time1 = new Date().getTime()
+            return m("div", {
+                id: vnode.attrs.id || null,
+                style: {
+                    position: "relative",
+                    overflow: "hidden",
+                    ...vnode.attrs.style
+                },
+                onmousedown: (e) => {
+                    //Datos para que el ripple aparezca donde se hace click
 
-            setTimeout(()=> {
-                rippleEffect = false
-                m.redraw()
-            }, 1000)
-          },
-          //onmouseout:(e)=> rippleEffect = false,
-          onmouseup:(e)=>{
-            time2 = new Date().getTime()
-            
-            if(vnode.attrs.onclick){
-                setTimeout(()=>{
-                    vnode.attrs.onclick();
-                    m.redraw()
-                }, time2-time1 > 500 ? 0 : 500-(time2-time1))
-            }
-          }
-        },
-          vnode.children,
-          //Efecto ripple
-          rippleEffect
-          ?  [ m(RippleSpan,{x,y, key : rippleEffect}) ]
-          : null
-        )
-      }
+                    const item = e.currentTarget.getBoundingClientRect()
+                    x = `${e.clientX - item.left}px`;
+                    y = `${e.clientY - item.top}px`;
+
+                    rippleEffect = true
+                    time1 = new Date().getTime()
+
+                    setTimeout(() => {
+                        rippleEffect = false
+                        m.redraw()
+                    }, 1000)
+                },
+                //onmouseout:(e)=> rippleEffect = false,
+                onmouseup: (e) => {
+                    time2 = new Date().getTime()
+
+                    if (vnode.attrs.onclick) {
+                        setTimeout(() => {
+                            vnode.attrs.onclick();
+                            m.redraw()
+                        }, time2 - time1 > 500 ? 0 : 500 - (time2 - time1))
+                    }
+                }
+            },
+                vnode.children,
+                //Efecto ripple
+                rippleEffect
+                    ? [m(RippleSpan, { x, y, key: rippleEffect })]
+                    : null
+            )
+        }
     }
 }
 
@@ -355,7 +355,7 @@ function RippleEffect() {
 /*
 * type: primary, secondary, danger
 */
-function Button(){
+function Button() {
     let hover = {
         filter: 'brightness(80%)',
     }
@@ -380,7 +380,7 @@ function Button(){
             background: 'white',
             hover,
             onmousedown,
-            ...config.elements?.button?.secondary 
+            ...config.elements?.button?.secondary
         },
         positive: {
             color: 'white',
@@ -429,47 +429,47 @@ function Button(){
     }
 
 
-    let sizes= {
+    let sizes = {
         small: {
-            paddingLeft:'0.3em',
-            paddingRight:'0.3em',
-            fontSize:'0.875em',
-            minHeight:'30px',
-            minWidth:'30px'
+            paddingLeft: '0.3em',
+            paddingRight: '0.3em',
+            fontSize: '0.875em',
+            minHeight: '30px',
+            minWidth: '30px'
         },
         default: {
-            paddingLeft:`1.5em`,
-            paddingRight:'1.5em',
-            fontSize:'1em',
-            minHeight:'40px',
-            minWidth:'40px'
+            paddingLeft: `1.5em`,
+            paddingRight: '1.5em',
+            fontSize: '1em',
+            minHeight: '40px',
+            minWidth: '40px'
         }
     }
-    
+
     return {
-        
-        view:(vnode)=>{
-            let { type='primary', onclick, disabled, fluid, icon, size } = vnode.attrs
-            
+
+        view: (vnode) => {
+            let { type = 'primary', onclick, disabled, fluid, icon, size } = vnode.attrs
+
             // REPASAR ESTO, MUCHAS CONDICIONES
-            return m(Tappable, { 
+            return m(Tappable, {
                 style: {
-                    cursor:'pointer',
-                    display:'flex',
-                    alignItems:'center',
-                    justifyContent:'center',
-                    fontWeight:'normal',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'normal',
                     fontFamily: config.fontFamily,
-                    minHeight:'40px',
-                    width: fluid ? '100%': 'auto',
-                    userSelect:'none',
-                    filter:`brightness(100%)`,
-                    borderRadius:'1em',
+                    minHeight: '40px',
+                    width: fluid ? '100%' : 'auto',
+                    userSelect: 'none',
+                    filter: `brightness(100%)`,
+                    borderRadius: '1em',
                     gap: "5px",
                     ...disabled && {
-                        opacity:'0.5',
+                        opacity: '0.5',
                         cursor: 'not-allowed',
-                        boxShadow:'none'
+                        boxShadow: 'none'
                     },
                     ...config.elements?.button,
                     ...types[type] || types.primary,
@@ -485,9 +485,9 @@ function Button(){
                     ...config.elements?.button?.onmousedown,
                     ...types[type]?.onmousedown
                 }
-            }, 
+            },
                 icon ? [
-                    m(Icon,{ icon:icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
+                    m(Icon, { icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
                     // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
@@ -512,39 +512,39 @@ function Button(){
  * https://fonts.google.com/icons
  *
  **/
-function Icon(){    
+function Icon() {
     let sizes = {
-        'mini':'font-size:14px',
-        'tiny':'font-size:16px',
-        'small':'font-size:18px;',
-        'medium':'',
-        'large':'font-size:28px',
-        'huge':'font-size:32px',
-        'massive':'font-size:50px'
+        'mini': 'font-size:14px',
+        'tiny': 'font-size:16px',
+        'small': 'font-size:18px;',
+        'medium': '',
+        'large': 'font-size:28px',
+        'huge': 'font-size:32px',
+        'massive': 'font-size:50px'
     }
 
     return {
         /*oninit:(vnode)=>{
             
         },*/
-        view:(vnode)=>{
-            let {onclick} = vnode.attrs
+        view: (vnode) => {
+            let { onclick } = vnode.attrs
 
-            return m("span",{
-                class:'material-icons', 
-                onclick:vnode.attrs.onclick,
-                style:`${sizes[vnode.attrs.size || 'medium']}; user-select: none;color:${vnode.attrs.color || 'black'};opacity:${vnode.attrs.opacity || 1};${onclick ? 'cursor:pointer':''}`,
-                
+            return m("span", {
+                class: 'material-icons',
+                onclick: vnode.attrs.onclick,
+                style: `${sizes[vnode.attrs.size || 'medium']}; user-select: none;color:${vnode.attrs.color || 'black'};opacity:${vnode.attrs.opacity || 1};${onclick ? 'cursor:pointer' : ''}`,
+
             }, vnode.attrs.icon)
         }
     }
 }
 
 
-function Span(){
+function Span() {
     return {
-        view:(vnode)=>{
-            return m("span",{
+        view: (vnode) => {
+            return m("span", {
                 style: {
                     ...vnode.attrs
                 }
@@ -554,59 +554,59 @@ function Span(){
 }
 
 
-function Message(){
+function Message() {
 
     let types = {
         'error': {
-            background:'#fef2f2',
-            color:'#B91C1C',
+            background: '#fef2f2',
+            color: '#B91C1C',
             icon: 'shield_error'
         },
         'info': {
-            color:'black',
+            color: 'black',
             icon: 'info'
         }
     }
-    
+
 
     // set different types 
 
     return {
-        view:(vnode)=>{
-            let { type='info' } = vnode.attrs
+        view: (vnode) => {
+            let { type = 'info' } = vnode.attrs
 
-            return m(Segment,{
-                    style: {
-                        ...types[type] || {},
-                        ...vnode.attrs?.style
-                    },
-                    type:'secondary',
-                }, 
-                m(FlexRow, {alignItems: 'center', gap:'1em'},
+            return m(Segment, {
+                style: {
+                    ...types[type] || {},
+                    ...vnode.attrs?.style
+                },
+                type: 'secondary',
+            },
+                m(FlexRow, { alignItems: 'center', gap: '1em' },
                     m(SVGIcon, {
-                        icon: types[type]?.icon || 'info', 
-                        size: 'small', 
-                        color: type == 'error' ? 'red': 'black'
+                        icon: types[type]?.icon || 'info',
+                        size: 'small',
+                        color: type == 'error' ? 'red' : 'black'
                     }),
 
-                    vnode.attrs.header || vnode.attrs.message ? 
-                    m(FlexCol, 
-                        
-                        vnode.attrs.header && m(Text, {
-                            marginBottom:'0.5em', 
-                            fontWeight:'bold', 
-                            
-                        }, vnode.attrs.header),
+                    vnode.attrs.header || vnode.attrs.message ?
+                        m(FlexCol,
 
-                        vnode.attrs.message && 
+                            vnode.attrs.header && m(Text, {
+                                marginBottom: '0.5em',
+                                fontWeight: 'bold',
+
+                            }, vnode.attrs.header),
+
+                            vnode.attrs.message &&
+                            m(Text, {
+                                //color: type == 'error' ? '#7f1d1d': 'black'
+                            }, vnode.attrs.message)
+
+                        ) :
                         m(Text, {
                             //color: type == 'error' ? '#7f1d1d': 'black'
-                        }, vnode.attrs.message)
-
-                    ) :
-                    m(Text,{
-                        //color: type == 'error' ? '#7f1d1d': 'black'
-                    }, vnode.children )
+                        }, vnode.children)
                 )
             )
         }
@@ -614,7 +614,7 @@ function Message(){
 }
 
 
-function Label(){
+function Label() {
 
     let types = {
         default: {
@@ -677,48 +677,48 @@ function Label(){
     // follow the fontSizes of H2, Text and SmallText
     let sizes = {
         'small': {
-            fontSize:'0.6em',
+            fontSize: '0.6em',
         },
         'default': {
-            fontSize:'0.875em',
+            fontSize: '0.875em',
         },
         'large': {
-            fontSize:'1.1em',
+            fontSize: '1.1em',
             padding: ".75em 1em"
         }
     }
 
     return {
-        view:(vnode)=>{
-            let { type='default', size = 'default'} = vnode.attrs
+        view: (vnode) => {
+            let { type = 'default', size = 'default' } = vnode.attrs
 
             return [
-                m("div",{
+                m("div", {
                     style: {
                         lineHeight: "1",
                         margin: "0 .14285714em",
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        width:'fit-content',
+                        width: 'fit-content',
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
                         ...types[type],
-                        ...(vnode.attrs.basic && { 
-                            backgroundColor:'white',
+                        ...(vnode.attrs.basic && {
+                            backgroundColor: 'white',
                             color: types[type].backgroundColor || 'black'
                         }),
                         ...(sizes[size] || sizes['default']),
                         ...vnode.attrs.style
                     },
                     onclick: vnode.attrs.onclick
-                }, 
-                    vnode.attrs.icon || vnode.attrs.text ? 
-                    m(FlexRow, {gap:'0.5em', alignItems:'center'},
-                        vnode.attrs.icon && m(Icon,{icon:vnode.attrs.icon, size:'small', color: types[type]?.color || 'white'}),
-                        vnode.attrs.text && m(SmallText, vnode.attrs.text),
-                    ) : null,
+                },
+                    vnode.attrs.icon || vnode.attrs.text ?
+                        m(FlexRow, { gap: '0.5em', alignItems: 'center' },
+                            vnode.attrs.icon && m(Icon, { icon: vnode.attrs.icon, size: 'small', color: types[type]?.color || 'white' }),
+                            vnode.attrs.text && m(SmallText, vnode.attrs.text),
+                        ) : null,
 
                     vnode.children
                 )
@@ -728,33 +728,33 @@ function Label(){
 }
 
 
-function Checkbox(){
+function Checkbox() {
 
     let checkboxStyle = {
-        width:'17px', 
-        height:'17px',
-        cursor:'pointer',
+        width: '17px',
+        height: '17px',
+        cursor: 'pointer',
     }
 
     return {
-        view:(vnode)=>{
-            let {data, name, onchange,label, checked} = vnode.attrs
+        view: (vnode) => {
+            let { data, name, onchange, label, checked } = vnode.attrs
 
             return [
-                m(FlexRow, {alignItems:'center', gap:'0.5em'},
-                    m("input",{
-                        type:'checkbox',
+                m(FlexRow, { alignItems: 'center', gap: '0.5em' },
+                    m("input", {
+                        type: 'checkbox',
                         checked: data && name ? data[name] : checked,
                         style: checkboxStyle,
-                        onchange:(e)=>{
-                            if(data && name){
+                        onchange: (e) => {
+                            if (data && name) {
                                 data[name] = e.target.checked
                             }
 
-                            onchange ? onchange(e): ''
+                            onchange ? onchange(e) : ''
                         }
                     }),
-                    
+
                     label ? m(Text, label) : null
                     //m("label", localize(label))
                 )
@@ -764,88 +764,89 @@ function Checkbox(){
 }
 
 
-function Card(){
+function Card() {
 
     let shadow = 'rgba(50, 50, 93, 0.25) 0px 2px 5px -1px'
-    
+
     return {
         view: (vnode) => {
-            let { photo, title, type, description, borderColor ='lightgrey', labels, style} = vnode.attrs
+            let { photo, title, type, description, borderColor = 'lightgrey', labels, style } = vnode.attrs
 
             return [
-                m("div",{
-                    style:{
+                m("div", {
+                    style: {
                         //height:'100%', width:'100%', // hay que meter la card siempre en un contenedor !!
-                        border:'2px solid rgb(224, 224, 224)',
-                        cursor:'pointer', background: type == 'secondary' ? '#e0e0e0': 'white', //border:'1px solid lightgrey',
-                        borderRadius:'1em', position:'relative', padding: !photo ? '1em':'0em',
+                        border: '2px solid rgb(224, 224, 224)',
+                        cursor: 'pointer', background: type == 'secondary' ? '#e0e0e0' : 'white', //border:'1px solid lightgrey',
+                        borderRadius: '1em', position: 'relative', padding: !photo ? '1em' : '0em',
                         ...(style || vnode.attrs)
                     },
                     onclick: vnode.attrs.onclick,
-                    onmouseenter:(e)=>{
-                       vnode.attrs.onclick ? shadow = 'rgba(0, 0, 0, 0.35) 0px 5px 15px': null
+                    onmouseenter: (e) => {
+                        vnode.attrs.onclick ? shadow = 'rgba(0, 0, 0, 0.35) 0px 5px 15px' : null
                     },
-                    onmouseleave:(e)=>{
+                    onmouseleave: (e) => {
                         shadow = 'rgba(50, 50, 93, 0.25) 0px 2px 5px -1px'
                     },
                 },
-                    
-                    m(FlexCol,{ height: '100%', width: '100%', justifyContent: 'center', position:'relative'},
+
+                    m(FlexCol, { height: '100%', width: '100%', justifyContent: 'center', position: 'relative' },
                         labels ? [
-                            m(FlexRow, {gap:'0.5em', position:'absolute', top:'0.5em', left:'0.5em', zIndex:1},
+                            m(FlexRow, { gap: '0.5em', position: 'absolute', top: '0.5em', left: '0.5em', zIndex: 1 },
                                 labels.map((label) =>
                                     m(Label, {
                                         ...label,
-                                        size:'small'
+                                        size: 'small'
                                     })
                                 )
                             ),
-                            !photo && m(Div, {height:'2em'})
+                            !photo && m(Div, { height: '2em' })
                         ] : null,
 
                         photo ?
-                        [
-                            m("img", { 
-                            "src": photo + '?w=300', 
-                            "style": { 
-                                "width": "100%",  "height": "auto", "max-height":'150px', 
-                                "border-style": "none", "background":'white',
-                                'border-top-left-radius':'1em', 'border-top-right-radius':'1em',         
-                                willChange: 'transform', 
-                                ...vnode.attrs.imgStyle
-                            }}),
+                            [
+                                m("img", {
+                                    "src": photo + '?w=300',
+                                    "style": {
+                                        "width": "100%", "height": "auto", "max-height": '150px',
+                                        "border-style": "none", "background": 'white',
+                                        'border-top-left-radius': '1em', 'border-top-right-radius': '1em',
+                                        willChange: 'transform',
+                                        ...vnode.attrs.imgStyle
+                                    }
+                                }),
 
-                            borderColor &&
-                            m(Div, {
-                                height:'2px',
-                                background: `${borderColor}`,
-                                width:'90%',
-                                margin:'0 auto',
-                            })
-                        ]
-                        : null,
-                        
+                                borderColor &&
+                                m(Div, {
+                                    height: '2px',
+                                    background: `${borderColor}`,
+                                    width: '90%',
+                                    margin: '0 auto',
+                                })
+                            ]
+                            : null,
+
                         description || title ?
-                        m(FlexCol,{flex:2, padding:'1em', justifyContent: 'center'},
-                            m(Text,{fontWeight:'bold', width:'90%', marginTop:'0.5em', marginBottom:'0.5em'}, title),
+                            m(FlexCol, { flex: 2, padding: '1em', justifyContent: 'center' },
+                                m(Text, { fontWeight: 'bold', width: '90%', marginTop: '0.5em', marginBottom: '0.5em' }, title),
 
-                            description ? m(SmallText, {
-                                display: "-webkit-box", 
-                                "-webkit-box-orient": "vertical", 
-                                "-webkit-line-clamp": 4,  // esto debe de ser configurable !!
-                                "overflow": "hidden", 
-                                "text-overflow": "ellipsis", 
-                                'color':'grey'
-                            }, m.trust(description)) : null,
+                                description ? m(SmallText, {
+                                    display: "-webkit-box",
+                                    "-webkit-box-orient": "vertical",
+                                    "-webkit-line-clamp": 4,  // esto debe de ser configurable !!
+                                    "overflow": "hidden",
+                                    "text-overflow": "ellipsis",
+                                    'color': 'grey'
+                                }, m.trust(description)) : null,
 
-                            m(Box,{height:'0.5em'}),
-                        ) : null,
+                                m(Box, { height: '0.5em' }),
+                            ) : null,
 
 
                         vnode.children
                     ),
 
-                   // 
+                    // 
 
                 )
             ]
@@ -854,31 +855,31 @@ function Card(){
 }
 
 
-function BreadCrumb(){
+function BreadCrumb() {
 
     return {
-        view:(vnode)=>{
-            let {style, onclick} = vnode.attrs
+        view: (vnode) => {
+            let { style, onclick } = vnode.attrs
 
 
             return [
-                m(FlexRow, {gap:'1em', alignItems:'center', ...style},
-                    vnode.children.map((item,i)=>{
-                        let active = i == vnode.children.length -1
-                        
+                m(FlexRow, { gap: '1em', alignItems: 'center', ...style },
+                    vnode.children.map((item, i) => {
+                        let active = i == vnode.children.length - 1
+
                         return [
-                            m(Tappable,{
-                                onclick:(e)=> {
-                                    if(!active) onclick(i)
+                            m(Tappable, {
+                                onclick: (e) => {
+                                    if (!active) onclick(i)
                                 }
                             }, m(Text, {
-                                fontWeight: active  ? 'bold': 'normal', 
-                                ...style 
+                                fontWeight: active ? 'bold' : 'normal',
+                                ...style
                             }, item.label || item)),
-                        
-                            !active && m(Icon,{icon:'chevron_right'}) 
+
+                            !active && m(Icon, { icon: 'chevron_right' })
                         ]
-                    })    
+                    })
                 )
             ]
 
@@ -887,7 +888,7 @@ function BreadCrumb(){
 }
 
 
-function Spinner(){
+function Spinner() {
     // can you create different sizes, only sizes
     let sizes = {
         small: {
@@ -917,11 +918,11 @@ function Spinner(){
 
 
     return {
-        view:(vnode)=>{
-            let {color, size = 'small'}= vnode.attrs
+        view: (vnode) => {
+            let { color, size = 'small' } = vnode.attrs
 
-            
-           return [
+
+            return [
                 // código copiado de stackoverflow, habrá que pasarlo a nuestro modelo
                 // cambia la clase por id
                 m(`style`, `
@@ -933,16 +934,16 @@ function Spinner(){
                         transform: rotate(360deg);
                     }
                 }`),
-                    
-                m(Div,{
+
+                m(Div, {
                     "display": "inline-flex",
                     justifyContent: "center",
                     "position": "relative",
-                    "width": `${sizes[size].width*2}px`,
-                    "height": `${sizes[size].height*2}px`,
+                    "width": `${sizes[size].width * 2}px`,
+                    "height": `${sizes[size].height * 2}px`,
                 },
-                    
-                    m(Div,{
+
+                    m(Div, {
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
@@ -952,7 +953,7 @@ function Spinner(){
                         }
                     }),
 
-                    m(Div,{
+                    m(Div, {
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
@@ -962,8 +963,8 @@ function Spinner(){
                         }
                     })
                 )
-                
-           ]
+
+            ]
         }
     }
 }
@@ -985,7 +986,7 @@ function Sidebar() {
             return m(`.ui.right.sidebar${transition}`, // quitar css de semantic
                 {
 
-                    tabindex:'0',
+                    tabindex: '0',
                     oncreate: ({ dom }) => {
                         dom.focus()
                     },
@@ -1003,8 +1004,8 @@ function Sidebar() {
         },
 
         onbeforeremove: (vnode) => {
-            return new Promise(function(resolve) {
-                vnode.dom.classList.add('transition','animating','out','slide','left')
+            return new Promise(function (resolve) {
+                vnode.dom.classList.add('transition', 'animating', 'out', 'slide', 'left')
                 setTimeout(resolve, 300)
             })
         }
@@ -1016,7 +1017,7 @@ function Sidebar() {
 
 
 
-function SVGIcon(){
+function SVGIcon() {
 
     const Icons = {
         arrow_left: [
@@ -1034,7 +1035,7 @@ function SVGIcon(){
             m("path", { d: "M2 10h20" }),
             m("path", { d: "M6 15h4" })
         ],
-       
+
         card: [
             m("rect", { x: "4", y: "3", width: "16", height: "18", rx: "2" }),
             m("path", { d: "M4 13h16" }),
@@ -1045,10 +1046,10 @@ function SVGIcon(){
         chevron_right: [
             m("path", { d: "m9 18 6-6-6-6" })
         ],
-        chevron_left:[
+        chevron_left: [
             m("path", { d: "m15 18-6-6 6-6" })
         ],
-        chevron_down:[
+        chevron_down: [
             m("path", { d: "m6 9 6 6 6-6" })
         ],
         chevron_up: [
@@ -1059,19 +1060,19 @@ function SVGIcon(){
             m("path", { d: "m9 12 2 2 4-4" })
         ],
         circle_close: [
-            m("circle",{cx:"12", cy:"12", r:"10"}),
-            m("path",{d:"m15 9-6 6"}),
-            m("path",{d:"m9 9 6 6"})
+            m("circle", { cx: "12", cy: "12", r: "10" }),
+            m("path", { d: "m15 9-6 6" }),
+            m("path", { d: "m9 9 6 6" })
         ],
         clock: [
-            m("circle", {cx:"12", cy:"12", r:"10"}),
-            m("path", {d:"M12 6v6l4 2"})
+            m("circle", { cx: "12", cy: "12", r: "10" }),
+            m("path", { d: "M12 6v6l4 2" })
         ],
-        close:[
+        close: [
             m("path", { d: "M18 6 6 18" }),
             m("path", { d: "m6 6 12 12" })
         ],
-        
+
         edit: [
             m("path", { d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
             m("path", { d: "M18.375 2.625a1.5 1.5 0 1 1 2.121 2.121L12 13.243l-3 0.757 0.757-3Z" })
@@ -1081,28 +1082,28 @@ function SVGIcon(){
             m("path", { d: "M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" })
         ],
         error: [
-            
+
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
         ],
         shield_error: [
-           m("path",{
-            d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
-           }),
-           m("path",{d:"M12 8v4"}),
-           m("path",{d:"M12 16h.01"})
+            m("path", {
+                d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+            }),
+            m("path", { d: "M12 8v4" }),
+            m("path", { d: "M12 16h.01" })
         ],
         euro: [
             m("path", { d: "M18 7a8 8 0 1 0 0 10" }),
             m("path", { d: "M4 10h9" }),
             m("path", { d: "M4 14h8" })
         ],
-        eye_open:[
+        eye_open: [
             m("path", { d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" }),
             m("circle", { cx: "12", cy: "12", r: "3" })
         ],
-        eye_closed:[
+        eye_closed: [
             m("path", { d: "m4 4 16 16" }),
             m("path", { d: "M10.58 10.58a2 2 0 0 0 2.83 2.83" }),
             m("path", { d: "M9.88 5.09A10.94 10.94 0 0 1 12 5c4.5 0 8.27 2.94 9.54 7a10.66 10.66 0 0 1-2.38 3.88" }),
@@ -1160,19 +1161,19 @@ function SVGIcon(){
         ],
         messages: [
             m("path", {
-                d:"M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                d: "M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
             }),
             m("path", {
-                d:"M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"
+                d: "M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"
             })
         ],
-        notebook:[
-            m("path", {d:"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"}),
-            m("path", {d:"M2 6h4"}),
-            m("path", {d:"M2 10h4"}),
-            m("path", {d:"M2 14h4"}),
-            m("path", {d:"M2 18h4"}),
-            m("path", {d:"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"})
+        notebook: [
+            m("path", { d: "M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" }),
+            m("path", { d: "M2 6h4" }),
+            m("path", { d: "M2 10h4" }),
+            m("path", { d: "M2 14h4" }),
+            m("path", { d: "M2 18h4" }),
+            m("path", { d: "M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" })
         ],
         phone: [
             m("path", { d: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" })
@@ -1196,7 +1197,7 @@ function SVGIcon(){
             m("path", { d: "M19 19h2" })
         ],
 
-        reservations:[
+        reservations: [
             m("rect", { x: "4", y: "3", width: "16", height: "18", rx: "2" }),
             m("path", { d: "M8 7h8" }),
             m("path", { d: "M8 11h8" }),
@@ -1222,7 +1223,7 @@ function SVGIcon(){
             m("rect", { x: "12", y: "10", width: "3", height: "8", rx: "1" }),
             m("rect", { x: "17", y: "7", width: "3", height: "11", rx: "1" })
         ],
-        sign_in : [
+        sign_in: [
             m("path", { d: "m8 17-5-5 5-5" }),
             m("path", { d: "M3 12h12" }),
             m("path", { d: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" })
@@ -1234,9 +1235,9 @@ function SVGIcon(){
             m("path", { d: "m9 2 3 3 3-3" })
         ],
         trash: [
-            m("path", {d:"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}),
-            m("path", {d:"M3 6h18"}),
-            m("path", {d:"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"})
+            m("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" }),
+            m("path", { d: "M3 6h18" }),
+            m("path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" })
         ],
         user: [
             m("circle", { cx: "12", cy: "8", r: "4" }),
@@ -1263,12 +1264,12 @@ function SVGIcon(){
 
 
     return {
-        view: ({attrs}) => {
+        view: ({ attrs }) => {
             const iconName = attrs.icon || "search"
             const iconNodes = Icons[iconName] || Icons.search
 
-            return m("svg",{
-                width: attrs.width || 18 ,
+            return m("svg", {
+                width: attrs.width || 18,
                 height: attrs.height || attrs.width || 18,
                 viewBox: "0 0 24 24",
                 xmlns: "http://www.w3.org/2000/svg",

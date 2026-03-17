@@ -12,7 +12,7 @@ export {
 }
 
 
-
+// el localize de aquí está bien puesto ??
 function localize(localized, lang = 'es') {
 
     if (!localized) return '';
@@ -29,6 +29,9 @@ function localize(localized, lang = 'es') {
 * 
 */
 function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then':()=>{}, 'multiple':false, 'onSaveAnswer':()=>{}, size:'tiny'}){
+    
+    if(typeof options =='string') { options = {'message': options}}
+    
     var elem = document.createElement("div")
 
     elem.style = 'inset:0px;z-index:1000000;position:fixed'
@@ -36,39 +39,46 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
     document.body.appendChild(elem);
 
     // TODO!! AÑADIR TRANSICIÓN DE SALIDA !!
-    m.mount(elem, {
-      onbeforeremove:()=>{
-          console.log('removing')
-          return new Promise(function(resolve) {
-              //console.log(vnode.attrs.transition)
-              //console.log(vnode.dom.classList);
-              vnode.dom.classList.add('fade', 'out')
-              vnode.dom.children[0].classList.add('scale', 'out')
-              setTimeout(resolve, 300)
-          })
-      },
-      view:()=>  m(Modal, {size: options.size || 'tiny'},
-              m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
-              
-              m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
-              
-              m(ModalFooter,
+    return new Promise((resolve,reject)=> {
+        m.mount(elem, {
+        onbeforeremove:()=>{
+            return new Promise(function(resolve) {
+                //console.log(vnode.attrs.transition)
+                //console.log(vnode.dom.classList);
+                vnode.dom.classList.add('fade', 'out')
+                vnode.dom.children[0].classList.add('scale', 'out')
+                setTimeout(resolve, 300)
+            })
+        },
+        view:()=>  m(Modal, {size: options.size || 'tiny'},
+                m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
+                
+                m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
+                
+                m(ModalFooter,
 
-                m(Button, {
-                    type:'positive',
-                    onclick:()=>{options.then ? options.then(true):null; elem.remove()}
-                }, options.buttonLabels ? options.buttonLabels[1] : localize({es:'Aceptar',va:'Acceptar'})),
+                    m(Button, {
+                        type:'positive',
+                        onclick:()=>{
+                            options.then ? options.then(true):null; 
+                            elem.remove()
+                            resolve(true);
+                        }
+                    }, options.buttonLabels ? options.buttonLabels[1] : localize({es:'Aceptar',va:'Acceptar'})),
 
-                m(Box,{width:'10px'}),
-
-                m(Button, {
-                    type:'negative',
-                    onclick:()=>{options.then ? options.then(false):null; elem.remove()}
-                },   
-                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cancelar',va:'Cancel·lar'})
+                    m(Button, {
+                        type:'negative',
+                        onclick:()=>{
+                            options.then ? options.then(false):null; 
+                            elem.remove()
+                            resolve(false)
+                        }
+                    },   
+                        options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cancelar',va:'Cancel·lar'})
+                    )
                 )
-              )
-          )
+            )
+        })
     })
 }
 
@@ -77,14 +87,16 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
 function alertDialog(options={
     title:'',
     message:'',
+    children: '',
     buttonLabels:[],
     type:"success",
     then:()=>{}, 
     multiple:false, 
     fluid:false,
     size:"tiny",
-    dom:(el)=>el // devuelve el elemento
+    dom:(el)=> el // devuelve el elemento
 }){
+    if(typeof options == 'string'){options = {message:options}}
 
     var elem = document.createElement("div")
 
@@ -92,13 +104,8 @@ function alertDialog(options={
     elem.id = Math.random()*10000 + ''
     document.body.appendChild(elem);
 
-    if(typeof options == 'string'){
-        options = {message:options}
-    }
 
-    if(options.dom){
-        options.dom(elem)
-    }
+    if(options.dom){ options.dom(elem) } // esto se utiliza ?? Llamarlo oncreate !!
    
     let types = {
         'info':{
@@ -136,10 +143,13 @@ function alertDialog(options={
                 m(ModalHeader,
                     m(Icon,{icon: types[options.type]?.icon, color: types[options.type]?.color }),
                     m(Box,{width:'10px'}),
-                    m(H2,{marginTop:0}, options.title ||  types[options.type]?.text )
+                    m(H2,{marginTop:0}, options.title ||  types[options.type]?.text ),
+                    
                 ):  null,
 
-                m(ModalContent, m(Div,{padding:'1em'}, m(Text, m.trust(options.message)))),
+                m(ModalContent, 
+                    m(Div,{padding:'1em'}, m(Text, m.trust(options.message)))
+                ),
 
                 m(ModalFooter,
                     m(Button, {
@@ -150,8 +160,7 @@ function alertDialog(options={
                         fluid:options.fluid,
                         type:'negative'
                     },
-                    m(Text,options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"}))
-                    )
+                    m(Text,options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})))
                 )
             )
     })
@@ -212,8 +221,6 @@ function promptDialog(options={
         onbeforeremove:()=>{
             console.log('removing')
             return new Promise(function(resolve) {
-                //console.log(vnode.attrs.transition)
-                //console.log(vnode.dom.classList);
                 vnode.dom.classList.add('fade', 'out')
                 vnode.dom.children[0].classList.add('scale', 'out')
                 setTimeout(resolve, 300)
@@ -254,9 +261,8 @@ function promptDialog(options={
                     options.buttonLabels ? options.buttonLabels[0] : localize({es:'Aceptar',va:"Aceptar"})
                 ),
 
-                m(Box, {width:'1em'}),
 
-                    m(Button, {
+                m(Button, {
                     onclick:(e)=>{
                         options.then ? options.then():null; 
                         elem.remove()
