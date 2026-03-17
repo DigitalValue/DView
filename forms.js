@@ -1,6 +1,6 @@
 import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
-import { Icon, Button } from './elements.js'
+import { Icon, Button, SVGIcon } from './elements.js'
 import { config } from "./config.js"
 import { localize, translateSALT } from "./util.js"
 
@@ -43,7 +43,7 @@ function FormLabel(){
                     ),
                     
                     required 
-                    ? m("span", {style:"color:red; font-weight:bold;margin-left:0.5em;"}, '*') 
+                    ? m("span", {style:"color:red; margin-left:0.5em; line-height: 1.21429em;"}, '*')
                     : null,
 
                     info 
@@ -61,13 +61,16 @@ function Checkbox(){
 
     let checkboxStyle = {
         width:'17px', 
+        minWidth:'17px', 
         height:'17px',
+        minHeight:'17px',
         cursor:'pointer',
+        marginBottom: "5px"
     }
 
     return {
         view:(vnode)=>{
-            let {data, name, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
+            let {data, name, info, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
                 m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
@@ -87,7 +90,8 @@ function Checkbox(){
                     }),
 
                    
-                    m(Text, label)
+                    m(FormLabel, { info: info, required: required }, label),
+                    
                 )
             ]
         }
@@ -96,77 +100,91 @@ function Checkbox(){
 
 
 function Input(){
+
+    let focused = false;
     
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, readonly, pattern, title, onchange, disabled, placeholder, value, info, onkeyup} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, onkeyup} = vnode.attrs
 
             return [
 
                 // TO DO: editar el estilo de focus
-                m(FlexCol,{ width:'100%'}, // pensar otra manera sin necesidad de meter width: 100%
-
+                m(FlexCol,{
+                    width: "100%"
+                }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
                         m(FormLabel,{required: required, info:info}, label),
                     ] : null,
 
-                    m(type =='textarea'? "textarea": "input", {
-                        readonly: readonly || false, // es lo mismo que disabbled==
-                        rows:rows,
-                        style:  {
-                            fontFamily: config.fontFamily,
-                            ...(config.form?.baseStyle),
-                            //...(config.fonts?.default || config.defaultFont || {}),
-                            ...(vnode.attrs.style || {})
-                        },
-                        oninput:(e)=>{
-                            console.log
-
-                            oninput ? oninput(e): ''
-                            data && name ? data[name] = e.target.value : ''
-                        },
-
-                        ...( value ? {value:value}:{} ),
-                        ...( data && data[name] ? {value:data[name]}:{} ),
-                        ...type && type != 'textarea' ? {type:type}: {},
-                        ...vnode.attrs.min && vnode.attrs.max ? {min:vnode.attrs.min, max:vnode.attrs.max}: {},
-                        ...vnode.attrs.minlength && vnode.attrs.maxlength ? {minlength:vnode.attrs.minlength, maxlength:vnode.attrs.maxlength}: {},
-                        ...pattern ? {pattern: pattern} : {},
-                        ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
-                        ...title ? {title: title} : {},
-                        ...placeholder ? {placeholder: placeholder} : {},
-                        disabled: disabled || false,
-
-                        ...((Object.entries(config.form?.focusStyle || {}).length || vnode.attrs.onfocus) && {
-                            onfocus:(e)=>{
-                                // console.log('config', config.form.focusStyle)
-
-                                Object.entries(config.form?.focusStyle).forEach(([key, value])=>{
-                                    e.target.style[key] = value
+                    m(Div, {position:'relative', width:'100%', display:'flex'},
+                        m(type =='textarea'? "textarea": "input", {
+                            readonly: readonly || false, // es lo mismo que disabbled==
+                            rows:rows,
+                            style:  {
+                                transition:' box-shadow 0.1s ease-in-out, outline 0.1s ease-in-out',
+                                width:'100%',
+                                fontFamily: config.fontFamily,
+                                ...(config.form?.baseStyle),
+                                ...icon ? {paddingLeft:'32px'}:{},
+                                //...(config.fonts?.default || config.defaultFont || {}),
+                                ...(vnode.attrs.style || {}),
+                                ...(config.form?.baseStyle),
+                                ...(config.form?.input || {}),
+                            },
+                            oninput:(e)=>{
+                                data && name ? data[name] = e.target.value : ''
+                                oninput ? oninput(e): ''
+                            },
+                            
+                            onfocus:(e)=> {
+                                Object.keys(config.form?.focusStyle || {}).forEach((key)=>{
+                                    e.target.style[key] = config.form.focusStyle[key]
                                 })
 
+                                focused = true;
+                                
                                 if(vnode.attrs.onfocus){
                                     vnode.attrs.onfocus(e)
                                 }
                             },
                             onblur:(e)=>{
-                                Object.entries(config.form?.focusStyle).forEach(([key, value])=>{
-                                    e.target.style[key] = config.form.baseStyle[key] || ""
+                                focused = false;
+                                Object.keys(config.form?.focusStyle || {}).forEach((key)=>{
+                                    e.target.style[key] = config.form.baseStyle[key]
                                 })
 
                                 if(vnode.attrs.onblur){
                                     vnode.attrs.onblur(e)
                                 }
-                            }
-                        }),
+                            },
+                            ...( value ? {value:value}:{} ),
+                            ...( data && data[name] ? {value:data[name]}:{} ),
+                            ...type && type != 'textarea' ? {type:type}: {},
+                            ...vnode.attrs.min && vnode.attrs.max ? {min:vnode.attrs.min, max:vnode.attrs.max}: {},
+                            ...vnode.attrs.minlength && vnode.attrs.maxlength ? {minlength:vnode.attrs.minlength, maxlength:vnode.attrs.maxlength}: {},
+                            ...pattern ? {pattern: pattern} : {},
+                            ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
+                            ...title ? {title: title} : {},
+                            ...placeholder ? {placeholder: placeholder} : {},
+                            disabled: disabled || false,
 
-
-                        ...onkeyup ? {onkeyup: onkeyup} : {},
-                        onchange:(e)=>{
-                            if(onchange) onchange(e)
+                            ...onkeyup ? {onkeyup: onkeyup} : {},
+                            onchange:(e)=>{
+                                if(onchange) onchange(e)
+                            },
                         },
-                    })
+                    
+                            
+                        ),
+                        icon ?
+                        m(SVGIcon,{
+                            icon:icon, width:18, height:19, color: focused ? 'black': 'grey',
+                            style: { position:'absolute', top:'50%', transform:'translateY(-50%)', left:'8px'}
+                        }) : null
+                    )
+
                 )
 
             ]
@@ -343,7 +361,7 @@ function Dropdown(){
     
     return {
         view:(vnode)=>{
-            let { data, name, label,  onchange, disabled=false, info, required, value, style={}} = vnode.attrs
+            let { data, name, label,  onchange, disabled=false, info, required, value, placeholder, style={}} = vnode.attrs
 
 
             return [
@@ -353,7 +371,9 @@ function Dropdown(){
                     m("select",{
                         disabled,
                         style: {
-                            ...(config.form?.baseStyle)
+                            ...(config.form?.baseStyle),
+                            // appearance: 'none',
+                            // WebkitAppearance: 'none',
                         },
                         onchange:(e)=>{
                             data && name !=undefined ? data[name] = e.target.value: ''
@@ -361,7 +381,7 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true, selected:true }, "Selecciona..."),
+                        m("option",{ disabled:true, selected:true }, placeholder ||  "Selecciona una opción"),
 
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
@@ -394,7 +414,7 @@ function RadioButtons() {
                         vnode.children.map((o)=> m(Tappable, {
                             style: {
                                 display: "flex",
-                                gap: "5px",
+                                gap: "0.5em",
                                 alignItems: "center",
                                 width: "fit-content"
                             },
@@ -416,6 +436,8 @@ function RadioButtons() {
                                 style: {
                                     width: "20px",
                                     height: "20px",
+                                    minWidth: "20px",
+                                    minHeight: "20px",
                                     justifyContent: "center",
                                     alignItems: "center",
                                     borderRadius: "100px",
@@ -552,9 +574,12 @@ function DateSelector() {
 function HtmlDropdown() {
     let open = false;
 
+    let val = ''
+
     return {
         view: (vnode) => {
             let { data, name, label, onchange, required} = vnode.attrs
+
 
             return [
                 m(FlexCol,{width:'100%'},
@@ -580,21 +605,24 @@ function HtmlDropdown() {
                         },
                         onclick:(e)=> open = !open
                     },
-                        m(FlexRow, { justifyContent:'space-between', alignItems:'center'},
+                        m(FlexRow, { justifyContent:'space-between', alignItems:'center', height:'100%'},
                             
                             m(Text, {
                                 maxWidth:'80%',
                                 overflow:'hidden',
                                 textOverflow:'ellipsis',
                                 whiteSpace:'nowrap',
-                                color:  data && name && data[name] ? 'black' : 'grey',
-
-                            }, data && name && data[name] ? data[name] : 'Selecciona'),
+                                color:  data && name && data[name] ? 'black' : 'grey'
+                            }, 
+                            val ? val : data && name && data[name] ? data[name] : 'Selecciona'),
 
                             // is there a built-in icon without using a library??
 
-                            m(Icon, { icon: open ? 'keyboard_arrow_up' : 'keyboard_arrow_down', color:'rgba(34, 36, 38)' }
-                        )),
+                            m(SVGIcon, { 
+                                icon: open ? 'chevron_up' : 'chevron_down', 
+                                color:'rgba(34, 36, 38)' 
+                            })
+                        ),
 
                         open ?
                         m(FlexCol, {
@@ -625,6 +653,10 @@ function HtmlDropdown() {
 
                                     if(data && name != undefined) {
                                         data[name] = o.value != undefined ? o.value : o
+
+                                        if(o.label){
+                                            val = o.label
+                                        }
                                     }
 
                                     open = !open
@@ -887,20 +919,35 @@ function InfoTooltip(){
                         0% { opacity:0; }
                         100% { opacity:1; }
                     }
-                    @keyframes scaleOut {
+                    @keyframes fadeout {
                         0% { opacity:1; }
                         100% { opacity:0; }
                     }
                 `),
 
                 // Cambiar esto por un icono de google  ??
-                m("i.blue.question.circle.outline.link.icon.visible", {
-                    class: showingInfo ? 'visible' : '',
-                    onmouseover:(e)=> showingInfo = true,
-                    onmouseout:(e)=> showingInfo = false,
-                    style:"margin-left:5px; position:relative",
+                // m("i.blue.question.circle.outline.link.icon.visible", {
+                //     class: showingInfo ? 'visible' : '',
+                //     onmouseover:(e)=> showingInfo = true,
+                //     onmouseout:(e)=> showingInfo = false,
+                //     style:"margin-left:5px; position:relative",
+                // },
+                m(Tappable, {
+                    onhover: (hovering)=> { showingInfo = hovering },
+                    style: {
+                        marginLeft:"5px",
+                        marginBottom:"5px",
+                        display: "flex",
+                        alignItems: "center",
+                        position: "relative"
+                    }
                 },
-
+                    m(SVGIcon, {
+                        icon: "info",
+                        color: "#2185d0",
+                        width: 16,
+                        height: 16,
+                    }),
 
                     m("div",{
                         class: showingInfo ? 'fadein' : showingInfo != undefined ? 'fadeout':'',
@@ -908,7 +955,7 @@ function InfoTooltip(){
                                tooltipstyle + (inverted ? 'background:#000000de; color:white;' : ''),
                         onmouseover:(e)=> showingInfo = true,
                         onmouseout:(e)=> showingInfo = false,
-                    },m.trust(text || vnode.children))
+                    },  m.trust(text || vnode.children))
                 )
             ]
         }

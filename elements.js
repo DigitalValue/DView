@@ -1,13 +1,13 @@
 import { config } from "./config.js"
-import { Div, FlexRow, Tappable, FlexCol, Animate, Box } from "./layout.js"
-import { Text, SmallText, H2 } from "./texts.js"
+import { Box, Div, FlexCol, FlexRow, Tappable } from "./layout.js"
+import { SmallText, Text } from "./texts.js"
 
 
 export {
     Segment, Span, RippleEffect,
     Button, Icon, Img,
     Sidebar, Label,
-    Message, Card, Checkbox, Spinner,
+    Message, Card, Spinner,
     BreadCrumb,
     Table, TableHead, TableBody, TableRow, TableCell, TableFooter,
     SVGIcon
@@ -314,7 +314,6 @@ function RippleEffect() {
                 },
                 onmousedown: (e) => {
                     //Datos para que el ripple aparezca donde se hace click
-
                     const item = e.currentTarget.getBoundingClientRect()
                     x = `${e.clientX - item.left}px`;
                     y = `${e.clientY - item.top}px`;
@@ -438,12 +437,19 @@ function Button() {
             minWidth: '30px'
         },
         default: {
-            paddingLeft: `1.5em`,
-            paddingRight: '1.5em',
-            fontSize: '1em',
-            minHeight: '40px',
-            minWidth: '40px'
-        }
+            paddingLeft:`1.5em`,
+            paddingRight:'1.5em',
+            fontSize:'1em',
+            minHeight:'40px',
+            minWidth:'40px'
+        },
+        large: {
+            paddingLeft:`1.5em`,
+            paddingRight:'1.5em',
+            fontSize:'1.2em',
+            minHeight:'55px',
+            minWidth:'55px'
+        },
     }
 
     return {
@@ -460,11 +466,11 @@ function Button() {
                     justifyContent: 'center',
                     fontWeight: 'normal',
                     fontFamily: config.fontFamily,
-                    minHeight: '40px',
-                    width: fluid ? '100%' : 'auto',
-                    userSelect: 'none',
-                    filter: `brightness(100%)`,
-                    borderRadius: '1em',
+                    minHeight:'40px',
+                    width: fluid ? '100%': 'auto',
+                    //userSelect:'none',
+                    filter:`brightness(100%)`,
+                    borderRadius:'1em',
                     gap: "5px",
                     ...disabled && {
                         opacity: '0.5',
@@ -620,17 +626,20 @@ function Label() {
         default: {
             backgroundColor: "#1b1c1d",
             color: "white",
-            border: "1px solid #e8e8e8"
+            border: "1px solid #e8e8e8",
+            ...config.elements?.label?.default || {}
         },
         primary: {
             backgroundColor: "#1b1c1d",
             color: "white",
-            border: "1px solid #1b1c1d"
+            border: "1px solid #1b1c1d",
+            ...config.elements?.label?.primary || {}
         },
         secondary: {
             backgroundColor: "#4b5563",
             color: "white",
-            border: "1px solid #4b5563"
+            border: "1px solid #4b5563",
+            ...config.elements?.label?.secondary || {}
         },
         tertiary: {
             backgroundColor: "#e8e8e8",
@@ -700,7 +709,7 @@ function Label() {
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        width: 'fit-content',
+                        
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
@@ -728,43 +737,7 @@ function Label() {
 }
 
 
-function Checkbox() {
-
-    let checkboxStyle = {
-        width: '17px',
-        height: '17px',
-        cursor: 'pointer',
-    }
-
-    return {
-        view: (vnode) => {
-            let { data, name, onchange, label, checked } = vnode.attrs
-
-            return [
-                m(FlexRow, { alignItems: 'center', gap: '0.5em' },
-                    m("input", {
-                        type: 'checkbox',
-                        checked: data && name ? data[name] : checked,
-                        style: checkboxStyle,
-                        onchange: (e) => {
-                            if (data && name) {
-                                data[name] = e.target.checked
-                            }
-
-                            onchange ? onchange(e) : ''
-                        }
-                    }),
-
-                    label ? m(Text, label) : null
-                    //m("label", localize(label))
-                )
-            ]
-        }
-    }
-}
-
-
-function Card() {
+function Card(){
 
     let shadow = 'rgba(50, 50, 93, 0.25) 0px 2px 5px -1px'
 
@@ -891,9 +864,10 @@ function BreadCrumb() {
 function Spinner() {
     // can you create different sizes, only sizes
     let sizes = {
+        
         small: {
             width: 20,
-            height: 20
+            height: 20,
         },
         medium: {
             width: 40,
@@ -918,8 +892,10 @@ function Spinner() {
 
 
     return {
-        view: (vnode) => {
-            let { color, size = 'small' } = vnode.attrs
+        view:(vnode)=>{
+            let {color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
+
+            console.log('color', color)
 
 
             return [
@@ -934,21 +910,22 @@ function Spinner() {
                         transform: rotate(360deg);
                     }
                 }`),
-
-                m(Div, {
-                    "display": "inline-flex",
+                    
+                m(Div,{
+                    display: "inline-flex",
                     justifyContent: "center",
-                    "position": "relative",
-                    "width": `${sizes[size].width * 2}px`,
-                    "height": `${sizes[size].height * 2}px`,
+                    alignItems: "center",
+                    position: "relative",
+                    width: `${sizes[size].width*2}px`,
+                    height: `${sizes[size].height*2}px`,
                 },
 
                     m(Div, {
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].height}px`,
+                            ...sizes[size],
+                            
                             "animation-delay": "-0.45s"
                         }
                     }),
@@ -957,8 +934,7 @@ function Spinner() {
                         style: {
                             ...spinStyle,
                             color: color || '#1c4c5b',
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].height}px`,
+                            ...sizes[size],
                             "animation-delay": "-0.3s"
                         }
                     })
@@ -1020,6 +996,10 @@ function Sidebar() {
 function SVGIcon() {
 
     const Icons = {
+        add: [
+            m("path", {d:"M5 12h14"}),
+            m("path", {d:"M12 5v14"})
+        ],
         arrow_left: [
             m("path", { d: "m12 19-7-7 7-7" }),
             m("path", { d: "M19 12H5" })
@@ -1042,6 +1022,10 @@ function SVGIcon() {
             m("circle", { cx: "9", cy: "8", r: "1.8" }),
             m("path", { d: "m20 13-4.2-4.2a2 2 0 0 0-2.8 0L9 13" }),
             m("path", { d: "M8 17h8" })
+        ],
+        check_circle: [
+            m("path", {d:"M21.801 10A10 10 0 1 1 17 3.335"}),
+            m("path", {d:"m9 11 3 3L22 4"})
         ],
         chevron_right: [
             m("path", { d: "m9 18 6-6-6-6" })
@@ -1072,7 +1056,11 @@ function SVGIcon() {
             m("path", { d: "M18 6 6 18" }),
             m("path", { d: "m6 6 12 12" })
         ],
-
+        download: [
+            m("path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
+            m("path", { d: "m7 10 5 5 5-5" }),
+            m("path", { d: "M12 15V3" })
+        ],
         edit: [
             m("path", { d: "M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
             m("path", { d: "M18.375 2.625a1.5 1.5 0 1 1 2.121 2.121L12 13.243l-3 0.757 0.757-3Z" })
@@ -1082,11 +1070,19 @@ function SVGIcon() {
             m("path", { d: "M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" })
         ],
         error: [
-
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
         ],
+        google: {
+            viewBox: "0 0 256 262",
+            nodes: [
+                m("path", { d: "M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027", fill: "#4285F4", stroke: "none" }),
+                m("path", { d: "M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1", fill: "#34A853", stroke: "none" }),
+                m("path", { d: "M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782", fill: "#FBBC05", stroke: "none" }),
+                m("path", { d: "M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251", fill: "#EB4335", stroke: "none" })
+            ]
+        },
         shield_error: [
             m("path", {
                 d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
@@ -1099,7 +1095,11 @@ function SVGIcon() {
             m("path", { d: "M4 10h9" }),
             m("path", { d: "M4 14h8" })
         ],
-        eye_open: [
+        eye: [
+            m("path", { d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" }),
+            m("circle", { cx: "12", cy: "12", r: "3" })
+        ],
+        eye_open:[
             m("path", { d: "M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" }),
             m("circle", { cx: "12", cy: "12", r: "3" })
         ],
@@ -1109,6 +1109,9 @@ function SVGIcon() {
             m("path", { d: "M9.88 5.09A10.94 10.94 0 0 1 12 5c4.5 0 8.27 2.94 9.54 7a10.66 10.66 0 0 1-2.38 3.88" }),
             m("path", { d: "M6.61 6.61A10.82 10.82 0 0 0 2.46 12a10.66 10.66 0 0 0 4.13 5.37" }),
             m("path", { d: "M14.12 14.12A3 3 0 0 1 9.88 9.88" })
+        ],
+        flag: [
+           m("path", {d:"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"})
         ],
         gallery: [
             m("rect", { x: "3", y: "4", width: "18", height: "16", rx: "2" }),
@@ -1155,10 +1158,20 @@ function SVGIcon() {
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
             m("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" })
         ],
+        map: [
+            m("path", { d:"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"}),
+            m("path", { d:"M15 5.764v15"}),
+            m("path", { d:"M9 3.236v15"})
+        ],
         map_pin: [
             m("path", { d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" }),
             m("circle", { cx: "12", cy: "10", r: "3" })
         ],
+        lock: [
+            m("rect", {width:"18", height:"11", x:"3", y:"11", rx:"2", ry:"2"}),
+            m("path",{d:"M7 11V7a5 5 0 0 1 10 0v4"})
+        ],
+
         messages: [
             m("path", {
                 d: "M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
@@ -1174,6 +1187,10 @@ function SVGIcon() {
             m("path", { d: "M2 14h4" }),
             m("path", { d: "M2 18h4" }),
             m("path", { d: "M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" })
+        ],
+        sticky_note: [
+           m("path", {d:"M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"}),
+           m("path", {d:"M15 3v5a1 1 0 0 0 1 1h5"})
         ],
         phone: [
             m("path", { d: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" })
@@ -1204,6 +1221,11 @@ function SVGIcon() {
             m("path", { d: "M8 15h5" }),
             m("circle", { cx: "17", cy: "15", r: "1" })
         ],
+
+        reset: [
+            m("path", {d:"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}),
+            m("path", {d:"M3 3v5h5"})
+        ],
         search: [
             m("path", { d: "m21 21-4.34-4.34" }),
             m("circle", { cx: "11", cy: "11", r: "8" })
@@ -1228,6 +1250,22 @@ function SVGIcon() {
             m("path", { d: "M3 12h12" }),
             m("path", { d: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" })
         ],
+        square_menu: [
+            m("rect", {
+                width: 18,
+                height: 18,
+                x: 3,
+                y: 3,
+                rx: 2
+            }),
+            m("path", { d: "M7 8h10" }),
+            m("path", { d: "M7 12h10" }),
+            m("path", { d: "M7 16h10" })
+        ],
+        square_pen: [
+            m("path",{d:"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}),
+            m("path",{d:"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"})
+        ],
         tv: [
             m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
             m("path", { d: "M8 21h8" }),
@@ -1238,6 +1276,10 @@ function SVGIcon() {
             m("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" }),
             m("path", { d: "M3 6h18" }),
             m("path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" })
+        ],
+        lock: [
+            m("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }),
+            m("path", { d: "M7 11V7a5 5 0 0 1 10 0v4" })
         ],
         user: [
             m("circle", { cx: "12", cy: "8", r: "4" }),
@@ -1250,6 +1292,11 @@ function SVGIcon() {
             m("path", { d: "M12 3a14 14 0 0 0 0 18" }),
             m("path", { d: "M5.5 7.5h13" }),
             m("path", { d: "M5.5 16.5h13" })
+        ],
+        warning: [
+            m("path",{d:"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}),
+            m("path", {d:"M12 9v4"}),
+            m("path", {d:"M12 17h.01"})
         ],
         whatsapp: [
             m("path", { d: "M12 3a8.5 8.5 0 0 0-7.2 13l-1 4 4-1a8.5 8.5 0 1 0 4.2-16Z" }),
@@ -1266,12 +1313,14 @@ function SVGIcon() {
     return {
         view: ({ attrs }) => {
             const iconName = attrs.icon || "search"
-            const iconNodes = Icons[iconName] || Icons.search
+            const iconData = Icons[iconName] || Icons.search
+            const iconNodes = Array.isArray(iconData) ? iconData : iconData.nodes
+            const iconViewBox = Array.isArray(iconData) ? "0 0 24 24" : (iconData.viewBox || "0 0 24 24")
 
             return m("svg", {
                 width: attrs.width || 18,
                 height: attrs.height || attrs.width || 18,
-                viewBox: "0 0 24 24",
+                viewBox: iconViewBox,
                 xmlns: "http://www.w3.org/2000/svg",
                 fill: attrs.filled ? attrs.color : 'none',
                 stroke: attrs.color || 'black',

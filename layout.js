@@ -1,3 +1,4 @@
+import { RippleEffect } from "./elements.js"
 
 
 export {
@@ -34,7 +35,7 @@ function Container(){
                         }*/
 
                         @media (width>=1200px ) {
-                            width: 80% !important;
+                            width: 65% !important;
                         }
                     }
                     .container {
@@ -79,7 +80,8 @@ function FlexCol(){
                 style:{
                     display:'flex',
                     flexDirection:'column',
-                    ...vnode.attrs?.style || vnode.attrs 
+                    ...(vnode.attrs?.style),
+                    ...(vnode.attrs)
                 }, 
             }, vnode.children)
         }
@@ -292,7 +294,13 @@ function Tappable(){
                         Object.keys(vnode.attrs.onmousedown).forEach(h => elem.style[h] = vnode.attrs.style && vnode.attrs.style[h] || '')
                     }
                 },
-                style:{ cursor:'pointer', ...vnode.attrs.style },
+                style:{ 
+                    cursor:'pointer', 
+                    // para que no salga el highlight azul en mobile
+                    "-webkit-tap-highlight-color": 'transparent',
+
+                    ...vnode.attrs.style 
+                },
                 id: vnode.attrs.id,
                 onclick: vnode.attrs.onclick
             }, vnode.children)
@@ -463,6 +471,8 @@ function Animate() {
                     })
                 }, delay)
             }
+
+            if(attrs.oncreate) attrs.oncreate({attrs, dom})
 
             // porque los estilos default se añaden al animar ??
             /*if(style && Object.keys(style).length > 0){

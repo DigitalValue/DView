@@ -18,8 +18,9 @@ function H1(){
         view:(vnode)=>{
             return m("h1",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
-                    margin:0,
+                    margin: 0,
                     ...(config.fonts.h1 || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 },
@@ -34,6 +35,7 @@ function H2(){
         view:(vnode)=>{
             return m("h2",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
                     margin:0,
                     ...(config.fonts.h2 || {}),
@@ -50,7 +52,7 @@ function H3(){
             return m("h3",{
                 style: {
                     fontFamily: config.fontFamily,
-                    margin:0,
+                    margin: 0,
                     ...(config.fonts.h3 || {}),
                     ...(vnode.attrs?.style || vnode.attrs)
                 }
@@ -75,12 +77,15 @@ function H4(){
 }
 
 function Text(){
-    return{ 
+    return { 
         view:(vnode)=>{
             return m("p",{
                 style: {
+                    userSelect:'none',
                     fontFamily: config.fontFamily,
-                    ...(config.fonts.default || config.defaultFont || {}),
+                    margin: 0,
+                    // color:'black',
+                    ...(config.fonts?.text ||  config.defaultFont  || {}),
                     ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
@@ -94,6 +99,7 @@ function SmallText(){
             return m("p",{
                 style: {
                     fontFamily: config.fontFamily,
+                    margin: 0,
                     ...(config.fonts.small || config.smallFont || {}),
                     ...(vnode.attrs.style || vnode.attrs)
                 }

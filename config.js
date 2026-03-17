@@ -56,6 +56,7 @@ let config = {
             border: '1px solid #ccc',
             borderColor:'#ccc',
             color: 'rgba(0, 0, 0, .87)',
+            outline:'none',
             resize: "vertical"
         },
         focusStyle: {
@@ -94,6 +95,9 @@ let config = {
         //background: ''
         
     }
+
+
+
 }
 
 function setConfig(newConfig) {

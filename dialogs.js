@@ -1,15 +1,16 @@
 import { config } from "./config.js";
-import { Button, Icon, SVGIcon } from "./elements.js";
+import { Button, SVGIcon } from "./elements.js";
 import { Input } from "./forms.js";
-import { Box, Div, FlexRow } from "./layout.js";
+import { Animate, Box, Div, FlexRow } from "./layout.js";
 import { H2, Text } from "./texts.js";
 
 
 
-export { 
-    alertDialog, confirmDialog, promptDialog, openDialog, 
-    Modal, ModalContent, ModalHeader, ModalFooter, Dimmer
-}
+export {
+    alertDialog, confirmDialog,  openDialog,
+    Dimmer, Modal, ModalContent, ModalFooter,  ModalHeader, 
+    openPopup, promptDialog, showSnackbar
+};
 
 
 // el localize de aquí está bien puesto ??
@@ -50,7 +51,7 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
                 setTimeout(resolve, 300)
             })
         },
-        view:()=>  m(Modal, {size: options.size || 'tiny'},
+        view:()=>  m(Modal, {size: options.size || 'tiny', center:true},
                 m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
                 
                 m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
@@ -108,18 +109,18 @@ function alertDialog(options={
     if(options.dom){ options.dom(elem) } // esto se utiliza ?? Llamarlo oncreate !!
    
     let types = {
-        'info':{
+        'info': {
             icon:'info',
         },
-        'warning':{
+        'warning': {
             icon:'warning', 
         },
-        'error':{
+        'error': {
             icon:'error',
             text:'Error',
             color:'#db2828'
         },
-        'success':{
+        'success': {
             text:'Éxito',
             icon:'check_circle',
             color:'#00c853'
@@ -138,12 +139,18 @@ function alertDialog(options={
                 setTimeout(resolve, 300)
             })
         },
-        view:()=> m(Modal, { size: options.size || 'tiny' },
+        view:()=> m(Modal, { size: options.size || 'tiny', center:true },
                 types[options.type] || options.title ? 
-                m(ModalHeader,
-                    m(Icon,{icon: types[options.type]?.icon, color: types[options.type]?.color }),
-                    m(Box,{width:'10px'}),
-                    m(H2,{marginTop:0}, options.title ||  types[options.type]?.text ),
+                m(ModalHeader,{gap:'1em'},
+                    m(SVGIcon, {
+                        icon: types[options.type]?.icon, 
+                        color: types[options.type]?.color,
+                        height: 24,
+                        width: 24
+                    }),
+                    m(H2,{margin:0}, 
+                        options.title ||  types[options.type]?.text 
+                    ),
                     
                 ):  null,
 
@@ -157,7 +164,7 @@ function alertDialog(options={
                             options.then ? options.then():null; 
                             elem.remove()
                         },
-                        fluid:options.fluid,
+                        fluid:true,
                         type:'negative'
                     },
                     m(Text,options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})))
@@ -226,10 +233,10 @@ function promptDialog(options={
                 setTimeout(resolve, 300)
             })
         },
-        view:()=> m(Modal, { size:'tiny' },
+        view:()=> m(Modal, { size:'tiny', center:true },
             types[options.type] || options.title ? 
             m(ModalHeader,
-                m(Icon,{ icon: types[options.type]?.icon, color: types[options.type]?.color }),
+                m(SVGIcon,{ icon: types[options.type]?.icon, color: types[options.type]?.color }),
                 m(Box,{ width:'10px' }),
                 m(H2,{ marginTop:0 }, options.title ||  types[options.type]?.text )
             ) :  null,
@@ -283,7 +290,7 @@ function openDialog(Component, options = {}) {
     
     var elem = document.createElement("div")
 
-    elem.style = 'position:fixed;inset:0px;z-index:100000'
+    elem.style = 'position:fixed;inset:0px;z-index:1000'
     elem.id = Math.random() * 10000 + ''
 
     document.body.appendChild(elem);
@@ -301,10 +308,71 @@ function openDialog(Component, options = {}) {
             close: (e) => {
                 m.mount(elem, null)
                 elem.remove()
+            },
+            close: (e) => {
+                m.mount(elem, null)
+                elem.remove()
             }
         })
     })
 }
+
+
+// cuadrado que sale debajo de la pantalla, está bien para móviles !!
+function showSnackbar({message, duration = 3000, fixed = false, id, background = '#1a1a1a'} = {}){
+
+    var elem = document.createElement("div")
+
+    elem.style = 'position:fixed;inset:0px;z-index:100000'
+    elem.id = id || Math.random() * 10000 + ''
+    document.body.appendChild(elem);
+
+    m.mount(elem, {
+        view: () =>  m(Animate,{
+            from: { transform: 'translateY(100%)' },
+            to: { transform: 'translateY(0%)' },
+            duration: duration || 300,
+            oncreate:(vnode)=>{
+                if(!fixed){
+                    setTimeout(() => {
+                        vnode.dom.style.transform = 'translateY(100%)';
+
+                        setTimeout(()=>{
+                            m.mount(elem, null)
+                            elem.remove()
+                        }, duration || 300 )
+                    }, 2000);
+                }
+            },
+            style: {
+                background: background,
+                padding:'1rem',
+                position:'fixed',
+                bottom:0, minHeight:'60px', 
+                display:'flex', alignItems:'center', justifyContent:'center',
+                zIndex:10, left:0, right:0
+            }
+        },  m(Text, {color:'white'}, message)
+        )
+    })
+
+
+}
+
+
+// abre una ventana pop up
+function openPopup(url){
+    const width = 500;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+
+    // window features for popup
+    const windowFeatures = `scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`;
+    const popup = window.open(url, "popup", windowFeatures);
+    return popup;
+};
+
 
 
 function Modal(){
@@ -313,25 +381,28 @@ function Modal(){
         width:'850px',
         margin:0,
         position:'absolute',
+        flex: '0 0 auto',
         backgroundColor:'white',
+        overflow:'hidden',
         margin:'0 auto',
         borderRadius:config.borderRadius || '1em',
+        transform: config.fixedModals ? 'translateX(-50%)': 'translate(-50%,-50%)',
         left:'50%',
-        top:'50%',
+        top: config.fixedModals ? '10vh': '50%',
         maxWidth:'90%',
-        transform:'translate(-50%,-50%)',
         zIndex:1001,
         display:'flex',
         flexDirection:'column',
-        maxWidth:'90%',
         transition: 'all 0.3s ease-out',
         outline: 'none'
     }
 
     let sizes = {
-        'small':'500px',
+        'tiny': '300px',
+        'small': '600px',
         'big':'850px',
-        'tiny': '300px'
+        'large': {width:'1080px', maxWidth:'90%'},
+        'fullscreen': {width:'90vw', maxWidth:'1400px'}
     }
     
     let dimmerStyle = {
@@ -344,16 +415,29 @@ function Modal(){
     }
 
     return {
-        view:(vnode)=>{
+        oninit:(vnode)=>{
             if(vnode.attrs.size){
-                modalStyle.width = sizes[vnode.attrs.size]
-                modalStyle.maxWidth = '90vw'
+                let size = sizes[vnode.attrs.size]
+                modalStyle.width = size.width || size
+                modalStyle.maxWidth = size.maxWidth || size
             }
 
+            if(vnode.attrs.center){
+                modalStyle.top = '50%',
+                modalStyle.transform = 'translate(-50%,-50%)'
+            }
+
+            if(vnode.attrs.top){
+                modalStyle.top = vnode.attrs.top + 'px'
+            }
+            /*
             if(vnode.attrs.animate){ 
                 modalStyle.transform = 'translate(-50%,-30%) scale(0.7)'
-            }
+            }*/
 
+        },
+        view:(vnode)=>{
+           
             return m("div", {
                 style: dimmerStyle
             }, 
@@ -361,11 +445,11 @@ function Modal(){
                     style:{ ...modalStyle, ...vnode.attrs.style },
                     tabindex: -1,
                     oncreate:({dom})=> { 
-                        if(vnode.attrs.animate){
+                        /*if(vnode.attrs.animate){
                             setTimeout(()=>{
                                 dom.style.transform = 'translate(-50%,-40%) scale(1)'
                             }, 100)
-                        }
+                        }*/
                         
                         setTimeout(()=>dom.focus(),50)
                     },
@@ -374,7 +458,7 @@ function Modal(){
                     }
                 },  
                     vnode.attrs.header ?
-                    m(ModalHeader,{  justifyContent:'space-between',borderBottom: '2px solid lightgrey',  alignItems:'center'},
+                    m(ModalHeader,{  justifyContent:'space-between', alignItems:'center'},
                         m(H2,{marginBottom:0}, vnode.attrs.header),
 
                         m(SVGIcon,{
@@ -401,9 +485,10 @@ function ModalContent(){
                 style:{
                     padding:'1em',
                     overflowY:'auto',
-                    maxHeight:'50vh',
+                    maxHeight:'70vh',
                     ...(vnode.attrs.style || vnode.attrs)
-                }
+                },
+                id: vnode.attrs.id
             }, vnode.children)
         }
     }
@@ -415,7 +500,10 @@ function ModalHeader(){
     return {
         view:(vnode)=>{
             return m(FlexRow,{
-                borderBottom:'2px solid lightgrey', justifyContent:'center', alignItems:'center', padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', ...vnode.attrs
+                borderBottom:'1px solid #eaeaea', 
+                justifyContent:'center', alignItems:'center', 
+                padding:'1em', paddingLeft:'1.5em', fontWeight:'bold', 
+                ...vnode.attrs
             },
                 vnode.children
             )
@@ -427,7 +515,13 @@ function ModalHeader(){
 function ModalFooter(){
     return {
         view:(vnode)=>{
-            return m(FlexRow,{ borderTop:'2px solid lightgrey', justifyContent:'end', padding:'1em', gap:'1em'},
+            return m(FlexRow,{ 
+                background:'#fafafa',
+                borderTop:'1px solid #22242626', 
+                justifyContent:'end', 
+                padding:'1em', gap:'1em',
+                ...vnode.attrs
+            },
                 vnode.children
             )
         }
