@@ -398,7 +398,7 @@ function Modal(){
     }
 
     let sizes = {
-        'tiny': '300px',
+        'tiny': '340px',
         'small': '600px',
         'big':'850px',
         'large': {width:'1080px', maxWidth:'90%'},
@@ -416,7 +416,7 @@ function Modal(){
 
     return {
         oninit:(vnode)=>{
-            if(vnode.attrs.size){
+            if(vnode.attrs.size && sizes[vnode.attrs.size]){
                 let size = sizes[vnode.attrs.size]
                 modalStyle.width = size.width || size
                 modalStyle.maxWidth = size.maxWidth || size

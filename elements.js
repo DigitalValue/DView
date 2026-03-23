@@ -713,6 +713,7 @@ function Label() {
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
+                        ...config.elements?.label || {},
                         ...types[type],
                         ...(vnode.attrs.basic && {
                             backgroundColor: 'white',
@@ -724,10 +725,10 @@ function Label() {
                     onclick: vnode.attrs.onclick
                 },
                     vnode.attrs.icon || vnode.attrs.text ?
-                        m(FlexRow, { gap: '0.5em', alignItems: 'center' },
-                            vnode.attrs.icon && m(Icon, { icon: vnode.attrs.icon, size: 'small', color: types[type]?.color || 'white' }),
-                            vnode.attrs.text && m(SmallText, vnode.attrs.text),
-                        ) : null,
+                    m(FlexRow, { gap: '0.5em', alignItems: 'center' },
+                        vnode.attrs.icon && m(Icon, { icon: vnode.attrs.icon, size: 'small', color: types[type]?.color || 'white' }),
+                        vnode.attrs.text && m(SmallText, vnode.attrs.text),
+                    ) : null,
 
                     vnode.children
                 )
@@ -1052,6 +1053,10 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 6v6l4 2" })
         ],
+        clone: [
+            m("rect", {width:"14", height:"14", x:"8", y:"8", rx:"2", ry:"2"}),
+            m("path", {d:"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"})
+        ],
         close: [
             m("path", { d: "M18 6 6 18" }),
             m("path", { d: "m6 6 12 12" })
@@ -1126,6 +1131,11 @@ function SVGIcon() {
             m("circle", { cx: "19", cy: "9", r: "2" }),
             m("path", { d: "M22.5 20c0-2.2-1.8-4-4-4" })
         ],
+        help: [
+            //m("circle", {cx:"12", cy:"12", r:"10"}),
+            m("path", {d:"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"}),
+            m("path", {d:"M12 17h.01"})
+        ],
         info: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 16v-4" }),
@@ -1158,6 +1168,9 @@ function SVGIcon() {
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
             m("rect", { x: "2", y: "4", width: "20", height: "16", rx: "2" })
         ],
+        minus: [
+            m("path", {d:"M5 12h14"})
+        ],
         map: [
             m("path", { d:"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"}),
             m("path", { d:"M15 5.764v15"}),
@@ -1168,8 +1181,8 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "10", r: "3" })
         ],
         lock: [
-            m("rect", {width:"18", height:"11", x:"3", y:"11", rx:"2", ry:"2"}),
-            m("path",{d:"M7 11V7a5 5 0 0 1 10 0v4"})
+            m("rect", { width:"18", height:"11", x:"3", y:"11", rx:"2", ry:"2"}),
+            m("path",{ d:"M7 11V7a5 5 0 0 1 10 0v4" })
         ],
 
         messages: [
@@ -1191,6 +1204,13 @@ function SVGIcon() {
         sticky_note: [
            m("path", {d:"M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"}),
            m("path", {d:"M15 3v5a1 1 0 0 0 1 1h5"})
+        ],
+        paste: [
+            m("path", {d:"M11 14h10"}),
+            m("path", {d:"M16 4h2a2 2 0 0 1 2 2v1.344"}),
+            m("path", {d:"m17 18 4-4-4-4"}),
+            m("path", {d:"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113"}),
+            m("rect", {x:"8", y:"2", width:"8", height:"4", rx:"1"})
         ],
         phone: [
             m("path", { d: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" })
