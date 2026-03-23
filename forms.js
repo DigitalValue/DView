@@ -28,9 +28,9 @@ function FormLabel(){
 
     return {
         view:(vnode)=>{
-            let { required, info} = vnode.attrs
+            let { required, description, info} = vnode.attrs
 
-            return [
+            return m(FlexCol, [
                 m(FlexRow,
                     // label debería ser Text ??
                     m("label", {
@@ -49,9 +49,13 @@ function FormLabel(){
                     info 
                     ? m(InfoTooltip,{text:info})
                     : null
-                )
+                ),
+              
+                description
+                ? m(SmallText, { paddingBottom: "5px", color: "gray" }, description)
+                : null
                 
-            ]
+            ])
         }
     }
 }
@@ -70,7 +74,7 @@ function Checkbox(){
 
     return {
         view:(vnode)=>{
-            let {data, name, info, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
+            let {data, name, info, description, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
                 m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
@@ -90,7 +94,7 @@ function Checkbox(){
                     }),
 
                    
-                    m(FormLabel, { info: info, required: required }, label),
+                    m(FormLabel, { info: info, description, required: required }, label),
                     
                 )
             ]
@@ -105,7 +109,7 @@ function Input(){
     
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, onkeyup} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup} = vnode.attrs
 
             return [
 
@@ -115,7 +119,7 @@ function Input(){
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
-                        m(FormLabel,{required: required, info:info}, label),
+                        m(FormLabel,{required: required, description, info:info}, label),
                     ] : null,
 
                     m(Div, {position:'relative', width:'100%', display:'flex'},
@@ -364,12 +368,12 @@ function Dropdown(){
     
     return {
         view:(vnode)=>{
-            let { data, name, label,  onchange, disabled=false, info, required, value, placeholder, style={}} = vnode.attrs
+            let { data, name, label,  onchange, disabled=false, info, description, required, value, placeholder, style={}} = vnode.attrs
 
 
             return [
                 m(FlexCol,{width:'100%', ...vnode.attrs.style},
-                    label ? m(FormLabel,{info:info, required:required}, label): null,
+                    label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
                     m("select",{
                         disabled,
@@ -405,13 +409,13 @@ function RadioButtons() {
     
     return {
         view:(vnode)=>{
-            let { data, name, label, onchange, disabled=false, info, required } = vnode.attrs
+            let { data, name, label, onchange, disabled=false, info, description, required } = vnode.attrs
 
 
             return [
                 m(FlexCol,{width:'100%', gap: "5px", ...vnode.attrs.style},
 
-                    label ? m(FormLabel,{info:info, required:required}, label): null,
+                    label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
                     m(FlexCol, { gap: "10px" },
                         vnode.children.map((o)=> m(Tappable, {
