@@ -493,7 +493,7 @@ function Button() {
                 }
             },
                 icon ? [
-                    m(Icon, { icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }),
+                    m(Icon, { icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }), // PASAR esto a svgicon
                     // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
