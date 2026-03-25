@@ -401,8 +401,8 @@ function Modal(){
         'tiny': '340px',
         'small': '600px',
         'big':'850px',
-        'large': {width:'1080px', maxWidth:'90%'},
-        'fullscreen': {width:'90vw', maxWidth:'1400px'}
+        'large':'1080px', 
+        'fullscreen': '90vw'
     }
     
     let dimmerStyle = {
@@ -418,8 +418,11 @@ function Modal(){
         oninit:(vnode)=>{
             if(vnode.attrs.size && sizes[vnode.attrs.size]){
                 let size = sizes[vnode.attrs.size]
-                modalStyle.width = size.width || size
-                modalStyle.maxWidth = size.maxWidth || size
+                modalStyle.width = size?.width || size
+
+                if(size.maxWidth){
+                    modalStyle.maxWidth = size.maxWidth || size
+                }
             }
 
             if(vnode.attrs.center){
