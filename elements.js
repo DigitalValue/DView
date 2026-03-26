@@ -1058,6 +1058,14 @@ function SVGIcon() {
             m("path", { d: "m15 9-6 6" }),
             m("path", { d: "m9 9 6 6" })
         ],
+        csv: [
+            m("path", {d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"}),
+            m("path", {d: "M14 2v4a2 2 0 0 0 2 2h4"}),
+            m("path", {d: "M8 12h8"}),
+            m("path", {d: "M8 16h8"}),
+            m("path", {d: "M11 12v6"}),
+            m("path", {d: "M14 12v6"})
+        ],
         clock: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 6v6l4 2" })
