@@ -1002,9 +1002,17 @@ function SVGIcon() {
             m("path", {d:"M5 12h14"}),
             m("path", {d:"M12 5v14"})
         ],
+        arrow_down: [
+            m("path", { d: "M12 5v14" }),
+            m("path", { d: "m19 12-7 7-7-7" })
+        ],
         arrow_left: [
             m("path", { d: "m12 19-7-7 7-7" }),
             m("path", { d: "M19 12H5" })
+        ],
+        arrow_up: [
+            m("path", { d: "m5 12 7-7 7 7" }),
+            m("path", { d: "M12 19V5" })
         ],
         banknote_arrow_up: [
             m("path", {d:"M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"}),
@@ -1172,6 +1180,11 @@ function SVGIcon() {
             m("circle", { cx: "3", cy: "6", r: "1" }),
             m("circle", { cx: "3", cy: "12", r: "1" }),
             m("circle", { cx: "3", cy: "18", r: "1" })
+        ],
+        list_filter: [
+            m("path", { d: "M2 5h20" }),
+            m("path", { d: "M6 12h12" }),
+            m("path", { d: "M9 19h6" })
         ],
         mail: [
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),

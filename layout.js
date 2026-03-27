@@ -238,6 +238,7 @@ function Div(){
  * @param {Function} onclick - Funcion que se ejecuta al hacer click
  * @param {Function} onmousedown - Funcion que se ejecuta al hacer mousedown
  * @param {Function} onmouseup - Funcion que se ejecuta al hacer mouseup
+ * @param {Function} clickout - Funcion que se ejecuta al hacer click fuera del elemento
 */
 function Tappable(){
 
