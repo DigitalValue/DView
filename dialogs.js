@@ -142,12 +142,15 @@ function alertDialog(options={
         view:()=> m(Modal, { size: options.size || 'tiny', center:true },
                 types[options.type] || options.title ? 
                 m(ModalHeader,{gap:'1em'},
+                    
+                    types[options.type] ?
                     m(SVGIcon, {
                         icon: types[options.type]?.icon, 
                         color: types[options.type]?.color,
                         height: 24,
                         width: 24
-                    }),
+                    }): null,
+
                     m(H2,{margin:0}, 
                         options.title ||  types[options.type]?.text 
                     ),
