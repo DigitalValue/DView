@@ -46,12 +46,14 @@ function Segment() {
         primary: {
             backgroundColor: 'white',
             border: '1px solid #e0e0e0',
-            color: '#1b1c1d'
+            color: '#1b1c1d',
+            ...config.elements?.segment?.primary,
         },
         secondary: {
             backgroundColor: '#f0f0f0',
             border: '1px solid #e5e7eb',
-            color: '#4b5563'
+            color: '#4b5563',
+            ...config.elements?.segment?.secondary,
         },
         tertiary: {
             backgroundColor: '#f5f5f5',
