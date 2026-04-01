@@ -133,9 +133,9 @@ function Input(){
                                 ...(config.form?.baseStyle),
                                 ...icon ? {paddingLeft:'32px'}:{},
                                 //...(config.fonts?.default || config.defaultFont || {}),
-                                ...(vnode.attrs.style || {}),
                                 ...(config.form?.baseStyle),
                                 ...(config.form?.input || {}),
+                                ...(vnode.attrs.style || {}),
                             },
                             oninput:(e)=>{
                                 data && name ? data[name] = e.target.value : ''
