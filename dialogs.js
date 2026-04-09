@@ -128,48 +128,54 @@ function alertDialog(options={
     }
 
     // TODO!! AÑADIR TRANSICIÓN DE SALIDA !!
-    m.mount(elem, {
-        onbeforeremove:()=>{
-            console.log('removing')
-            return new Promise(function(resolve) {
-                //console.log(vnode.attrs.transition)
-                //console.log(vnode.dom.classList);
-                vnode.dom.classList.add('fade', 'out')
-                vnode.dom.children[0].classList.add('scale', 'out')
-                setTimeout(resolve, 300)
-            })
-        },
-        view:()=> m(Modal, { size: options.size || 'tiny', center:true },
-                types[options.type] || options.title ? 
-                m(ModalHeader,{gap:'1em'},
-                    m(SVGIcon, {
-                        icon: types[options.type]?.icon, 
-                        color: types[options.type]?.color,
-                        height: 24,
-                        width: 24
-                    }),
-                    m(H2,{margin:0}, 
-                        options.title ||  types[options.type]?.text 
+    return new Promise((resolve,reject)=> {
+        m.mount(elem, {
+            /*onbeforeremove:()=>{
+                console.log('removing')
+                return new Promise(function(resolve) {
+                    //console.log(vnode.attrs.transition)
+                    //console.log(vnode.dom.classList);
+                    vnode.dom.classList.add('fade', 'out')
+                    vnode.dom.children[0].classList.add('scale', 'out')
+                    setTimeout(resolve, 300)
+                })
+            },*/
+            view:()=> m(Modal, { size: options.size || 'tiny', center:true },
+                    types[options.type] || options.title ? 
+                    m(ModalHeader,{gap:'1em'},
+                        
+                        types[options.type] ?
+                        m(SVGIcon, {
+                            icon: types[options.type]?.icon, 
+                            color: types[options.type]?.color,
+                            height: 24,
+                            width: 24
+                        }): null,
+
+                        m(H2,{margin:0}, 
+                            options.title ||  types[options.type]?.text 
+                        ),
+                        
+                    ):  null,
+
+                    m(ModalContent, 
+                        m(Div,{padding:'1em'}, m(Text, m.trust(options.message)))
                     ),
-                    
-                ):  null,
 
-                m(ModalContent, 
-                    m(Div,{padding:'1em'}, m(Text, m.trust(options.message)))
-                ),
-
-                m(ModalFooter,
-                    m(Button, {
-                        onclick:(e)=>{
-                            options.then ? options.then():null; 
-                            elem.remove()
+                    m(ModalFooter,
+                        m(Button, {
+                            onclick:(e)=>{
+                                options.then ? options.then():null;
+                                elem.remove()
+                                resolve();
+                            },
+                            fluid:true,
+                            type:'negative'
                         },
-                        fluid:true,
-                        type:'negative'
-                    },
-                    m(Text,options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})))
+                        m(Text,options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})))
+                    )
                 )
-            )
+        })
     })
 }
 
@@ -188,7 +194,7 @@ function promptDialog(options={
 }){
     var elem = document.createElement("div")
 
-    elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : 'position:fixed')
+    elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : 'position:fixed') // cambia algo el position ??
     elem.id = Math.random()*10000 + ''
     document.body.appendChild(elem);
 
@@ -223,67 +229,74 @@ function promptDialog(options={
             text:'Éxito',
             icon:'check_circle',
             color:'#00c853'
+        },
+        'clone':{
+            icon:'clone',
         }
     }
 
     // TODO!! AÑADIR TRANSICIÓN DE SALIDA !!
-    m.mount(elem, {
-        onbeforeremove:()=>{
-            console.log('removing')
-            return new Promise(function(resolve) {
-                vnode.dom.classList.add('fade', 'out')
-                vnode.dom.children[0].classList.add('scale', 'out')
-                setTimeout(resolve, 300)
-            })
-        },
-        view:()=> m(Modal, { size:'tiny', center:true },
-            types[options.type] || options.title ? 
-            m(ModalHeader,
-                m(SVGIcon,{ icon: types[options.type]?.icon, color: types[options.type]?.color }),
-                m(Box,{ width:'10px' }),
-                m(H2,{ marginTop:0 }, options.title ||  types[options.type]?.text )
-            ) :  null,
-
-            m(Div,{padding:'1em'}, 
-                m(Input,{
-                    label: options.message,
-                    type: options.type || 'text',
-                    data: data,
-                    name: name,
-                    onchange: options.onchange || (()=>{}),
-                    placeholder: options.placeholder || localize({es:'Escribe aquí...',va:'Escriu ací...'}),
-                    fluid: options.fluid || false,
+    return new Promise((resolve,reject)=> {
+        m.mount(elem, {
+            /*onbeforeremove:()=>{
+                console.log('removing')
+                return new Promise(function(resolve) {
+                    vnode.dom.classList.add('fade', 'out')
+                    vnode.dom.children[0].classList.add('scale', 'out')
+                    setTimeout(resolve, 300)
                 })
-            ),
+            },*/
+            view:()=> m(Modal, { size:'tiny', center:true },
+                types[options.type] || options.title ?
+                m(ModalHeader,
+                    m(SVGIcon,{ icon: types[options.type]?.icon, color: types[options.type]?.color }),
+                    m(Box,{ width:'10px' }),
+                    m(H2,{ marginTop:0 }, options.title ||  types[options.type]?.text )
+                ) :  null,
 
-            m(ModalFooter,
-
-                m(Button, {
-                    onclick:(e)=>{
-                        if(!data[name]) return;
-                        options.then ? options.then(data[name]):null; 
-                        elem.remove()
-                    },
-                    disabled: !data[name] || data[name] == '',
-                    fluid: options.fluid,
-                    type: 'positive'
-                },
-                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Aceptar',va:"Aceptar"})
+                m(Div,{padding:'1em'},
+                    m(Input,{
+                        label: options.message,
+                        type: options.type || 'text',
+                        data: data,
+                        name: name,
+                        onchange: options.onchange || (()=>{}),
+                        placeholder: options.placeholder || localize({es:'Escribe aquí...',va:'Escriu ací...'}),
+                        fluid: options.fluid || false,
+                    })
                 ),
 
+                m(ModalFooter,
 
-                m(Button, {
-                    onclick:(e)=>{
-                        options.then ? options.then():null; 
-                        elem.remove()
+                    m(Button, {
+                        onclick:(e)=>{
+                            if(!data[name]) return;
+                            options.then ? options.then(data[name]):null;
+                            elem.remove()
+                            resolve(data[name])
+                        },
+                        disabled: !data[name] || data[name] == '',
+                        fluid: options.fluid,
+                        type: 'positive'
                     },
-                    fluid:options.fluid,
-                    type:'negative'
-                },
-                    options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})
+                        options.buttonLabels ? options.buttonLabels[0] : localize({es:'Aceptar',va:"Aceptar"})
+                    ),
+
+
+                    m(Button, {
+                        onclick:(e)=>{
+                            options.then ? options.then():null;
+                            elem.remove()
+                            resolve(null)
+                        },
+                        fluid:options.fluid,
+                        type:'negative'
+                    },
+                        options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})
+                    )
                 )
             )
-        )
+        })
     })
 }
 
@@ -293,7 +306,7 @@ function openDialog(Component, options = {}) {
     
     var elem = document.createElement("div")
 
-    elem.style = 'position:fixed;inset:0px;z-index:1000'
+    elem.style = `position:fixed;inset:0px;z-index:${options.multiple ? '10000000':'100000'}`
     elem.id = Math.random() * 10000 + ''
 
     document.body.appendChild(elem);
@@ -404,8 +417,8 @@ function Modal(){
         'tiny': '340px',
         'small': '600px',
         'big':'850px',
-        'large': {width:'1080px', maxWidth:'90%'},
-        'fullscreen': {width:'90vw', maxWidth:'1400px'}
+        'large':'1080px', 
+        'fullscreen': '90vw'
     }
     
     let dimmerStyle = {
@@ -421,8 +434,11 @@ function Modal(){
         oninit:(vnode)=>{
             if(vnode.attrs.size && sizes[vnode.attrs.size]){
                 let size = sizes[vnode.attrs.size]
-                modalStyle.width = size.width || size
-                modalStyle.maxWidth = size.maxWidth || size
+                modalStyle.width = size?.width || size
+
+                if(size.maxWidth){
+                    modalStyle.maxWidth = size.maxWidth || size
+                }
             }
 
             if(vnode.attrs.center){
@@ -440,6 +456,7 @@ function Modal(){
 
         },
         view:(vnode)=>{
+            console.log('header', vnode.attrs.header)
            
             return m("div", {
                 style: dimmerStyle

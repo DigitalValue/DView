@@ -77,7 +77,7 @@ function Checkbox(){
             let {data, name, info, description, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
-                m(FlexRow, { alignItems: "center", flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
+                m(FlexRow, { flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
                     
                     m("input",{
                         type:'checkbox',
@@ -133,9 +133,9 @@ function Input(){
                                 ...(config.form?.baseStyle),
                                 ...icon ? {paddingLeft:'32px'}:{},
                                 //...(config.fonts?.default || config.defaultFont || {}),
-                                ...(vnode.attrs.style || {}),
                                 ...(config.form?.baseStyle),
                                 ...(config.form?.input || {}),
+                                ...(vnode.attrs.style || {}),
                             },
                             oninput:(e)=>{
                                 data && name ? data[name] = e.target.value : ''

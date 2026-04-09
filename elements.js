@@ -46,12 +46,14 @@ function Segment() {
         primary: {
             backgroundColor: 'white',
             border: '1px solid #e0e0e0',
-            color: '#1b1c1d'
+            color: '#1b1c1d',
+            ...config.elements?.segment?.primary,
         },
         secondary: {
             backgroundColor: '#f0f0f0',
             border: '1px solid #e5e7eb',
-            color: '#4b5563'
+            color: '#4b5563',
+            ...config.elements?.segment?.secondary,
         },
         tertiary: {
             backgroundColor: '#f5f5f5',
@@ -492,7 +494,8 @@ function Button() {
                 onmousedown: !disabled && {
                     ...config.elements?.button?.onmousedown,
                     ...types[type]?.onmousedown
-                }
+                },
+                id: vnode.attrs.id
             },
                 icon ? [
                     m(Icon, { icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }), // PASAR esto a svgicon
@@ -1003,9 +1006,25 @@ function SVGIcon() {
             m("path", {d:"M5 12h14"}),
             m("path", {d:"M12 5v14"})
         ],
+        arrow_down: [
+            m("path", { d: "M12 5v14" }),
+            m("path", { d: "m19 12-7 7-7-7" })
+        ],
         arrow_left: [
             m("path", { d: "m12 19-7-7 7-7" }),
             m("path", { d: "M19 12H5" })
+        ],
+        arrow_up: [
+            m("path", { d: "m5 12 7-7 7 7" }),
+            m("path", { d: "M12 19V5" })
+        ],
+        banknote_arrow_up: [
+            m("path", {d:"M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"}),
+            m("path", {d:"M18 12h.01"}),
+            m("path", {d:"M19 22v-6"}),
+            m("path", {d:"m22 19-3-3-3 3"}),
+            m("path", {d:"M6 12h.01"}),
+            m("circle", {cx:"12", cy:"12", r:"2"})
         ],
         calendar: [
             m("path", { d: "M8 2v4" }),
@@ -1050,6 +1069,14 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "m15 9-6 6" }),
             m("path", { d: "m9 9 6 6" })
+        ],
+        csv: [
+            m("path", {d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"}),
+            m("path", {d: "M14 2v4a2 2 0 0 0 2 2h4"}),
+            m("path", {d: "M8 12h8"}),
+            m("path", {d: "M8 16h8"}),
+            m("path", {d: "M11 12v6"}),
+            m("path", {d: "M14 12v6"})
         ],
         clock: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
@@ -1159,6 +1186,16 @@ function SVGIcon() {
             m("path", { d: "M3 18h2" }),
             m("path", { d: "M19 18h2" })
         ],
+        keyboard: [
+           m("path", {d:"M12 12h.01"}),
+           m("path", {d:"M14 8h.01"}),
+           m("path", {d:"M16 12h.01"}),
+           m("path", {d:"M18 8h.01"}),
+           m("path", {d:"M6 8h.01"}),
+           m("path", {d:"M7 16h10"}),
+           m("path", {d:"M8 12h.01"}),
+           m("rect", {width:"20", height:"16", x:"2", y:"4", rx:"2"})
+        ],
         log_out: [
             m("path", { d: "m16 17 5-5-5-5" }),
             m("path", { d: "M21 12H9" }),
@@ -1171,6 +1208,11 @@ function SVGIcon() {
             m("circle", { cx: "3", cy: "6", r: "1" }),
             m("circle", { cx: "3", cy: "12", r: "1" }),
             m("circle", { cx: "3", cy: "18", r: "1" })
+        ],
+        list_filter: [
+            m("path", { d: "M2 5h20" }),
+            m("path", { d: "M6 12h12" }),
+            m("path", { d: "M9 19h6" })
         ],
         mail: [
             m("path", { d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" }),
@@ -1265,10 +1307,18 @@ function SVGIcon() {
             m("path", { d: "M8 15h5" }),
             m("circle", { cx: "17", cy: "15", r: "1" })
         ],
-
+        receipt_euro: [
+            m("path", {d:"M15.828 14.829a4 4 0 0 1-5.656 0 4 4 0 0 1 0-5.657 4 4 0 0 1 5.656 0"}),
+            m("path", {d:"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"}),
+            m("path", {d:"M8 12h5"})
+        ],
         reset: [
             m("path", {d:"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}),
             m("path", {d:"M3 3v5h5"})
+        ],
+        sticky_note: [
+           m("path", {d:"M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"}),
+           m("path", {d:"M15 3v5a1 1 0 0 0 1 1h5"})
         ],
         search: [
             m("path", { d: "m21 21-4.34-4.34" }),
@@ -1278,6 +1328,10 @@ function SVGIcon() {
             m("path", { d: "M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" }),
             m("path", { d: "M17 21v-8H7v8" }),
             m("path", { d: "M7 3v5h8" })
+        ],
+        send: [
+            m("path", { d: "M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" }),
+            m("path", { d: "M6 12h16" })
         ],
         settings: [
             m("circle", { cx: "12", cy: "12", r: "3" }),
@@ -1330,6 +1384,18 @@ function SVGIcon() {
             m("path", { d: "M8 21h8" }),
             m("path", { d: "M12 19v2" }),
             m("path", { d: "m9 2 3 3 3-3" })
+        ],
+        ticket: [
+            m("path", { d: "M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" }),
+            m("path", { d: "M13 5v2" }),
+            m("path", { d: "M13 17v2" }),
+            m("path", { d: "M13 11v2" })
+        ],
+        ticket_percent: [
+            m("path", { d: "M2 9a3 3 0 1 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 1 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" }),
+            m("path", { d: "M9 9h.01" }),
+            m("path", { d: "m15 9-6 6" }),
+            m("path", { d: "M15 15h.01" })
         ],
         trash: [
             m("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" }),
