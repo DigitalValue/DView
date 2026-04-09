@@ -52,9 +52,9 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
             })
         },
         view:()=>  m(Modal, {size: options.size || 'tiny', center:true},
-                m(ModalHeader, m(H2, options.title || 'Confirma la acción')),
+                m(ModalHeader, m(H2, localize(options.title) || 'Confirma la acción')),
                 
-                m(Div,{padding:'1em'}, m(Text, m.trust(options.message))),
+                m(Div,{padding:'1em'}, m(Text, m.trust(localize(options.message)))),
                 
                 m(ModalFooter,
 
@@ -210,6 +210,9 @@ function promptDialog(options={
         },
         'warning':{
             icon:'warning', 
+        },
+        'clone':{
+            icon:'clone', 
         },
         'error':{
             icon:'error',
