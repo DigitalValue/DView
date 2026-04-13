@@ -5,7 +5,7 @@ import { SmallText, Text } from "./texts.js"
 
 export {
     Segment, Span, RippleEffect,
-    Button, Icon, Img,
+    Button, Icon, Img, IconButton,
     Sidebar, Label,
     Message, Card, Spinner,
     BreadCrumb,
@@ -994,6 +994,21 @@ function Sidebar() {
     }
 }
 
+
+function IconButton() {
+    let hovered = false;
+
+    return {
+        view: (vnode) => {
+            let { icon, color, onclick, filled, hoverColor } = vnode.attrs
+
+            return m(Tappable, {
+                onclick: onclick,
+                onhover: (hover) => hovered = hover,
+            }, m(SVGIcon, { icon: icon, filled: filled, color: hovered ? hoverColor || color : color }))
+        }
+    }
+}
 
 
 
