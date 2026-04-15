@@ -1000,12 +1000,12 @@ function IconButton() {
 
     return {
         view: (vnode) => {
-            let { icon, color, onclick, filled, hoverColor } = vnode.attrs
+            let { icon, color, onclick, filled, size, hoverColor } = vnode.attrs
 
             return m(Tappable, {
                 onclick: onclick,
                 onhover: (hover) => hovered = hover,
-            }, m(SVGIcon, { icon: icon, filled: filled, color: hovered ? hoverColor || color : color }))
+            }, m(SVGIcon, { icon: icon, size:size, filled: filled, color: hovered ? hoverColor || color : color }))
         }
     }
 }
@@ -1185,6 +1185,13 @@ function SVGIcon() {
             //m("circle", {cx:"12", cy:"12", r:"10"}),
             m("path", {d:"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"}),
             m("path", {d:"M12 17h.01"})
+        ],
+        id_card: [
+            m("path", {d:"M16 10h2"}),
+            m("path", {d:"M16 14h2"}),
+            m("path", {d:"M6.17 15a3 3 0 0 1 5.66 0"}),
+            m("circle", {cx:"9", cy:"11", r:"2"}),
+            m("rect", {x:"2", y:"5", width:"20", height:"14", rx:"2"})
         ],
         info: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
@@ -1449,6 +1456,17 @@ function SVGIcon() {
 
     }
 
+    let sizes = {
+        'small': {
+            height:14,
+            width:14,
+        },
+        'large': {
+            height:24,
+            width:24
+        }
+    }
+
 
     return {
         view: ({ attrs }) => {
@@ -1458,8 +1476,8 @@ function SVGIcon() {
             const iconViewBox = Array.isArray(iconData) ? "0 0 24 24" : (iconData.viewBox || "0 0 24 24")
 
             return m("svg", {
-                width: attrs.width || 18,
-                height: attrs.height || attrs.width || 18,
+                width: sizes[attrs.size]?.width || attrs.width || 18,
+                height:sizes[attrs.size]?.height || attrs.height || attrs.width || 18,
                 viewBox: iconViewBox,
                 xmlns: "http://www.w3.org/2000/svg",
                 fill: attrs.filled ? attrs.color : 'none',
