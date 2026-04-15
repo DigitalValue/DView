@@ -931,7 +931,8 @@ function Spinner() {
                             ...spinStyle,
                             color: color || '#1c4c5b',
                             ...sizes[size],
-                            
+                            width: `${sizes[size].width}px`,
+                            height: `${sizes[size].width}px`,
                             "animation-delay": "-0.45s"
                         }
                     }),
@@ -941,6 +942,8 @@ function Spinner() {
                             ...spinStyle,
                             color: color || '#1c4c5b',
                             ...sizes[size],
+                            width: `${sizes[size].width}px`,
+                            height: `${sizes[size].width}px`,
                             "animation-delay": "-0.3s"
                         }
                     })
