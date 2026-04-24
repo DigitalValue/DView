@@ -1008,12 +1008,16 @@ function IconButton() {
 
     return {
         view: (vnode) => {
-            let { icon, color, onclick, filled, size, hoverColor, width } = vnode.attrs
+            let { icon, color, onclick, filled, size, hoverColor, width, style={} } = vnode.attrs
 
             return m(Tappable, {
                 onclick: onclick,
                 style: {display:'flex'},
                 onhover: (hover) => hovered = hover,
+                style: {
+                    display: "flex",
+                    ...style
+                }
             }, m(SVGIcon, { icon: icon, size:size, height:width, width:width, filled: filled, color: hovered ? hoverColor || color : color }))
         }
     }
