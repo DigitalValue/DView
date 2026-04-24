@@ -81,7 +81,7 @@ function Text(){
         view:(vnode)=>{
             return m("p",{
                 style: {
-                    userSelect:'none',
+                    //userSelect:'none',
                     fontFamily: config.fontFamily,
                     margin: 0,
                     // color:'black',

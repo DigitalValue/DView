@@ -1,6 +1,6 @@
 import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
-import { Icon, Button, SVGIcon } from './elements.js'
+import { Icon, Button, SVGIcon, IconButton } from './elements.js'
 import { config } from "./config.js"
 import { localize, translateSALT } from "./util.js"
 
@@ -8,7 +8,7 @@ import { localize, translateSALT } from "./util.js"
 export {
     FormLabel, Input, TranslationInput, Dropdown,
     IntegerInput, Switch, InfoTooltip, Checkbox, RadioButtons,
-    HtmlIntegerInput, HtmlDropdown, DateSelector
+    HtmlIntegerInput, HtmlDropdown, DateSelector, DateInput
 }
 
 
@@ -69,7 +69,7 @@ function Checkbox(){
         height:'17px',
         minHeight:'17px',
         cursor:'pointer',
-        marginBottom: "5px"
+        //marginBottom: "5px"
     }
 
     return {
@@ -77,7 +77,7 @@ function Checkbox(){
             let {data, name, info, description, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
-                m(FlexRow, { flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em'},
+                m(FlexRow, { flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em', alignItems:'center'},
                     
                     m("input",{
                         type:'checkbox',
@@ -195,6 +195,464 @@ function Input(){
                 )
 
             ]
+        }
+    }
+}
+
+
+
+
+function DateInput(){
+    let open = false;
+    
+    let internalValue = '';
+    let segs = ['', '', '']; // [dd, mm, yyyy]
+    let segRefs = [null, null, null];
+    let focused = false;
+
+    function storedToSegs(stored) {
+        if (!stored) return ['', '', ''];
+        let parts = stored.split('/');
+        if (parts.length === 3) return [parts[2], parts[1], parts[0]]; // dd, mm, yyyy
+        return ['', '', ''];
+    }
+
+    function segsToStored() {
+        let [dd, mm, yyyy] = segs;
+        if (!dd && !mm && !yyyy) return '';
+        return `${yyyy || ''}/${mm ? String(mm).padStart(2,'0') : ''}/${dd ? String(dd).padStart(2,'0') : ''}`;
+    }
+
+    function getValue(data, name) {
+        return (data && name) ? (data[name] || '') : internalValue;
+    }
+
+    function setValue(val, data, name, onchange, oninput) {
+        if (data && name) data[name] = val;
+        else internalValue = val;
+        if (onchange) onchange(val);
+        if(oninput) oninput(val)
+
+        segs = storedToSegs(val);
+        if (val) {
+            let parts = val.split('/');
+            if (parts[0]) viewYear = parseInt(parts[0]) || viewYear;
+            if (parts[1]) viewMonth = parseInt(parts[1]) - 1;
+        }
+        m.redraw();
+    }
+
+    function syncSeg(idx, val, data, name, onchange) {
+        segs[idx] = val;
+        let stored = segsToStored();
+        if (data && name) data[name] = stored;
+        else internalValue = stored;
+        if (onchange) onchange(stored);
+    }
+
+    return {
+        view:(vnode)=>{
+            let { data, name, label, required, onchange, oninput } = vnode.attrs;
+
+            if(data && name && data[name]){
+                internalValue = data[name]
+            }
+
+            return [
+                m(FlexCol, { width: '100%' },
+                    label ? m(FormLabel, { required }, label) : null,
+
+                    m(Tappable, {
+                        style: {
+                            ...(config.form?.baseStyle),
+                            ...focused && (config.form?.focusStyle || {}),
+                            position: 'relative',
+                            width: '100%',
+                            boxSizing: 'border-box',
+                        },
+                        onclick:(e)=> focused = true,
+                        clickout: () => {
+                            focused = false;
+                            if (open) { 
+                                open = false; 
+                                m.redraw(); 
+                            }
+                        },
+                    },
+
+                        m(FlexRow, { justifyContent: 'space-between', alignItems: 'center', width: '100%' },
+
+                            m('div', { style: { flex: 1, userSelect: 'none', display: 'flex', alignItems: 'center' } },
+                                m(DateSegment, {
+                                    ref: (dom) => { segRefs[0] = dom; },
+                                    value: segs[0], placeholder: 'dd',
+                                    min: 1, max: 31, digits: 2,
+                                    onvalue: (v) => syncSeg(0, v, data, name, onchange),
+                                    onadvance: () => { segRefs[1]?.focus(); },
+                                }),
+                                m('span', { style: { color: '#aaa', padding: '0 1px' } }, '/'),
+                                m(DateSegment, {
+                                    ref: (dom) => { segRefs[1] = dom; },
+                                    value: segs[1], placeholder: 'mm',
+                                    min: 1, max: 12, digits: 2,
+                                    onvalue: (v) => syncSeg(1, v, data, name, onchange),
+                                    onadvance: () => { segRefs[2]?.focus(); },
+                                    onretreat: () => { segRefs[0]?.focus(); },
+                                }),
+                                m('span', { style: { color: '#aaa', padding: '0 1px' } }, '/'),
+                                m(DateSegment, {
+                                    ref: (dom) => { segRefs[2] = dom; },
+                                    value: segs[2], placeholder: 'aaaa',
+                                    min: 1900, max: 2100, digits: 4,
+                                    onvalue: (v) => syncSeg(2, v, data, name, onchange),
+                                    onretreat: () => { segRefs[1]?.focus(); },
+                                }),
+                            ),
+
+                            m(IconButton, {
+                                icon: 'calendar',
+                                color: 'rgba(34, 36, 38, 0.6)',
+                                hoverColor: '#2185d0',
+                                onclick: (e) => {
+                                    open = !open;
+                                }
+                            })
+                        ),
+
+                        open ? m(Calendar, { data, name, onchange, setValue }) : null
+                    )
+                )
+            ]
+        }
+    }
+
+    function DateSegment() {
+        let typingBuf = '';
+        let elem = null;
+        
+
+        return {
+            view: (vnode) => {
+                let { value, placeholder, min, max, digits = 2, onvalue, onadvance, onretreat } = vnode.attrs;
+                let active = elem ? document.activeElement === elem : false;
+
+                return m('span', {
+                    tabindex: 0,
+                    style: {
+                        padding: '0 3px',
+                        borderRadius: '2px',
+                        minWidth: digits > 2 ? '2.8em' : '1.4em',
+                        textAlign: 'center',
+                        display: 'inline-block',
+                        outline: 'none',
+                        background: active ? '#2185d0' : 'transparent',
+                        color: active ? 'white' : (value ? 'inherit' : '#aaa'),
+                        cursor: 'default',
+                        userSelect: 'none',
+                    },
+                    onfocus: () => { typingBuf = ''; m.redraw(); },
+                    onblur:  () => { typingBuf = ''; m.redraw(); },
+                    onkeydown: (e) => {
+                        let key = e.key;
+
+                        if (key >= '0' && key <= '9') {
+                            e.preventDefault();
+                            typingBuf += key;
+
+                            if (digits === 4) {
+                                if (typingBuf.length === 4) {
+                                    let val = String(Math.min(Math.max(parseInt(typingBuf), min), max));
+                                    if (onvalue) onvalue(val);
+                                    typingBuf = '';
+                                    if (onadvance) onadvance();
+                                }
+                                m.redraw();
+                            } else {
+                                let num = parseInt(typingBuf);
+                                if (typingBuf.length === 1 && num > Math.floor(max / 10)) {
+                                    let val = String(Math.min(Math.max(num, min), max)).padStart(2, '0');
+                                    if (onvalue) onvalue(val);
+                                    typingBuf = '';
+                                    if (onadvance) onadvance();
+                                } else if (typingBuf.length === 2) {
+                                    let val = String(Math.min(Math.max(parseInt(typingBuf), min), max)).padStart(2, '0');
+                                    if (onvalue) onvalue(val);
+                                    typingBuf = '';
+                                    if (onadvance) onadvance();
+                                }
+                                m.redraw();
+                            }
+
+                        } else if (key === 'ArrowUp') {
+                            e.preventDefault();
+                            typingBuf = '';
+                            let cur = parseInt(value);
+                            let next = isNaN(cur) ? min : (cur + 1 > max ? min : cur + 1);
+                            if (onvalue) onvalue(digits === 4 ? String(next) : String(next).padStart(2, '0'));
+
+                        } else if (key === 'ArrowDown') {
+                            e.preventDefault();
+                            typingBuf = '';
+                            let cur = parseInt(value);
+                            let next = isNaN(cur) ? max : (cur - 1 < min ? max : cur - 1);
+                            if (onvalue) onvalue(digits === 4 ? String(next) : String(next).padStart(2, '0'));
+
+                        } else if (key === 'ArrowRight' || key === '/') {
+                            e.preventDefault();
+                            typingBuf = '';
+                            if (onadvance) onadvance();
+                            m.redraw();
+
+                        } else if (key === 'ArrowLeft') {
+                            e.preventDefault();
+                            typingBuf = '';
+                            if (onretreat) onretreat();
+                            m.redraw();
+
+                        } else if (key === 'Tab') {
+                            typingBuf = '';
+                            if (e.shiftKey) {
+                                if (onretreat) { e.preventDefault(); onretreat(); }
+                            } else {
+                                if (onadvance) { e.preventDefault(); onadvance(); }
+                            }
+
+                        } else if (key === 'Backspace' || key === 'Delete') {
+                            e.preventDefault();
+                            typingBuf = '';
+                            if (onvalue) onvalue('');
+                        }
+                    },
+                }, typingBuf || value || placeholder)
+            }
+        }
+    }
+
+
+    function Calendar(){
+        const DAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+        const MONTHS_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+        // rango de años visible en el picker — se extiende al hacer scroll
+        let viewYear = new Date().getFullYear();
+    let viewMonth = new Date().getMonth();
+        let yearRangeStart = viewYear - 5;
+        let yearRangeEnd   = viewYear + 5;
+        let scrollElem = null;
+        let calStyle = {
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            left: '0px',
+            right: '0px',
+            background: '#fff',
+            border: '1px solid #ccc',
+            borderRadius: '0.5em',
+            boxShadow: '0 2px 10px 0 rgba(34,36,38,.15)',
+            zIndex: 1000,
+            padding: '0.75em',
+        };
+
+        let showYearPicker = false;
+       
+
+        return {
+            view:(vnode)=>{
+                let { data, name, onchange, setValue } = vnode.attrs;
+                let selectedValue = getValue(data, name);
+                let selParts = selectedValue ? selectedValue.split('/') : [];
+                let selYear  = selParts[0] ? parseInt(selParts[0]) : null;
+                let selMonth = selParts[1] ? parseInt(selParts[1]) - 1 : null; // 0-based
+                
+
+                // ── Selector de año con scroll infinito ──
+                if (showYearPicker) {
+                    let years = [];
+                    for (let y = yearRangeStart; y <= yearRangeEnd; y++) years.push(y);
+
+                    return m(FlexCol, { ...calStyle, padding: '0' },
+
+                        // cabecera
+                        m(FlexRow, {
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '0.6em 0.75em',
+                            borderBottom: '1px solid #eee',
+                        },
+                            m(Text, { style: { fontWeight: 'bold' } }, 'Selecciona mes y año'),
+                            m(Tappable, {
+                                onclick: (e) => { e.stopPropagation(); showYearPicker = false; }
+                            }, m(SVGIcon, { icon: 'close', color: 'grey' }))
+                        ),
+
+                        // lista scrolleable
+                        m('div', {
+                            oncreate: ({ dom }) => {
+                                scrollElem = dom;
+                                // scroll al año actual
+                                let idx = years.indexOf(viewYear);
+                                if (idx >= 0) dom.scrollTop = idx * 52;
+                            },
+                            onscroll: (e) => {
+                                let el = e.target;
+                                // cargar más al llegar al borde
+                                if (el.scrollTop < 60) {
+                                    yearRangeStart -= 5;
+                                    el.scrollTop += 5 * 52;
+                                    m.redraw();
+                                }
+                                if (el.scrollTop + el.clientHeight > el.scrollHeight - 60) {
+                                    yearRangeEnd += 5;
+                                    m.redraw();
+                                }
+                            },
+                            style: {
+                                overflowY: 'auto',
+                                maxHeight: '280px',
+                            }
+                        },
+                            years.map(y => {
+                                let isCurrentYear = y === viewYear;
+
+                                return m(FlexCol, {
+                                    key: y,
+                                    style: {
+                                        background: isCurrentYear ? '#f0f5ff' : (y % 2 === 0 ? '#f8f8f8' : '#fff'),
+                                        borderBottom: '1px solid #eee',
+                                    }
+                                },
+                                    // fila del año
+                                    m(FlexRow, {
+                                        alignItems: 'center',
+                                        padding: '6px 0.75em 4px',
+                                        gap: '0.5em',
+                                    },
+                                        m(Text, {
+                                            style: {
+                                                fontWeight: 'bold',
+                                                fontSize: '0.85em',
+                                                color: isCurrentYear ? '#2185d0' : '#555',
+                                                minWidth: '3em',
+                                            }
+                                        }, String(y))
+                                    ),
+
+                                    // fila de meses
+                                    m('div', {
+                                        style: {
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(6, 1fr)',
+                                            gap: '3px',
+                                            padding: '0 0.75em 6px',
+                                        }
+                                    },
+                                        MONTHS_SHORT.map((mon, mi) => {
+                                            let isSelected = selYear === y && selMonth === mi;
+                                            let isCurrent  = y === new Date().getFullYear() && mi === new Date().getMonth();
+
+                                            return m(Tappable, {
+                                                key: mi,
+                                                style: {
+                                                    textAlign: 'center',
+                                                    padding: '4px 2px',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.75em',
+                                                    background: isSelected ? '#2185d0' : 'transparent',
+                                                    color: isSelected ? 'white' : isCurrent ? '#2185d0' : 'inherit',
+                                                    fontWeight: isCurrent || isSelected ? 'bold' : 'normal',
+                                                    cursor: 'pointer',
+                                                    border: isCurrent && !isSelected ? '1px solid #2185d0' : '1px solid transparent',
+                                                },
+                                                hover: { background: isSelected ? '#1a77c2' : '#e0e8ff' },
+                                                onclick: (e) => {
+                                                    e.stopPropagation();
+                                                    viewYear = y;
+                                                    viewMonth = mi;
+                                                    showYearPicker = false;
+                                                }
+                                            }, mon)
+                                        })
+                                    )
+                                )
+                            })
+                        )
+                    )
+                }
+
+                // ── Calendario ──
+                let daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+                let firstDay = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7;
+
+                let cells = [];
+                for (let i = 0; i < firstDay; i++) cells.push(null);
+                for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+                return m(FlexCol, calStyle,
+
+                    m(FlexRow, { justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75em' },
+                        m(Tappable, {
+                            onclick: (e) => {
+                                e.stopPropagation();
+                                if (viewMonth === 0) { viewMonth = 11; viewYear--; }
+                                else viewMonth--;
+                            }
+                        }, m(SVGIcon, { icon: 'chevron_left', color: 'black' })),
+
+                        m(Tappable, {
+                            onclick: (e) => { e.stopPropagation(); showYearPicker = true; }
+                        }, m(Text, { style: { fontWeight: 'bold', cursor: 'pointer' } }, `${MONTHS[viewMonth]} ${viewYear}`)),
+
+                        m(Tappable, {
+                            onclick: (e) => {
+                                e.stopPropagation();
+                                if (viewMonth === 11) { viewMonth = 0; viewYear++; }
+                                else viewMonth++;
+                            }
+                        }, m(SVGIcon, { icon: 'chevron_right', color: 'black' }))
+                    ),
+
+                    m('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' } },
+                        DAYS.map(d => m('div', {
+                            style: { textAlign: 'center', fontSize: '0.75em', fontWeight: 'bold', color: 'grey', padding: '2px 0' }
+                        }, d))
+                    ),
+
+                    m('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' } },
+                        cells.map((day) => {
+                            if (!day) return m('div');
+
+                            let mm = String(viewMonth + 1).padStart(2, '0');
+                            let dd = String(day).padStart(2, '0');
+                            let isSelected = selectedValue === `${viewYear}/${mm}/${dd}`;
+
+                            let today = new Date();
+                            let isToday = today.getFullYear() === viewYear &&
+                                today.getMonth() === viewMonth &&
+                                today.getDate() === day;
+
+                            return m(Tappable, {
+                                style: {
+                                    textAlign: 'center',
+                                    padding: '5px 2px',
+                                    borderRadius: '4px',
+                                    background: isSelected ? '#2185d0' : 'transparent',
+                                    color: isSelected ? 'white' : isToday ? '#2185d0' : 'black',
+                                    fontWeight: isToday ? 'bold' : 'normal',
+                                    cursor: 'pointer',
+                                    fontSize: '0.85em',
+                                },
+                                hover: { background: isSelected ? '#1a77c2' : '#f0f0f0' },
+                                onclick: (e) => {
+                                    e.stopPropagation();
+                                    let val = `${viewYear}/${mm}/${dd}`;
+                                    setValue(val, data, name, onchange);
+                                    open = false;
+                                }
+                            }, day)
+                        })
+                    )
+                )
+            }
         }
     }
 }
@@ -575,6 +1033,7 @@ function DateSelector() {
         }
     }
 }
+
 
 
 // dropdown sin utilizar el select html
