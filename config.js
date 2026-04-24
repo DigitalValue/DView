@@ -94,9 +94,26 @@ let config = {
         },
         //background: ''
         
+    },
+
+    colors: {
+        blue: '#2185d0',
+        green: '#21ba45',
+        orange: '#00b5ad',
+        teal: '#00b5ad',
+        olive: '#b5cc18',
+        brown: '#a5673f',
+        violet: '#6435c9',
+        grey: 'grey',
+        purple: '#6435c9',
+        red: '#db2828',
+        lightgrey: '#0000000d',
+        borderColor: '#22242626',
+        secondaryText: '#555',
+        inverted: '#545454',
+        dark: '#334156',
+        border: 'rgba(34, 36, 38, 0.15)'
     }
-
-
 
 }
 
