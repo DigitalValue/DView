@@ -303,6 +303,7 @@ function Tappable(){
                     ...vnode.attrs.style 
                 },
                 id: vnode.attrs.id,
+                title: vnode.attrs.title,
                 onclick: vnode.attrs.onclick
             }, vnode.children)
         }

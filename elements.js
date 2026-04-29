@@ -1008,9 +1008,10 @@ function IconButton() {
 
     return {
         view: (vnode) => {
-            let { icon, color, onclick, filled, size, hoverColor, width, style={} } = vnode.attrs
+            let { icon, color, onclick, filled, size, hoverColor, width, title="", style={} } = vnode.attrs
 
             return m(Tappable, {
+                title: title,
                 onclick: onclick,
                 style: {display:'flex'},
                 onhover: (hover) => hovered = hover,
