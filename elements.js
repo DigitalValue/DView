@@ -1043,6 +1043,10 @@ function SVGIcon() {
             m("path", { d: "m12 19-7-7 7-7" }),
             m("path", { d: "M19 12H5" })
         ],
+        arrow_right: [
+            m("path", { d: "M5 12h14" }),
+            m("path", { d: "m12 5 7 7-7 7" })
+        ],
         arrow_up: [
             m("path", { d: "m5 12 7-7 7 7" }),
             m("path", { d: "M12 19V5" })
