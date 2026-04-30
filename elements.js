@@ -429,7 +429,12 @@ function Button() {
             onmousedown
         }
     }
-
+    
+    let design = {
+        'full':{},
+        'basic':{},
+        'ghost':{}
+    }
 
     let sizes = {
         small: {
@@ -488,7 +493,8 @@ function Button() {
                 onclick: !disabled && onclick,
                 hover: !disabled && {
                     ...config.elements?.button?.hover,
-                    ...types[type]?.hover
+                    ...types[type]?.hover,
+                    ...vnode.attrs.hover
                 },
                 onhover: vnode.attrs.onhover,
                 onmousedown: !disabled && {
@@ -498,7 +504,8 @@ function Button() {
                 id: vnode.attrs.id
             },
                 icon ? [
-                    m(Icon, { icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }), // PASAR esto a svgicon
+                    m(Icon, { 
+                        icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }), // PASAR esto a svgicon
                     // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
@@ -578,10 +585,9 @@ function Message() {
             icon: 'info'
         }
     }
-
-
+    
+    
     // set different types 
-
     return {
         view: (vnode) => {
             let { type = 'info' } = vnode.attrs
@@ -870,18 +876,26 @@ function BreadCrumb() {
 function Spinner() {
     // can you create different sizes, only sizes
     let sizes = {
-        
-        small: {
-            width: 20,
-            height: 20,
+        small: 20,
+        medium: 40,
+        large: 80
+    }
+
+    let sizeStyle ={
+        'small': {
+            "margin": "4px",
+            "border": "4px solid transparent",
+            "border-top": "4px solid currentColor"    
         },
-        medium: {
-            width: 40,
-            height: 40
+        'medium': {
+            "margin": "6px",
+            "border": "6px solid transparent",    
+            "border-top": "6px solid currentColor"
         },
-        large: {
-            width: 60,
-            height: 60
+        'large': {
+            "margin": "10px",
+            "border": "10px solid transparent",
+            "border-top": "10px solid currentColor"
         }
     }
 
@@ -889,11 +903,9 @@ function Spinner() {
         "box-sizing": "border-box",
         "display": "block",
         "position": "absolute",
-        "margin": "8px",
-        "border": "8px solid transparent",
         "border-radius": "50%",
         "animation": "lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
-        "border-top": "8px solid currentColor"
+        
     }
 
 
@@ -920,17 +932,17 @@ function Spinner() {
                     justifyContent: "center",
                     alignItems: "center",
                     position: "relative",
-                    width: `${sizes[size].width*2}px`,
-                    height: `${sizes[size].height*2}px`,
+                    width: `${sizes[size]*2}px`,
+                    height: `${sizes[size]*2}px`,
                 },
 
                     m(Div, {
                         style: {
                             ...spinStyle,
+                            ...sizeStyle[size],
                             color: color || '#1c4c5b',
-                            ...sizes[size],
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].width}px`,
+                            width: `${sizes[size]}px`,
+                            height: `${sizes[size]}px`,
                             "animation-delay": "-0.45s"
                         }
                     }),
@@ -938,10 +950,10 @@ function Spinner() {
                     m(Div, {
                         style: {
                             ...spinStyle,
+                            ...sizeStyle[size],
                             color: color || '#1c4c5b',
-                            ...sizes[size],
-                            width: `${sizes[size].width}px`,
-                            height: `${sizes[size].width}px`,
+                            width: `${sizes[size]}px`,
+                            height: `${sizes[size]}px`,
                             "animation-delay": "-0.3s"
                         }
                     })
@@ -1001,12 +1013,18 @@ function IconButton() {
 
     return {
         view: (vnode) => {
-            let { icon, color, onclick, filled, size, hoverColor } = vnode.attrs
+            let { icon, color, onclick, filled, size, hoverColor, width, title="", style={} } = vnode.attrs
 
             return m(Tappable, {
+                title: title,
                 onclick: onclick,
+                style: {display:'flex'},
                 onhover: (hover) => hovered = hover,
-            }, m(SVGIcon, { icon: icon, size:size, filled: filled, color: hovered ? hoverColor || color : color }))
+                style: {
+                    display: "flex",
+                    ...style
+                }
+            }, m(SVGIcon, { icon: icon, size:size, height:width, width:width, filled: filled, color: hovered ? hoverColor || color : color }))
         }
     }
 }
@@ -1403,9 +1421,7 @@ function SVGIcon() {
             m("path",{d:"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"})
         ],
 
-        svg: [
-
-        ],
+       
         tv: [
             m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
             m("path", { d: "M8 21h8" }),
@@ -1428,6 +1444,10 @@ function SVGIcon() {
             m("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" }),
             m("path", { d: "M3 6h18" }),
             m("path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" })
+        ],
+        torus: [
+            m("ellipse", { cx: "12", cy: "11", rx: "3", ry: "2" }),
+            m("ellipse", { cx: "12", cy: "12.5", rx: "10", ry: "8.5" })
         ],
         lock: [
             m("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }),
