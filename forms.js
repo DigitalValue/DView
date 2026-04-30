@@ -201,65 +201,42 @@ function Input(){
 
 
 
-
 function DateInput(){
     let open = false;
-    
+
     let internalValue = '';
-    let segs = ['', '', '']; // [dd, mm, yyyy]
-    let segRefs = [null, null, null];
+    let onchange, oninput;
+
     let focused = false;
 
-    function storedToSegs(stored) {
-        if (!stored) return ['', '', ''];
-        let parts = stored.split('/');
-        if (parts.length === 3) return [parts[2], parts[1], parts[0]]; // dd, mm, yyyy
-        return ['', '', ''];
+    let today = new Date()
+    let state = {
+        day: 'dd',
+        month: 'mm',
+        year: 'aaaa'
     }
 
-    function segsToStored() {
-        let [dd, mm, yyyy] = segs;
-        if (!dd && !mm && !yyyy) return '';
-        return `${yyyy || ''}/${mm ? String(mm).padStart(2,'0') : ''}/${dd ? String(dd).padStart(2,'0') : ''}`;
-    }
+    let currentSeg = null;
+    let lang; 
 
-    function getValue(data, name) {
-        return (data && name) ? (data[name] || '') : internalValue;
-    }
-
-    function setValue(val, data, name, onchange, oninput) {
-        if (data && name) data[name] = val;
-        else internalValue = val;
-        if (onchange) onchange(val);
-        if(oninput) oninput(val)
-
-        segs = storedToSegs(val);
-        if (val) {
-            let parts = val.split('/');
-            if (parts[0]) viewYear = parseInt(parts[0]) || viewYear;
-            if (parts[1]) viewMonth = parseInt(parts[1]) - 1;
-        }
-        m.redraw();
-    }
-
-    function syncSeg(idx, val, data, name, onchange) {
-        segs[idx] = val;
-        let stored = segsToStored();
-        if (data && name) data[name] = stored;
-        else internalValue = stored;
-        if (onchange) onchange(stored);
-    }
-
+    
     return {
-        view:(vnode)=>{
-            let { data, name, label, required, onchange, oninput } = vnode.attrs;
+        oninit:(vnode)=>{
+            let { data, name } = vnode.attrs;
 
-            if(data && name && data[name]){
-                internalValue = data[name]
+            if(data && data[name]){
+                let splitted = data[name].split('/')
+                state.day = splitted[0]
+                state.month = splitted[1]
+                state.year = splitted[2]
             }
+        },
+        view:(vnode)=>{
+            let { label, data, name, required, onchange, style, oninput, disabled } = vnode.attrs;
+          
 
             return [
-                m(FlexCol, { width: '100%' },
+                m(FlexCol, { width: '100%', ...style },
                     label ? m(FormLabel, { required }, label) : null,
 
                     m(Tappable, {
@@ -268,175 +245,214 @@ function DateInput(){
                             ...focused && (config.form?.focusStyle || {}),
                             position: 'relative',
                             width: '100%',
+                            ...disabled ? 
+                            { opacity : 0.7 }
+                            : {},
                             boxSizing: 'border-box',
                         },
-                        onclick:(e)=> focused = true,
+                        onclick:(e)=> !disabled ? focused = true: '',
                         clickout: () => {
+                            if(disabled) return;
+
                             focused = false;
+                            currentSeg = null; // el segmento focuseado de fecha
                             if (open) { 
                                 open = false; 
-                                m.redraw(); 
                             }
+
+                            m.redraw()
                         },
                     },
 
                         m(FlexRow, { justifyContent: 'space-between', alignItems: 'center', width: '100%' },
 
-                            m('div', { style: { flex: 1, userSelect: 'none', display: 'flex', alignItems: 'center' } },
-                                m(DateSegment, {
-                                    ref: (dom) => { segRefs[0] = dom; },
-                                    value: segs[0], placeholder: 'dd',
-                                    min: 1, max: 31, digits: 2,
-                                    onvalue: (v) => syncSeg(0, v, data, name, onchange),
-                                    onadvance: () => { segRefs[1]?.focus(); },
-                                }),
-                                m('span', { style: { color: '#aaa', padding: '0 1px' } }, '/'),
-                                m(DateSegment, {
-                                    ref: (dom) => { segRefs[1] = dom; },
-                                    value: segs[1], placeholder: 'mm',
-                                    min: 1, max: 12, digits: 2,
-                                    onvalue: (v) => syncSeg(1, v, data, name, onchange),
-                                    onadvance: () => { segRefs[2]?.focus(); },
-                                    onretreat: () => { segRefs[0]?.focus(); },
-                                }),
-                                m('span', { style: { color: '#aaa', padding: '0 1px' } }, '/'),
-                                m(DateSegment, {
-                                    ref: (dom) => { segRefs[2] = dom; },
-                                    value: segs[2], placeholder: 'aaaa',
-                                    min: 1900, max: 2100, digits: 4,
-                                    onvalue: (v) => syncSeg(2, v, data, name, onchange),
-                                    onretreat: () => { segRefs[1]?.focus(); },
-                                }),
-                            ),
+                            m(Input, vnode.attrs),
 
                             m(IconButton, {
                                 icon: 'calendar',
                                 color: 'rgba(34, 36, 38, 0.6)',
                                 hoverColor: '#2185d0',
                                 onclick: (e) => {
+                                    if(disabled) return;
                                     open = !open;
+                                    currentSeg = null; 
                                 }
                             })
                         ),
 
-                        open ? m(Calendar, { data, name, onchange, setValue }) : null
+                        open ? m(Calendar, vnode.attrs) : null
                     )
                 )
             ]
         }
     }
+    
 
-    function DateSegment() {
-        let typingBuf = '';
-        let elem = null;
-        
+    function Input(){
+
+        function isComplete() {
+            return state.day !== 'dd' && state.month !== 'mm' && state.year !== 'aaaa';
+        }
+
+        function persist({data,name, onchange, oninput}) {
+            if (isComplete()) {
+                let stored = `${state.year}/${state.month}/${state.day}`;
+                if (data && name) data[name] = stored;
+                
+                if (onchange) onchange({target:{value:stored}});
+                if (oninput) oninput({target:{value:stored}});
+            }
+        }
+
+        function advance() {
+            if (currentSeg !== null && currentSeg < 2) currentSeg++;
+            m.redraw();
+        }
+
+        function retreat() {
+            if (currentSeg !== null && currentSeg > 0) currentSeg--;
+            m.redraw();
+        }
 
         return {
-            view: (vnode) => {
-                let { value, placeholder, min, max, digits = 2, onvalue, onadvance, onretreat } = vnode.attrs;
-                let active = elem ? document.activeElement === elem : false;
+            view:(vnode)=>{
+                let { data, name, disabled } = vnode.attrs
 
-                return m('span', {
-                    tabindex: 0,
-                    style: {
-                        padding: '0 3px',
-                        borderRadius: '2px',
-                        minWidth: digits > 2 ? '2.8em' : '1.4em',
-                        textAlign: 'center',
-                        display: 'inline-block',
-                        outline: 'none',
-                        background: active ? '#2185d0' : 'transparent',
-                        color: active ? 'white' : (value ? 'inherit' : '#aaa'),
-                        cursor: 'default',
-                        userSelect: 'none',
-                    },
-                    onfocus: () => { typingBuf = ''; m.redraw(); },
-                    onblur:  () => { typingBuf = ''; m.redraw(); },
+                return m("span",{
+                    style: { flex: 1, userSelect: 'none', display: 'flex', alignItems: 'center' },
                     onkeydown: (e) => {
+                        if(disabled) return
                         let key = e.key;
 
                         if (key >= '0' && key <= '9') {
                             e.preventDefault();
-                            typingBuf += key;
+                            let segKey = currentSeg === 0 ? 'day' : currentSeg === 1 ? 'month' : 'year';
+                            let segLen = currentSeg === 2 ? 4 : 2;
+                            let segMin = currentSeg === 0 ? 1 : currentSeg === 1 ? 1 : 1900;
+                            let segMax = currentSeg === 0 ? 31 : currentSeg === 1 ? 12 : 2100;
 
-                            if (digits === 4) {
-                                if (typingBuf.length === 4) {
-                                    let val = String(Math.min(Math.max(parseInt(typingBuf), min), max));
-                                    if (onvalue) onvalue(val);
-                                    typingBuf = '';
-                                    if (onadvance) onadvance();
-                                }
-                                m.redraw();
+                            let currVal = state[segKey];
+                            if (currVal === 'dd' || currVal === 'mm' || currVal === 'aaaa') currVal = '';
+                            
+                            if(currVal.length >= segLen){
+                                // segmento lleno: reemplazar último char
+                                currVal = key;
                             } else {
-                                let num = parseInt(typingBuf);
-                                if (typingBuf.length === 1 && num > Math.floor(max / 10)) {
-                                    let val = String(Math.min(Math.max(num, min), max)).padStart(2, '0');
-                                    if (onvalue) onvalue(val);
-                                    typingBuf = '';
-                                    if (onadvance) onadvance();
-                                } else if (typingBuf.length === 2) {
-                                    let val = String(Math.min(Math.max(parseInt(typingBuf), min), max)).padStart(2, '0');
-                                    if (onvalue) onvalue(val);
-                                    typingBuf = '';
-                                    if (onadvance) onadvance();
+                                // append y avanzar al completar
+                                currVal += key;
+                                if (currVal.length >= segLen) {
+                                    let num = parseInt(currVal);
+                                    let clamped = Math.min(Math.max(num, segMin), segMax);
+                                    currVal = String(clamped).padStart(segLen, '0');
+                                    advance();
                                 }
-                                m.redraw();
                             }
+
+                            state[segKey] = currVal;
+                            persist(vnode.attrs);
+                            m.redraw();
 
                         } else if (key === 'ArrowUp') {
                             e.preventDefault();
-                            typingBuf = '';
-                            let cur = parseInt(value);
-                            let next = isNaN(cur) ? min : (cur + 1 > max ? min : cur + 1);
-                            if (onvalue) onvalue(digits === 4 ? String(next) : String(next).padStart(2, '0'));
+                            let segKey = currentSeg === 0 ? 'day' : currentSeg === 1 ? 'month' : 'year';
+                            let segLen = currentSeg === 2 ? 4 : 2;
+                            let segMin = currentSeg === 0 ? 1 : currentSeg === 1 ? 1 : 1900;
+                            let segMax = currentSeg === 0 ? 31 : currentSeg === 1 ? 12 : 2100;
+                            let cur = parseInt(state[segKey]);
+                            let next = isNaN(cur) ? segMin : (cur + 1 > segMax ? segMin : cur + 1);
+                            state[segKey] = String(next).padStart(segLen, '0');
+                            persist(vnode.attrs);
+                            m.redraw();
 
                         } else if (key === 'ArrowDown') {
                             e.preventDefault();
-                            typingBuf = '';
-                            let cur = parseInt(value);
-                            let next = isNaN(cur) ? max : (cur - 1 < min ? max : cur - 1);
-                            if (onvalue) onvalue(digits === 4 ? String(next) : String(next).padStart(2, '0'));
-
-                        } else if (key === 'ArrowRight' || key === '/') {
-                            e.preventDefault();
-                            typingBuf = '';
-                            if (onadvance) onadvance();
+                            let segKey = currentSeg === 0 ? 'day' : currentSeg === 1 ? 'month' : 'year';
+                            let segLen = currentSeg === 2 ? 4 : 2;
+                            let segMin = currentSeg === 0 ? 1 : currentSeg === 1 ? 1 : 1900;
+                            let segMax = currentSeg === 0 ? 31 : currentSeg === 1 ? 12 : 2100;
+                            let cur = parseInt(state[segKey]);
+                            let next = isNaN(cur) ? segMax : (cur - 1 < segMin ? segMax : cur - 1);
+                            state[segKey] = String(next).padStart(segLen, '0');
+                            persist(vnode.attrs);
                             m.redraw();
 
-                        } else if (key === 'ArrowLeft') {
+                        } else if (key === 'ArrowRight' || key === '/' || (key === 'Tab' && !e.shiftKey)) {
                             e.preventDefault();
-                            typingBuf = '';
-                            if (onretreat) onretreat();
+                            advance();
                             m.redraw();
 
-                        } else if (key === 'Tab') {
-                            typingBuf = '';
-                            if (e.shiftKey) {
-                                if (onretreat) { e.preventDefault(); onretreat(); }
-                            } else {
-                                if (onadvance) { e.preventDefault(); onadvance(); }
-                            }
+                        } else if (key === 'ArrowLeft' || (key === 'Tab' && e.shiftKey)) {
+                            e.preventDefault();
+                            retreat();
+                            m.redraw();
 
                         } else if (key === 'Backspace' || key === 'Delete') {
                             e.preventDefault();
-                            typingBuf = '';
-                            if (onvalue) onvalue('');
+                            if (currentSeg === 0) state.day = 'dd';
+                            else if (currentSeg === 1) state.month = 'mm';
+                            else state.year = 'yyyy';
+                            //persist(vnode.attrs);
+                            m.redraw();
                         }
                     },
-                }, typingBuf || value || placeholder)
+                    onclick: (e) => {
+                        if(disabled) return
+                        currentSeg = 0;
+                    }
+                },
+
+                    m(SpanText,{index:0, length:2}, state.day),
+
+                    m('span', { style: { color: '#aaa', padding: '0 1px' } }, '/'),
+
+                    m(SpanText,{ index:1, length:2}, state.month),
+
+                    m('span', { style: { color: '#aaa', padding: '0 1px' } }, '/'),
+
+                   m(SpanText,{ index:2, length:4}, state.year),
+                )
+            }
+        }
+
+
+        function SpanText(){
+            return {
+                view:(vnode)=>{
+                    let index = vnode.attrs.index;
+
+                    let isActive = currentSeg === index;
+                    let hasValue = !['dd','mm','yyyy'].includes(vnode.children);
+
+                    return m('span', {
+                        tabindex: 0,
+                        style: {
+                            padding: '0 3px',
+                            borderRadius: '2px',
+                            minWidth: index === 2 ? '2.8em' : '1.4em',
+                            textAlign: 'center',
+                            display: 'inline-block',
+                            outline: 'none',
+                            background: isActive ? '#2185d0' : 'transparent',
+                            color: isActive ? 'white' : hasValue ? 'inherit' : '#aaa',
+                            cursor: 'default',
+                            userSelect: 'none',
+                        },
+                        onfocus: () => { currentSeg = index; m.redraw(); },
+                        onblur:  () => { m.redraw(); },
+                        onclick: (e) => { currentSeg = index; e.stopPropagation(); m.redraw(); },
+                    }, String(vnode.children).padStart(vnode.attrs.length, '0'))
+                }
             }
         }
     }
 
 
     function Calendar(){
-        const DAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
-        const MONTHS_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-        const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
         // rango de años visible en el picker — se extiende al hacer scroll
-        let viewYear = new Date().getFullYear();
-    let viewMonth = new Date().getMonth();
+        // inicializa desde state si tiene valores válidos, si no desde hoy
+        let viewYear = state.year && state.year !== 'aaaa' ? parseInt(state.year) : new Date().getFullYear();
+        let viewMonth = state.month && state.month !== 'mm' ? parseInt(state.month) - 1 : new Date().getMonth();
         let yearRangeStart = viewYear - 5;
         let yearRangeEnd   = viewYear + 5;
         let scrollElem = null;
@@ -454,15 +470,157 @@ function DateInput(){
         };
 
         let showYearPicker = false;
+
+        const today = new Date();
+        const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+
+        function Month() {
+            const DAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
+
+
+            function times(n, fn) {
+                return Array(n).fill().map((_, i) => fn(i));
+            }
+
+            function daysInMonth(month, year) {
+                return new Date(year, month, 0).getDate();
+            }
+
+            function getWeekday(year, month, day) {
+                return new Date(year, month, day).getDay();
+            }
+
+            return {
+                view: (vnode) => {
+                    let { year, month, selectedValue, onselect } = vnode.attrs;
+
+                    return [
+                        m('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' } },
+                            DAYS.map(d => m('div', {
+                                style: { textAlign: 'center', fontSize: '0.75em', fontWeight: 'bold', color: 'grey', padding: '2px 0' }
+                            }, d))
+                        ),
+
+                        m('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' } }, [
+                            ...times(getWeekday(year, month, 0), () => m('div')),
+                            ...times(daysInMonth(month + 1, year), (index) => {
+                                let day = index + 1;
+                                let mm = String(month + 1).padStart(2, '0');
+                                let dd = String(day).padStart(2, '0');
+                                let isSelected = selectedValue === `${year}/${mm}/${dd}`;
+                                let isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+
+                                return m(Tappable, {
+                                    style: {
+                                        textAlign: 'center',
+                                        padding: '5px 2px',
+                                        borderRadius: '4px',
+                                        background: isSelected ? '#2185d0' : 'transparent',
+                                        color: isSelected ? 'white' : isToday ? '#2185d0' : 'black',
+                                        fontWeight: isToday ? 'bold' : 'normal',
+                                        cursor: 'pointer',
+                                        fontSize: '0.85em',
+                                    },
+                                    hover: { background: isSelected ? '#1a77c2' : '#f0f0f0' },
+                                    onclick: (e) => {
+                                        e.stopPropagation();
+                                        onselect(`${year}/${mm}/${dd}`);
+                                    }
+                                }, day)
+                            })
+                        ])
+                    ]
+                }
+            }
+        }
+
+        function Year() {
+            const MONTHS_SHORT = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+
+            function MonthButton() {
+                return {
+                    view: (vnode) => {
+                        let { mon, mi, y, selYear, selMonth, onclick } = vnode.attrs;
+                        let isSelected = selYear === y && selMonth === mi;
+                        let isCurrent = y === today.getFullYear() && mi === today.getMonth();
+
+                        return m(Tappable, {
+                            style: {
+                                textAlign: 'center',
+                                padding: '4px 2px',
+                                borderRadius: '4px',
+                                fontSize: '0.75em',
+                                background: isSelected ? '#2185d0' : 'transparent',
+                                color: isSelected ? 'white' : isCurrent ? '#2185d0' : 'inherit',
+                                fontWeight: isCurrent || isSelected ? 'bold' : 'normal',
+                                cursor: 'pointer',
+                                border: isCurrent && !isSelected ? '1px solid #2185d0' : '1px solid transparent',
+                            },
+                            hover: { background: isSelected ? '#1a77c2' : '#e0e8ff' },
+                            onclick,
+                        }, mon)
+                    }
+                }
+            }
+
+            return {
+                view: (vnode) => {
+                    let { y, selYear, selMonth, onmonthselect } = vnode.attrs;
+                    let isCurrentYear = y === selYear;
+
+                    return m(FlexCol, {
+                        style: {
+                            background: isCurrentYear ? '#f0f5ff' : (y % 2 === 0 ? '#f8f8f8' : '#fff'),
+                            borderBottom: '1px solid #eee',
+                        }
+                    },
+                        m(FlexRow, {
+                            alignItems: 'center',
+                            padding: '6px 0.75em 4px',
+                            gap: '0.5em',
+                        },
+                            m(Text, {
+                                style: {
+                                    fontWeight: 'bold',
+                                    fontSize: '0.85em',
+                                    color: isCurrentYear ? '#2185d0' : '#555',
+                                    minWidth: '3em',
+                                }
+                            }, String(y))
+                        ),
+
+                        m('div', {
+                            style: {
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(6, 1fr)',
+                                gap: '3px',
+                                padding: '0 0.75em 6px',
+                            }
+                        },
+                            MONTHS_SHORT.map((mon, mi) =>
+                                m(MonthButton, {
+                                    key: mi,
+                                    mon, mi, y, selYear, selMonth,
+                                    onclick: (e) => { e.stopPropagation(); onmonthselect(y, mi); }
+                                })
+                            )
+                        )
+                    )
+                }
+            }
+        }
        
 
         return {
             view:(vnode)=>{
-                let { data, name, onchange, setValue } = vnode.attrs;
-                let selectedValue = getValue(data, name);
-                let selParts = selectedValue ? selectedValue.split('/') : [];
-                let selYear  = selParts[0] ? parseInt(selParts[0]) : null;
-                let selMonth = selParts[1] ? parseInt(selParts[1]) - 1 : null; // 0-based
+                let { data, name, onchange, oninput } = vnode.attrs
+                
+                let isComplete = state.day !== 'dd' && state.month !== 'mm' && state.year !== 'aaaa';
+                let selectedValue = isComplete ? `${state.year}/${state.month}/${state.day}` : '';
+                let selYear  = state.year !== 'aaaa' ? parseInt(state.year) : null;
+                let selMonth = state.month !== 'mm' ? parseInt(state.month) - 1 : null; // 0-based
                 
 
                 // ── Selector de año con scroll infinito ──
@@ -511,147 +669,70 @@ function DateInput(){
                                 maxHeight: '280px',
                             }
                         },
-                            years.map(y => {
-                                let isCurrentYear = y === viewYear;
-
-                                return m(FlexCol, {
+                            years.map(y =>
+                                m(Year, {
                                     key: y,
-                                    style: {
-                                        background: isCurrentYear ? '#f0f5ff' : (y % 2 === 0 ? '#f8f8f8' : '#fff'),
-                                        borderBottom: '1px solid #eee',
+                                    y, selYear, selMonth,
+                                    onmonthselect: (yr, mi) => {
+                                        viewYear = yr;
+                                        viewMonth = mi;
+                                        showYearPicker = false;
                                     }
-                                },
-                                    // fila del año
-                                    m(FlexRow, {
-                                        alignItems: 'center',
-                                        padding: '6px 0.75em 4px',
-                                        gap: '0.5em',
-                                    },
-                                        m(Text, {
-                                            style: {
-                                                fontWeight: 'bold',
-                                                fontSize: '0.85em',
-                                                color: isCurrentYear ? '#2185d0' : '#555',
-                                                minWidth: '3em',
-                                            }
-                                        }, String(y))
-                                    ),
-
-                                    // fila de meses
-                                    m('div', {
-                                        style: {
-                                            display: 'grid',
-                                            gridTemplateColumns: 'repeat(6, 1fr)',
-                                            gap: '3px',
-                                            padding: '0 0.75em 6px',
-                                        }
-                                    },
-                                        MONTHS_SHORT.map((mon, mi) => {
-                                            let isSelected = selYear === y && selMonth === mi;
-                                            let isCurrent  = y === new Date().getFullYear() && mi === new Date().getMonth();
-
-                                            return m(Tappable, {
-                                                key: mi,
-                                                style: {
-                                                    textAlign: 'center',
-                                                    padding: '4px 2px',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.75em',
-                                                    background: isSelected ? '#2185d0' : 'transparent',
-                                                    color: isSelected ? 'white' : isCurrent ? '#2185d0' : 'inherit',
-                                                    fontWeight: isCurrent || isSelected ? 'bold' : 'normal',
-                                                    cursor: 'pointer',
-                                                    border: isCurrent && !isSelected ? '1px solid #2185d0' : '1px solid transparent',
-                                                },
-                                                hover: { background: isSelected ? '#1a77c2' : '#e0e8ff' },
-                                                onclick: (e) => {
-                                                    e.stopPropagation();
-                                                    viewYear = y;
-                                                    viewMonth = mi;
-                                                    showYearPicker = false;
-                                                }
-                                            }, mon)
-                                        })
-                                    )
-                                )
-                            })
+                                })
+                            )
                         )
                     )
-                }
+                } 
+                
+                else {
 
-                // ── Calendario ──
-                let daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-                let firstDay = (new Date(viewYear, viewMonth, 1).getDay() + 6) % 7;
+                    // ── Calendario ──
+                    return m(FlexCol, calStyle,
 
-                let cells = [];
-                for (let i = 0; i < firstDay; i++) cells.push(null);
-                for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-
-                return m(FlexCol, calStyle,
-
-                    m(FlexRow, { justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75em' },
-                        m(Tappable, {
-                            onclick: (e) => {
-                                e.stopPropagation();
-                                if (viewMonth === 0) { viewMonth = 11; viewYear--; }
-                                else viewMonth--;
-                            }
-                        }, m(SVGIcon, { icon: 'chevron_left', color: 'black' })),
-
-                        m(Tappable, {
-                            onclick: (e) => { e.stopPropagation(); showYearPicker = true; }
-                        }, m(Text, { style: { fontWeight: 'bold', cursor: 'pointer' } }, `${MONTHS[viewMonth]} ${viewYear}`)),
-
-                        m(Tappable, {
-                            onclick: (e) => {
-                                e.stopPropagation();
-                                if (viewMonth === 11) { viewMonth = 0; viewYear++; }
-                                else viewMonth++;
-                            }
-                        }, m(SVGIcon, { icon: 'chevron_right', color: 'black' }))
-                    ),
-
-                    m('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' } },
-                        DAYS.map(d => m('div', {
-                            style: { textAlign: 'center', fontSize: '0.75em', fontWeight: 'bold', color: 'grey', padding: '2px 0' }
-                        }, d))
-                    ),
-
-                    m('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' } },
-                        cells.map((day) => {
-                            if (!day) return m('div');
-
-                            let mm = String(viewMonth + 1).padStart(2, '0');
-                            let dd = String(day).padStart(2, '0');
-                            let isSelected = selectedValue === `${viewYear}/${mm}/${dd}`;
-
-                            let today = new Date();
-                            let isToday = today.getFullYear() === viewYear &&
-                                today.getMonth() === viewMonth &&
-                                today.getDate() === day;
-
-                            return m(Tappable, {
-                                style: {
-                                    textAlign: 'center',
-                                    padding: '5px 2px',
-                                    borderRadius: '4px',
-                                    background: isSelected ? '#2185d0' : 'transparent',
-                                    color: isSelected ? 'white' : isToday ? '#2185d0' : 'black',
-                                    fontWeight: isToday ? 'bold' : 'normal',
-                                    cursor: 'pointer',
-                                    fontSize: '0.85em',
-                                },
-                                hover: { background: isSelected ? '#1a77c2' : '#f0f0f0' },
+                        m(FlexRow, { justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75em' },
+                            m(Tappable, {
                                 onclick: (e) => {
                                     e.stopPropagation();
-                                    let val = `${viewYear}/${mm}/${dd}`;
-                                    setValue(val, data, name, onchange);
-                                    open = false;
+                                    if (viewMonth === 0) { viewMonth = 11; viewYear--; }
+                                    else viewMonth--;
                                 }
-                            }, day)
+                            }, m(SVGIcon, { icon: 'chevron_left', color: 'black' })),
+
+                            m(Tappable, {
+                                onclick: (e) => { e.stopPropagation(); showYearPicker = true; }
+                            }, m(Text, { style: { fontWeight: 'bold', cursor: 'pointer' } }, `${MONTHS[viewMonth]} ${viewYear}`)),
+
+                            m(Tappable, {
+                                onclick: (e) => {
+                                    e.stopPropagation();
+                                    if (viewMonth === 11) { viewMonth = 0; viewYear++; }
+                                    else viewMonth++;
+                                }
+                            }, m(SVGIcon, { icon: 'chevron_right', color: 'black' }))
+                        ),
+
+                        m(Month, {
+                            year: viewYear,
+                            month: viewMonth,
+                            selectedValue,
+                            onselect: (val) => {
+                                let parts = val.split('/');
+                                state.year = parts[0];
+                                state.month = parts[1];
+                                state.day = parts[2];
+
+                                open = false;
+
+                                if(data && name) data[name] = val;
+                                if(onchange) onchange({target:{value:val}})
+                                if(oninput) oninput({target:{value:val}})
+                                
+                                
+                                m.redraw()
+                            }
                         })
                     )
-                )
+                }
             }
         }
     }

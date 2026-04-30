@@ -85,8 +85,10 @@ let config = {
         }
 
     },
-
     
+    dialogs: {
+
+    },
     
     app: {
         appBar: {
