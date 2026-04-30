@@ -59,7 +59,16 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
                 m(ModalFooter,
 
                     m(Button, {
-                        type:'positive',
+                            ...options.buttonColors?.[1] ? 
+                        {
+                            type:'secondary',
+                            style: {
+                                color: options.buttonColors?.[1]
+                            }
+                        }: {
+                            type:'positive',
+                        },
+                        
                         onclick:()=>{
                             options.then ? options.then(true):null; 
                             elem.remove()
@@ -68,7 +77,15 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
                     }, options.buttonLabels ? options.buttonLabels[1] : localize({es:'Aceptar',va:'Acceptar'})),
 
                     m(Button, {
-                        type:'negative',
+                        ...options.buttonColors?.[0] ? 
+                        {
+                            type:'secondary',
+                            style: {
+                                color: options.buttonColors?.[0]
+                            }
+                        }: {
+                            type:'negative',
+                        },
                         onclick:()=>{
                             options.then ? options.then(false):null; 
                             elem.remove()
