@@ -77,7 +77,7 @@ function Checkbox(){
             let {data, name, info, description, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
 
             return [
-                m(FlexRow, { flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em', alignItems:'center'},
+                m(FlexRow, { flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em', alignItems:'start' },
                     
                     m("input",{
                         type:'checkbox',
