@@ -429,7 +429,12 @@ function Button() {
             onmousedown
         }
     }
-
+    
+    let design = {
+        'full':{},
+        'basic':{},
+        'ghost':{}
+    }
 
     let sizes = {
         small: {
@@ -488,7 +493,8 @@ function Button() {
                 onclick: !disabled && onclick,
                 hover: !disabled && {
                     ...config.elements?.button?.hover,
-                    ...types[type]?.hover
+                    ...types[type]?.hover,
+                    ...vnode.attrs.hover
                 },
                 onhover: vnode.attrs.onhover,
                 onmousedown: !disabled && {
@@ -498,7 +504,8 @@ function Button() {
                 id: vnode.attrs.id
             },
                 icon ? [
-                    m(Icon, { icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }), // PASAR esto a svgicon
+                    m(Icon, { 
+                        icon: icon, size: size || 'small', color: "inherit" || types[type].color || "black" }), // PASAR esto a svgicon
                     // m(Box, { width:'5px' })
                 ] : null,
                 vnode.children
@@ -905,8 +912,6 @@ function Spinner() {
     return {
         view:(vnode)=>{
             let {color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
-
-            console.log('color', color)
 
 
             return [
@@ -1439,6 +1444,10 @@ function SVGIcon() {
             m("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" }),
             m("path", { d: "M3 6h18" }),
             m("path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" })
+        ],
+        torus: [
+            m("ellipse", { cx: "12", cy: "11", rx: "3", ry: "2" }),
+            m("ellipse", { cx: "12", cy: "12.5", rx: "10", ry: "8.5" })
         ],
         lock: [
             m("rect", { x: "3", y: "11", width: "18", height: "11", rx: "2", ry: "2" }),
