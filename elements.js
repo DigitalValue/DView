@@ -921,8 +921,6 @@ function Spinner() {
         view:(vnode)=>{
             let {color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
 
-            console.log('color', color)
-
 
             return [
                 // código copiado de stackoverflow, habrá que pasarlo a nuestro modelo
