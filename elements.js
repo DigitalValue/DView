@@ -239,6 +239,7 @@ function TableRow() {
 
 // crear componente tablecell y tableCellheader ??
 function TableCell() {
+
     return {
         view: (vnode) => {
             let { header = false } = vnode.attrs
@@ -246,6 +247,13 @@ function TableCell() {
             return m(header ? "th" : "td", {
                 colspan: vnode.attrs.colspan,
                 onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
+                oncreate:(vnode)=>{
+                    
+                    let tr = vnode.dom.parentElement
+                    let isLastRow = tr.parentElement.lastElementChild === tr
+                    if(isLastRow) vnode.dom.style.border = 'none'
+                    
+                },
                 style: {
                     textAlign: 'left',
                     padding: '1em',
@@ -703,7 +711,7 @@ function Label() {
             fontSize: '0.875em',
         },
         'large': {
-            fontSize: '1.1em',
+            fontSize: '1em',
             padding: ".75em 1em"
         }
     }
@@ -724,13 +732,13 @@ function Label() {
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
+                        ...(sizes[size] || sizes['default']),
                         ...config.elements?.label || {},
                         ...types[type],
                         ...(vnode.attrs.basic && {
                             backgroundColor: 'white',
                             color: types[type].backgroundColor || 'black'
                         }),
-                        ...(sizes[size] || sizes['default']),
                         ...vnode.attrs.style
                     },
                     onclick: vnode.attrs.onclick
