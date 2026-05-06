@@ -6,7 +6,7 @@ import { localize, translateSALT } from "./util.js"
 
 
 export {
-    FormLabel, Input, TranslationInput, Dropdown,
+    FormLabel, Input, TranslationInput, Dropdown, CheckboxLabel,
     IntegerInput, Switch, InfoTooltip, Checkbox, RadioButtons,
     HtmlIntegerInput, HtmlDropdown, DateSelector, DateInput
 }
@@ -102,6 +102,70 @@ function Checkbox(){
     }
 }
 
+
+function CheckboxLabel(){
+
+    return {
+      view:(vnode)=>{
+        let { data, name, label, checked, onclick } = vnode.attrs
+        
+        let isChecked = checked || data && name && data[name] === true
+
+        return m(Tappable, {
+          style: {
+            border: `1px solid ${config.colors.border}`,
+            gap: '0.5em',
+            borderRadius: config.borderRadius,
+            padding: '0.5em',
+            alignItems: 'center',
+            display: 'flex',
+            whiteSpace:'wrap',
+            ...isChecked ? {
+              background: config.colors.grey
+            } : {}
+          },
+          onclick: () => {
+            
+            if(onclick){ // mirar de añadir data name ??
+                onclick()
+            }
+            
+            if(!data && !name) return;
+            
+            if(!data[name]){
+              data[name] = true
+            } else {
+              delete data[name]
+            }
+
+            m.redraw()
+          }
+        },  
+
+          isChecked
+          ? m(SVGIcon,{
+            icon:'circle_check',
+            color: config.colors.blue,
+            width:16
+          })
+          : m(Div, {
+            style: {
+              width: '16px',
+              height: '16px',
+              border: `1px solid ${config.colors.border}`,
+              borderRadius: '50%',
+              background: isChecked ? config.colors.blue : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }
+          }),
+
+          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label))
+        )
+      }
+    }
+  }
 
 function Input(){
 
