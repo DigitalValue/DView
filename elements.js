@@ -239,6 +239,7 @@ function TableRow() {
 
 // crear componente tablecell y tableCellheader ??
 function TableCell() {
+
     return {
         view: (vnode) => {
             let { header = false } = vnode.attrs
@@ -246,6 +247,13 @@ function TableCell() {
             return m(header ? "th" : "td", {
                 colspan: vnode.attrs.colspan,
                 onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
+                oncreate:(vnode)=>{
+                    
+                    let tr = vnode.dom.parentElement
+                    let isLastRow = tr.parentElement.lastElementChild === tr
+                    if(isLastRow) vnode.dom.style.border = 'none'
+                    
+                },
                 style: {
                     textAlign: 'left',
                     padding: '1em',
@@ -703,7 +711,7 @@ function Label() {
             fontSize: '0.875em',
         },
         'large': {
-            fontSize: '1.1em',
+            fontSize: '1em',
             padding: ".75em 1em"
         }
     }
@@ -724,13 +732,13 @@ function Label() {
                         borderRadius: "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
+                        ...(sizes[size] || sizes['default']),
                         ...config.elements?.label || {},
                         ...types[type],
                         ...(vnode.attrs.basic && {
                             backgroundColor: 'white',
                             color: types[type].backgroundColor || 'black'
                         }),
-                        ...(sizes[size] || sizes['default']),
                         ...vnode.attrs.style
                     },
                     onclick: vnode.attrs.onclick
@@ -1190,6 +1198,9 @@ function SVGIcon() {
         ],
         flag: [
            m("path", {d:"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"})
+        ],
+        filter: [
+            m("path", { d: "M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" })
         ],
         gallery: [
             m("rect", { x: "3", y: "4", width: "18", height: "16", rx: "2" }),

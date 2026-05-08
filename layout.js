@@ -148,6 +148,7 @@ function Grid() {
                 m("div",{
                     id: id,
                     style : {
+                        width:'100%',
                         ...vnode.attrs.style || vnode.attrs ,
                     }
                 },
