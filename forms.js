@@ -337,9 +337,12 @@ function DateInput(){
                                 color: 'rgba(34, 36, 38, 0.6)',
                                 hoverColor: '#2185d0',
                                 onclick: (e) => {
+                                    e.stopPropagation()
                                     if(disabled) return;
                                     open = !open;
+                                    if(!open){focused = false}
                                     currentSeg = null; 
+                                    
                                 }
                             })
                         ),
