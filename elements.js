@@ -650,14 +650,14 @@ function Label() {
         },
         primary: {
             backgroundColor: "#1b1c1d",
-            color: "white",
+            color: "black",
             border: "1px solid #1b1c1d",
             ...config.elements?.label?.primary || {}
         },
         secondary: {
-            backgroundColor: "#4b5563",
+            backgroundColor: "white",
             color: "white",
-            border: "1px solid #4b5563",
+            border: '1px solid #e0e0e0',
             ...config.elements?.label?.secondary || {}
         },
         tertiary: {
@@ -704,15 +704,17 @@ function Label() {
 
     // follow the fontSizes of H2, Text and SmallText
     let sizes = {
+        'tiny': {
+            fontSize: '.71428571rem'
+        },
         'small': {
-            fontSize: '0.6em',
+            fontSize: '.78571429rem'
         },
         'default': {
-            fontSize: '0.875em',
+            fontSize: '0.875em'
         },
         'large': {
-            fontSize: '1em',
-            padding: ".75em 1em"
+            fontSize: '1em'
         }
     }
 
@@ -720,16 +722,15 @@ function Label() {
         view: (vnode) => {
             let { type = 'default', size = 'default' } = vnode.attrs
 
+
             return [
                 m("div", {
                     style: {
                         lineHeight: "1",
-                        margin: "0 .14285714em",
                         backgroundImage: "none",
                         padding: ".5833em .833em",
                         textTransform: "none",
-                        
-                        borderRadius: "2em",
+                        borderRadius: config.borderRadius || "2em",
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
                         ...(sizes[size] || sizes['default']),

@@ -250,7 +250,11 @@ function Input(){
                         icon ?
                         m(SVGIcon,{
                             icon:icon, width:18, height:19, color: focused ? 'black': 'grey',
-                            style: { position:'absolute', top:'50%', transform:'translateY(-50%)', left:'8px'}
+                            style: { 
+                                position:'absolute', top:'50%', transform:'translateY(-50%)', left:'8px',
+                                ...vnode.attrs?.iconPosition || {}
+                            },
+                            onclick: vnode.attrs.iconclick
                         }) : null,
 
                         vnode.children
