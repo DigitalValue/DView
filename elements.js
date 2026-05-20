@@ -731,6 +731,7 @@ function Label() {
                         padding: ".5833em .833em",
                         textTransform: "none",
                         borderRadius: config.borderRadius || "2em",
+                        width:'fit-content',
                         transition: "background .1s ease",
                         cursor: vnode.attrs.onclick ? 'pointer' : 'default',
                         ...(sizes[size] || sizes['default']),
