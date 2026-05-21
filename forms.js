@@ -107,7 +107,7 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick } = vnode.attrs
+        let { data, name, label, checked, onclick, info } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
@@ -161,7 +161,11 @@ function CheckboxLabel(){
             }
           }),
 
-          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label))
+          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label)),
+
+          info 
+          ? m(InfoTooltip, {text:info}) 
+          : null
         )
       }
     }
@@ -845,6 +849,8 @@ function TranslationInput(){
             
             let value = data[name]
 
+
+
             return m(FlexCol,{width:'100%', },
 
                 label ? m(FormLabel,{ required:required, info:info }, label) : null,
@@ -871,6 +877,9 @@ function TranslationInput(){
                             borderRadius:'0em .28571429rem .28571429rem 0em',
                             minWidth: "80px", border:'1px solid #22242626', 
                             flexGrow:1,  
+                            padding: config.form.baseStyle?.padding,
+                            lineHeight: config.form.baseStyle?.lineHeight,
+                            minHeight:'fit-content',
                             fontFamily: "Poppins, Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;"
                         },
                         onclick:(e)=>{
@@ -888,7 +897,7 @@ function TranslationInput(){
                         }
                     },
                         typeof value !== "object"
-                        ? m(Icon, { icon: "language", color: "gray", size: "small" })
+                        ? m(Icon, { icon: "language", color: "gray", size: "tiny" })
                         : languages[selectedlang]
                     )
                 ),
