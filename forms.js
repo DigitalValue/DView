@@ -161,7 +161,8 @@ function CheckboxLabel(){
             }
           }),
 
-          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label))
+          
+          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label)  ) 
         )
       }
     }

@@ -590,6 +590,7 @@ function Message() {
         },
         'info': {
             color: 'black',
+            background:'white',
             icon: 'info'
         }
     }
