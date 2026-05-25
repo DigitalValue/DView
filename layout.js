@@ -223,6 +223,7 @@ function Div(){
                 ...vnode.attrs.id && {
                     id:vnode.attrs.id
                 },
+                class: vnode.attrs.class
             }, vnode.children)
         }
     }
