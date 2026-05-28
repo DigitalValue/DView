@@ -473,6 +473,8 @@ function Button() {
         view: (vnode) => {
             let { type = 'primary', onclick, disabled, fluid, icon, size } = vnode.attrs
 
+            console.log('CONFIG', config.elements)
+
             // REPASAR ESTO, MUCHAS CONDICIONES
             return m(Tappable, {
                 style: {
