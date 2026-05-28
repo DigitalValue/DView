@@ -104,7 +104,7 @@ let config = {
         olive: '#b5cc18',
         brown: '#a5673f',
         violet: '#6435c9',
-        grey: 'grey',
+        grey: '#dedede',
         purple: '#6435c9',
         red: '#db2828',
         lightgrey: 'whitesmoke',

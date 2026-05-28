@@ -473,7 +473,6 @@ function Modal(){
 
         },
         view:(vnode)=>{
-            console.log('header', vnode.attrs.header)
            
             return m("div", {
                 style: dimmerStyle
