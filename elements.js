@@ -486,7 +486,7 @@ function Button() {
                     width: fluid ? '100%': 'auto',
                     //userSelect:'none',
                     filter:`brightness(100%)`,
-                    borderRadius:'1em',
+                    borderRadius:config.borderRadius || '1em',
                     gap: "5px",
                     ...disabled && {
                         opacity: '0.5',
