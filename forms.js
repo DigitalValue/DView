@@ -121,7 +121,7 @@ function CheckboxLabel(){
             display: 'flex',
             whiteSpace:'wrap',
             ...isChecked ? {
-              background: config.colors.grey
+              background: config.colors.lightgrey
             } : {}
           },
           onclick: () => {
@@ -243,6 +243,8 @@ function Input(){
                             disabled: disabled || false,
 
                             ...onkeyup ? {onkeyup: onkeyup} : {},
+                            ...vnode.attrs.autocomplete ? { autocomplete: vnode.attrs.autocomplete} : {},
+
                             onchange:(e)=>{
                                 if(onchange) onchange(e)
                             },

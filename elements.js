@@ -651,7 +651,7 @@ function Label() {
         },
         primary: {
             backgroundColor: "#1b1c1d",
-            color: "black",
+            color: "white",
             border: "1px solid #1b1c1d",
             ...config.elements?.label?.primary || {}
         },

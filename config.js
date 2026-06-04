@@ -78,11 +78,9 @@ let config = {
         segment: {
 
         },
+        /*
         button: {
-            // primary : {
-            //     background: '#e8def8'
-            // }        
-        }
+        }*/
 
     },
     
@@ -109,7 +107,7 @@ let config = {
         grey: '#dedede',
         purple: '#6435c9',
         red: '#db2828',
-        lightgrey: '#0000000d',
+        lightgrey: 'whitesmoke',
         borderColor: '#22242626',
         secondaryText: '#555',
         inverted: '#545454',
@@ -121,7 +119,7 @@ let config = {
 
 function setConfig(newConfig) {
 
-    console.log('newConfig', newConfig)
+    console.log('SETTINGNEWCONFIG', newConfig)
 
     mergeDeep(config, newConfig)
 
