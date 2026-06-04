@@ -657,7 +657,7 @@ function Label() {
         },
         secondary: {
             backgroundColor: "white",
-            color: "white",
+            color: "black",
             border: '1px solid #e0e0e0',
             ...config.elements?.label?.secondary || {}
         },
