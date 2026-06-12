@@ -107,7 +107,7 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick, info, style } = vnode.attrs
+        let { data, name, label, checked, onclick, info, style={} } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
