@@ -107,49 +107,125 @@ function Grid() {
     let columns = 1
     let lastColumns = 1
 
-    let mobileColumns    
-    let tabletColumns    
+    let mobileColumns
+    let largeMobileColumns
+    let tabletColumns
     let computerColumns
+    let gap = '1em'
+    let mobileGap = null
+    let largeMobileGap = null
+    let tabletGap = null
+    let computerGap = null
+    let padding = null
+    let mobilePadding = null
+    let largeMobilePadding = null
+    let tabletPadding = null
+    let computerPadding = null
 
     let id;
 
-    
+    function getResponsiveValue(value, key) {
+        if (!value) return null
+        if (typeof value !== "object") return key === 'base' ? value : null
+        return value[key] || null
+    }
+
+    function getGridCss(columnValue, gapValue, paddingValue) {
+        return [
+            columnValue ? `grid-template-columns: repeat(${columnValue}, minmax(0, 1fr));` : '',
+            gapValue ? `gap: ${gapValue};` : '',
+            paddingValue ? `padding: ${paddingValue};` : '',
+        ].join('')
+    }
+
+    function setGridData(attrs) {
+        attrs = attrs || {}
+
+        let columnConfig = attrs.columns
+
+        largeMobileColumns = null
+        tabletColumns = null
+        computerColumns = null
+        mobileColumns = null
+
+        if(typeof columnConfig == "object") {
+            columns = columnConfig?.base || columnConfig?.computer || 1
+            computerColumns = columnConfig?.computer
+            mobileColumns = columnConfig?.mobile
+            largeMobileColumns = columnConfig?.largeMobile
+            tabletColumns = columnConfig?.tablet
+        }
+        else {
+            columns = columnConfig || 1
+            computerColumns = columnConfig
+            if(attrs.mobileColumns) mobileColumns = attrs.mobileColumns
+        }
+
+        gap = getResponsiveValue(attrs.gap, 'base') || getResponsiveValue(attrs.gap, 'mobile') || (typeof attrs.gap !== "object" ? attrs.gap : null) || '1em'
+        mobileGap = getResponsiveValue(attrs.gap, 'mobile')
+        largeMobileGap = getResponsiveValue(attrs.gap, 'largeMobile')
+        tabletGap = getResponsiveValue(attrs.gap, 'tablet')
+        computerGap = getResponsiveValue(attrs.gap, 'computer')
+
+        padding = getResponsiveValue(attrs.padding, 'base') || getResponsiveValue(attrs.padding, 'mobile') || (typeof attrs.padding !== "object" ? attrs.padding : null) || null
+        mobilePadding = getResponsiveValue(attrs.padding, 'mobile')
+        largeMobilePadding = getResponsiveValue(attrs.padding, 'largeMobile')
+        tabletPadding = getResponsiveValue(attrs.padding, 'tablet')
+        computerPadding = getResponsiveValue(attrs.padding, 'computer')
+    }
+
+    function getStyle(attrs) {
+        let style = {
+            ...attrs,
+            ...(typeof attrs.style === "object" ? attrs.style : {}),
+        }
+
+        delete style.columns
+        delete style.mobileColumns
+        delete style.largeMobileColumns
+        delete style.tabletColumns
+        delete style.computerColumns
+        delete style.gap
+        delete style.padding
+        delete style.class
+        delete style.className
+        delete style.id
+        delete style.style
+
+        return style
+    }
     return {
         oninit : (vnode)=> {
-            if(typeof vnode.attrs.columns == "object") {
-                columns = vnode.attrs.columns?.computer
-                computerColumns = vnode.attrs.columns?.computer
-                mobileColumns = vnode.attrs.columns?.mobile
-                tabletColumns = vnode.attrs.columns?.tablet
-            }
-            else {
-                columns = vnode.attrs.columns
-                computerColumns = vnode.attrs.columns
-                if(vnode.attrs.mobileColumns) mobileColumns = vnode.attrs.mobileColumns
-            }
-
+            setGridData(vnode.attrs)
             id = vnode.attrs.id || `grid-${Math.random().toString(36).substring(2, 9)}`
 
         },
         view : (vnode)=> {
+            setGridData(vnode.attrs)
+
+            let hasLargeMobile = largeMobileColumns || largeMobileGap || largeMobilePadding
+            let mobileMedia = hasLargeMobile ? '(max-width: 479px)' : '(max-width: 768px)'
+            let tabletMedia = hasLargeMobile ? '(min-width: 768px) and (max-width: 1023px)' : '(min-width: 769px) and (max-width: 992px)'
+            let computerMedia = hasLargeMobile ? '(min-width: 1024px)' : '(min-width: 993px)'
+
             return [
                 m("style",
                     `#${id} {
                         display: grid;
-                        grid-template-columns: repeat(${columns}, minmax(0, 1fr));
-                        gap: 1em;
-                    }  `
-                    // add styles for mobile and tablet with media queries
-                    + (mobileColumns ? `@media (max-width: 768px) { #${id} { grid-template-columns: repeat(${mobileColumns}, minmax(0, 1fr)); } }` : '')
-                    + (tabletColumns ? `@media (min-width: 769px) and (max-width: 992px) { #${id} { grid-template-columns: repeat(${tabletColumns}, minmax(0, 1fr)); } }` : '')
-                    + (computerColumns ? `@media (min-width: 993px) { #${id} { grid-template-columns: repeat(${computerColumns}, minmax(0, 1fr)); } }` : '')
+                        ${getGridCss(columns, gap, padding)}
+                    }`
+                    + (mobileColumns || mobileGap || mobilePadding ? `@media ${mobileMedia} { #${id} { ${getGridCss(mobileColumns, mobileGap, mobilePadding)} } }` : '')
+                    + (largeMobileColumns || largeMobileGap || largeMobilePadding ? `@media (min-width: 480px) and (max-width: 767px) { #${id} { ${getGridCss(largeMobileColumns, largeMobileGap, largeMobilePadding)} } }` : '')
+                    + (tabletColumns || tabletGap || tabletPadding ? `@media ${tabletMedia} { #${id} { ${getGridCss(tabletColumns, tabletGap, tabletPadding)} } }` : '')
+                    + (computerColumns || computerGap || computerPadding ? `@media ${computerMedia} { #${id} { ${getGridCss(computerColumns, computerGap, computerPadding)} } }` : '')
                 ),
 
                 m("div",{
                     id: id,
+                    class: vnode.attrs.class || vnode.attrs.className,
                     style : {
                         width:'100%',
-                        ...vnode.attrs.style || vnode.attrs ,
+                        ...getStyle(vnode.attrs),
                     }
                 },
                     vnode.children
@@ -506,25 +582,44 @@ function Animate() {
             duration = attrs.duration || 500
 
             if(attrs.animation){
-                attrs.from = animations[attrs.animation]?.from || {}
-                attrs.to = animations[attrs.animation]?.to || {}
-                attrs.exit = animations[attrs.animation]?.exit || {}
+                let animation = animations[attrs.animation] || {}
+
+                attrs.from = {
+                    ...(animation.from || {}),
+                    ...(attrs.from || {})
+                }
+                attrs.to = {
+                    ...(animation.to || {}),
+                    ...(attrs.to || {})
+                }
+                attrs.exit = {
+                    ...(animation.exit || {}),
+                    ...(attrs.exit || {})
+                }
             }
 
             return m("div", {
+                id: attrs.id,
+                title: attrs.title,
+                role: attrs.role,
+                tabindex: attrs.tabindex,
 
                 // Animacion Hover, hace falta aquí ???
                 ...(attrs.hover && {
                     onmouseenter: (e)=> {
+                        let target = e.currentTarget
+
                         Object.keys(attrs.hover).forEach(a => {
-                            e.target.style[a] = attrs.hover[a]
+                            target.style[a] = attrs.hover[a]
                         })
 
                         if(attrs.onmouseenter && typeof attrs.onmouseenter == "function") attrs.onmouseenter()
                     },
                     onmouseleave: (e)=> {
+                        let target = e.currentTarget
+
                         Object.keys(attrs.hover).forEach(a => {
-                            e.target.style[a] = attrs?.style?.[a] || ""
+                            target.style[a] = attrs?.style?.[a] || ""
                         })
 
                         if(attrs.onmouseleave && typeof attrs.onmouseleave == "function") attrs.onmouseleave()
@@ -534,19 +629,26 @@ function Animate() {
                 // Animacion click
                 ...(attrs.click && {
                     onmousedown: (e)=> {
+                        let target = e.currentTarget
+
                         Object.keys(attrs.click).forEach(a => {
-                            e.target.style[a] = attrs.click[a]
+                            target.style[a] = attrs.click[a]
                         })
                     },
                     onmouseup: (e)=> {
+                        let target = e.currentTarget
+
                         Object.keys(attrs.click).forEach(a => {
-                            e.target.style[a] = attrs?.style?.[a] || ""
+                            target.style[a] = attrs?.style?.[a] || ""
                         })
                     }
                 }),
 
-                onclick: ()=> {
-                    if(attrs.onclick && typeof attrs.onclick == "function") attrs.onclick()
+                onclick: (e)=> {
+                    if(attrs.onclick && typeof attrs.onclick == "function") attrs.onclick(e)
+                },
+                onkeydown: (e)=> {
+                    if(attrs.onkeydown && typeof attrs.onkeydown == "function") attrs.onkeydown(e)
                 },
 
                 style: {
@@ -590,5 +692,3 @@ function CssStyle(){
         }
     }
 }
-
-

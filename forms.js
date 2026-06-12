@@ -107,7 +107,7 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick, info } = vnode.attrs
+        let { data, name, label, checked, onclick, info, style } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
@@ -122,7 +122,8 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...isChecked ? {
               background: config.colors.lightgrey
-            } : {}
+            } : {},
+            ...style
           },
           onclick: () => {
             
@@ -183,7 +184,7 @@ function Input(){
 
                 // TO DO: editar el estilo de focus
                 m(FlexCol,{
-                    width: "100%"
+                   width: "100%"
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
@@ -1091,7 +1092,7 @@ function RadioButtons() {
 
 /*
 * 
-* input que solo se utiliza para fechas en formato yyyy/mm/dd
+* input que solo se utiliza para fechas en formato aaaa/mm/dd o dd/mm/aaaa
 *
 */
 function DateSelector() {
@@ -1103,9 +1104,159 @@ function DateSelector() {
 
     let writing = '';
 
+    function normalizeDateFormat(format){
+        let normalized = (format || 'aaaa/mm/dd')
+            .toLowerCase()
+            .trim()
+            .replace(/yyyy/g, 'aaaa')
+            .replace(/[.\-]/g, '/')
+            .replace(/\s+/g, '')
+
+        return ['aaaa/mm/dd', 'dd/mm/aaaa'].includes(normalized) ? normalized : 'aaaa/mm/dd'
+    }
+
+    function parseDateValue(value, format){
+        if(!value) return { year:'', month:'', day:'' }
+
+        let parts = String(value).split(/[/-]/).filter(Boolean)
+
+        if(parts.length == 3){
+            if(parts[0].length == 4){
+                return {
+                    year: parts[0].slice(0, 4),
+                    month: parts[1].slice(0, 2),
+                    day: parts[2].slice(0, 2)
+                }
+            }
+
+            if(parts[2].length == 4){
+                return {
+                    year: parts[2].slice(0, 4),
+                    month: parts[1].slice(0, 2),
+                    day: parts[0].slice(0, 2)
+                }
+            }
+        }
+
+        return parseDateDigits(String(value).replace(/[^0-9]/g, ''), format)
+    }
+
+    function parseDateDigits(value, format){
+        if(format == 'dd/mm/aaaa'){
+            return {
+                day: value.slice(0, 2),
+                month: value.slice(2, 4),
+                year: value.slice(4, 8)
+            }
+        }
+
+        return {
+            year: value.slice(0, 4),
+            month: value.slice(4, 6),
+            day: value.slice(6, 8)
+        }
+    }
+
+    function formatDateValue(format){
+        if(format == 'dd/mm/aaaa'){
+            return day ? `${day}${day?.length == 2 ? '/':''}${month ? month : ''}${month?.length == 2 ? '/':''}${year}` : ''
+        }
+
+        return year ? `${year}${month ? '/'+ month : ''}${day ? '/'+ day : ''}` : ''
+    }
+
+    function getDateDigits(format){
+        return format == 'dd/mm/aaaa'
+            ? `${day}${month}${year}`
+            : `${year}${month}${day}`
+    }
+
+    function setDateDigits(value, format){
+        let parsed = parseDateDigits(value.replace(/[^0-9]/g, ''), format)
+
+        year = parsed.year
+        month = parsed.month
+        day = parsed.day
+    }
+
+    function persistDateValue({data, name, oninput}, format){
+        let formattedValue = formatDateValue(format)
+
+        if(data && name){
+            if(formattedValue){
+                data[name] = formattedValue
+            } else {
+                delete data[name]
+            }
+        }
+
+        if(oninput) oninput({ target:{ value: formattedValue }})
+
+        return formattedValue
+    }
+
+    function getDigitIndexAtPosition(value, position, direction){
+        if(direction == 'left'){
+            for(let i = position - 1; i >= 0; i--){
+                if(/\d/.test(value[i])) return value.slice(0, i).replace(/[^0-9]/g, '').length
+            }
+        } else {
+            for(let i = position; i < value.length; i++){
+                if(/\d/.test(value[i])) return value.slice(0, i).replace(/[^0-9]/g, '').length
+            }
+        }
+
+        return -1
+    }
+
+    function removeSelectedDigits(input, format, direction){
+        let digits = getDateDigits(format)
+        let value = input.value
+        let start = input.selectionStart || 0
+        let end = input.selectionEnd || start
+
+        if(start != end){
+            let removeFrom = value.slice(0, start).replace(/[^0-9]/g, '').length
+            let removeTo = value.slice(0, end).replace(/[^0-9]/g, '').length
+
+            if(removeFrom != removeTo){
+                return digits.slice(0, removeFrom) + digits.slice(removeTo)
+            }
+        }
+
+        let digitIndex = getDigitIndexAtPosition(value, direction == 'left' ? start : end, direction)
+
+        if(digitIndex < 0) return digits
+
+        return digits.slice(0, digitIndex) + digits.slice(digitIndex + 1)
+    }
+
+    function syncFromData(data, name, format){
+        if(!data || !name) return
+
+        if(!data[name]){
+            year = ''
+            month = ''
+            day = ''
+            return
+        }
+
+        if(formatDateValue(format) == data[name]) return
+
+        let parsed = parseDateValue(data[name], format)
+        year = parsed.year
+        month = parsed.month
+        day = parsed.day
+    }
+
     return {
         view: (vnode) => {
-            let { data, name, label, onchange, required} = vnode.attrs
+            let { data, name, label, onchange, oninput, required, format, dateFormat} = vnode.attrs
+            let selectedFormat = normalizeDateFormat(dateFormat || format)
+            let dateValue = formatDateValue(selectedFormat)
+
+            syncFromData(data, name, selectedFormat)
+            dateValue = formatDateValue(selectedFormat)
 
             return [
                 m(FlexCol,{width:'100%'},
@@ -1155,33 +1306,35 @@ function DateSelector() {
                                     //...(config.fonts?.default || config.defaultFont || {}),
                                 },
                                 id: 'date-input',
-                                placeholder: 'aaaa/mm/dd',
+                                placeholder: selectedFormat,
                                 type: 'text',
                                 maxlength: 10,
-                                value: (year ? `${year}${month ? '/'+ month : ''}${day ? '/'+ day : ''}` : ''),
-                                oninput:(e)=>  {
-                                    let val = e.target.value.replace(/[^0-9]/g, '')
-                                    
-                                    year = val.slice(0,4)
-                                    month = val.slice(4,6)
+                                value: dateValue,
+                                onkeydown:(e)=> {
+                                    if(e.key != 'Backspace' && e.key != 'Delete') return
 
-                                    day = val.slice(6,8)
+                                    e.preventDefault()
 
-                                    if(data && name){
-                                        data[name] = `${year}/${month}${day ? '/'+ day : ''}`
-                                        console.log('DATA DATE', data[name])
-                                    }
+                                    let nextDigits = removeSelectedDigits(
+                                        e.target,
+                                        selectedFormat,
+                                        e.key == 'Backspace' ? 'left' : 'right'
+                                    )
+
+                                    setDateDigits(nextDigits, selectedFormat)
+                                    persistDateValue({data, name, oninput}, selectedFormat)
                                 },
-                                /*
+                                oninput:(e)=>  {
+                                    setDateDigits(e.target.value, selectedFormat)
+                                    persistDateValue({data, name, oninput}, selectedFormat)
+                                },
                                 onchange:(e)=> {
-                                    if(data && name) {
-                                        data[name] = `${year}/${month}/${day}`
-                                    }
-                                }*/
+                                    if(onchange) onchange({ target:{ value: formatDateValue(selectedFormat) }})
+                                }
                             }), 
                             
-                            year && focused ? 
-                            m(SmallText, {style:{position:'absolute', bottom:'-20px', color:'grey'}} , 'aaaa/mm/dd'): null,
+                            dateValue && focused ? 
+                            m(SmallText, {style:{position:'absolute', bottom:'-20px', color:'grey'}} , selectedFormat): null,
 
                             m(Icon, {
                                 icon: 'calendar_today',
@@ -1308,6 +1461,7 @@ function HtmlDropdown() {
 }
 
 
+// TO DO, que el switch se pueda hacer más pequeño !!
 function Switch() {
 
     return {
