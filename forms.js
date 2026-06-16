@@ -178,7 +178,7 @@ function Input(){
     
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode} = vnode.attrs
 
             return [
 
@@ -244,6 +244,7 @@ function Input(){
                             disabled: disabled || false,
 
                             ...onkeyup ? {onkeyup: onkeyup} : {},
+                            ...inputmode ? { inputmode: inputmode } : {},
                             ...vnode.attrs.autocomplete ? { autocomplete: vnode.attrs.autocomplete} : {},
 
                             onchange:(e)=>{
@@ -1272,14 +1273,7 @@ function DateSelector() {
                         },
                         onclick:(e)=> {
                             e.stopPropagation()
-                            // how can i focus the hidden input here??
-                            if(focused){
-                                focused = false
-                                document.getElementById('date-input').blur()
-                            } else {
-                                focused = true
-                                document.getElementById('date-input').focus()
-                            }
+                            document.getElementById('date-input').focus()
                         },
                         style: {
                             ...(config.form?.baseStyle),
@@ -1298,7 +1292,6 @@ function DateSelector() {
                                     border:'none',
                                     outline:'none',
                                     whiteSpace:'nowrap',
-                                    userSelect:'none',
                                     margin: 0,
 
                                     //fontSize:'1.4rem',
@@ -1308,8 +1301,18 @@ function DateSelector() {
                                 id: 'date-input',
                                 placeholder: selectedFormat,
                                 type: 'text',
+                                inputmode: 'numeric',
                                 maxlength: 10,
                                 value: dateValue,
+                                onclick:(e)=> e.stopPropagation(),
+                                onfocus:(e)=> {
+                                    focused = true
+                                    m.redraw()
+                                },
+                                onblur:(e)=> {
+                                    focused = false
+                                    m.redraw()
+                                },
                                 onkeydown:(e)=> {
                                     if(e.key != 'Backspace' && e.key != 'Delete') return
 
