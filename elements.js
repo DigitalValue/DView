@@ -277,6 +277,7 @@ function RippleEffect() {
     let rippleEffect = false
     let x, y
     let type = 'dark'
+    let touchHandled = false
 
     let background = {
         dark: 'rgb(0,0,0,0.2)',
@@ -284,6 +285,18 @@ function RippleEffect() {
     }
 
     let time1, time2;
+
+    function showRippleAt(target, clientX, clientY) {
+        const item = target.getBoundingClientRect()
+        x = `${clientX - item.left}px`
+        y = `${clientY - item.top}px`
+        rippleEffect = true
+        time1 = new Date().getTime()
+        setTimeout(() => {
+            rippleEffect = false
+            m.redraw()
+        }, 1000)
+    }
 
     function RippleSpan() {
 
@@ -321,29 +334,42 @@ function RippleEffect() {
                 style: {
                     position: "relative",
                     overflow: "hidden",
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
                     ...vnode.attrs.style
                 },
+                ontouchstart: (e) => {
+                    if (vnode.attrs.disabled) return
+
+                    // Evita que el input pierda el foco antes de ejecutar la acción.
+                    if (vnode.attrs.onclick) e.preventDefault()
+
+                    const touch = e.changedTouches[0]
+                    showRippleAt(e.currentTarget, touch.clientX, touch.clientY)
+                },
+                ontouchend: (e) => {
+                    if (vnode.attrs.disabled || !vnode.attrs.onclick) return
+
+                    e.preventDefault()
+                    touchHandled = true
+                    vnode.attrs.onclick(e)
+                    m.redraw()
+                    setTimeout(() => { touchHandled = false }, 400)
+                },
                 onmousedown: (e) => {
-                    //Datos para que el ripple aparezca donde se hace click
-                    const item = e.currentTarget.getBoundingClientRect()
-                    x = `${e.clientX - item.left}px`;
-                    y = `${e.clientY - item.top}px`;
+                    if (e.pointerType === 'touch') return
 
-                    rippleEffect = true
-                    time1 = new Date().getTime()
-
-                    setTimeout(() => {
-                        rippleEffect = false
-                        m.redraw()
-                    }, 1000)
+                    showRippleAt(e.currentTarget, e.clientX, e.clientY)
                 },
                 //onmouseout:(e)=> rippleEffect = false,
                 onmouseup: (e) => {
+                    if (touchHandled || e.pointerType === 'touch') return
+
                     time2 = new Date().getTime()
 
                     if (vnode.attrs.onclick) {
                         setTimeout(() => {
-                            vnode.attrs.onclick();
+                            vnode.attrs.onclick(e)
                             m.redraw()
                         }, time2 - time1 > 500 ? 0 : 500 - (time2 - time1))
                     }

@@ -178,7 +178,7 @@ function Input(){
     
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
 
             return [
 
@@ -245,6 +245,7 @@ function Input(){
 
                             ...onkeyup ? {onkeyup: onkeyup} : {},
                             ...inputmode ? { inputmode: inputmode } : {},
+                            ...enterkeyhint ? { enterkeyhint: enterkeyhint } : {},
                             ...vnode.attrs.autocomplete ? { autocomplete: vnode.attrs.autocomplete} : {},
 
                             onchange:(e)=>{
@@ -1032,16 +1033,18 @@ function RadioButtons() {
     
     return {
         view:(vnode)=>{
-            let { data, name, label, onchange, disabled=false, info, description, required } = vnode.attrs
-
+            let { data, name, label, onchange, disabled=false, info, description, required, direction } = vnode.attrs
+            const OptionsWrap = direction === "row" ? FlexRow : FlexCol
+            const optionsGap = direction === "row" ? "1.25rem" : "10px"
 
             return [
                 m(FlexCol,{width:'100%', gap: "5px", ...vnode.attrs.style},
 
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
-                    m(FlexCol, { gap: "10px" },
-                        vnode.children.map((o)=> m(Tappable, {
+                    m(OptionsWrap, { gap: optionsGap, flexWrap: direction === "row" ? "wrap" : undefined, alignItems: direction === "row" ? "center" : undefined },
+                        vnode.children.map((o, i)=> m(Tappable, {
+                            key: String(o?.value != null ? o.value : (typeof o === "string" || typeof o === "number" ? o : i)),
                             style: {
                                 display: "flex",
                                 gap: "0.5em",
