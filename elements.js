@@ -277,6 +277,7 @@ function RippleEffect() {
     let rippleEffect = false
     let x, y
     let type = 'dark'
+    let touchHandled = false
 
     let background = {
         dark: 'rgb(0,0,0,0.2)',
@@ -284,6 +285,18 @@ function RippleEffect() {
     }
 
     let time1, time2;
+
+    function showRippleAt(target, clientX, clientY) {
+        const item = target.getBoundingClientRect()
+        x = `${clientX - item.left}px`
+        y = `${clientY - item.top}px`
+        rippleEffect = true
+        time1 = new Date().getTime()
+        setTimeout(() => {
+            rippleEffect = false
+            m.redraw()
+        }, 1000)
+    }
 
     function RippleSpan() {
 
@@ -321,29 +334,42 @@ function RippleEffect() {
                 style: {
                     position: "relative",
                     overflow: "hidden",
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
                     ...vnode.attrs.style
                 },
+                ontouchstart: (e) => {
+                    if (vnode.attrs.disabled) return
+
+                    // Evita que el input pierda el foco antes de ejecutar la acción.
+                    if (vnode.attrs.onclick) e.preventDefault()
+
+                    const touch = e.changedTouches[0]
+                    showRippleAt(e.currentTarget, touch.clientX, touch.clientY)
+                },
+                ontouchend: (e) => {
+                    if (vnode.attrs.disabled || !vnode.attrs.onclick) return
+
+                    e.preventDefault()
+                    touchHandled = true
+                    vnode.attrs.onclick(e)
+                    m.redraw()
+                    setTimeout(() => { touchHandled = false }, 400)
+                },
                 onmousedown: (e) => {
-                    //Datos para que el ripple aparezca donde se hace click
-                    const item = e.currentTarget.getBoundingClientRect()
-                    x = `${e.clientX - item.left}px`;
-                    y = `${e.clientY - item.top}px`;
+                    if (e.pointerType === 'touch') return
 
-                    rippleEffect = true
-                    time1 = new Date().getTime()
-
-                    setTimeout(() => {
-                        rippleEffect = false
-                        m.redraw()
-                    }, 1000)
+                    showRippleAt(e.currentTarget, e.clientX, e.clientY)
                 },
                 //onmouseout:(e)=> rippleEffect = false,
                 onmouseup: (e) => {
+                    if (touchHandled || e.pointerType === 'touch') return
+
                     time2 = new Date().getTime()
 
                     if (vnode.attrs.onclick) {
                         setTimeout(() => {
-                            vnode.attrs.onclick();
+                            vnode.attrs.onclick(e)
                             m.redraw()
                         }, time2 - time1 > 500 ? 0 : 500 - (time2 - time1))
                     }
@@ -1293,6 +1319,11 @@ function SVGIcon() {
             m("path", { d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" }),
             m("circle", { cx: "12", cy: "10", r: "3" })
         ],
+        menu: [
+            m("path", {d:"M4 5h16"}),
+            m("path",{d:"M4 12h16"}),
+            m("path", {d:"M4 19h16"})
+        ],
         lock: [
             m("rect", { width:"18", height:"11", x:"3", y:"11", rx:"2", ry:"2"}),
             m("path",{ d:"M7 11V7a5 5 0 0 1 10 0v4" })
@@ -1476,12 +1507,9 @@ function SVGIcon() {
             m("path", { d: "M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8" })
         ],
         web: [
-            m("circle", { cx: "12", cy: "12", r: "9" }),
-            m("path", { d: "M3 12h18" }),
-            m("path", { d: "M12 3a14 14 0 0 1 0 18" }),
-            m("path", { d: "M12 3a14 14 0 0 0 0 18" }),
-            m("path", { d: "M5.5 7.5h13" }),
-            m("path", { d: "M5.5 16.5h13" })
+            m("circle", { cx: "12", cy: "12", r: "10" }),
+            m("path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" }),
+            m("path", { d: "M2 12h20" })
         ],
         warning: [
             m("path",{d:"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}),
