@@ -118,6 +118,7 @@ function Table() {
     return {
         view: (vnode) => {
             return m("table", {
+                "data-keep-last-row-borders": vnode.attrs.keepLastRowBorders ? "true" : undefined,
                 style: {
                     ...tableStyle,
                     ...config.elements?.table?.table || {},
@@ -201,7 +202,7 @@ function TableBody() {
             return m("tbody", {
                 style: {
                     ...config.elements?.table?.body || {},
-                    ...vnode.attrs
+                    ...(vnode.attrs.style || vnode.attrs),
                 }
             }, vnode.children)
         }
@@ -248,11 +249,20 @@ function TableCell() {
                 colspan: vnode.attrs.colspan,
                 onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
                 oncreate:(vnode)=>{
-                    
-                    let tr = vnode.dom.parentElement
-                    let isLastRow = tr.parentElement.lastElementChild === tr
-                    if(isLastRow) vnode.dom.style.border = 'none'
-                    
+                    if (vnode.attrs.header) return
+
+                    const tr = vnode.dom.parentElement
+                    const section = tr?.parentElement
+                    const table = section?.parentElement
+                    if (!tr || section?.tagName !== "TBODY" || !table) return
+
+                    if (table.dataset.keepLastRowBorders === "true") return
+
+                    // No quitar bordes si hay pie de tabla: la última fila de datos debe mantener línea inferior.
+                    if (table.querySelector("tfoot")) return
+
+                    const isLastRow = section.lastElementChild === tr
+                    if (isLastRow) vnode.dom.style.borderBottom = "none"
                 },
                 style: {
                     textAlign: 'left',
