@@ -1034,15 +1034,17 @@ function RadioButtons() {
     return {
         view:(vnode)=>{
             let { data, name, label, onchange, disabled=false, info, description, required, direction } = vnode.attrs
-            const OptionsWrap = direction === "row" ? FlexRow : FlexCol
-            const optionsGap = direction === "row" ? "1.25rem" : "10px"
-
+            
             return [
                 m(FlexCol,{width:'100%', gap: "5px", ...vnode.attrs.style},
 
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
-                    m(OptionsWrap, { gap: optionsGap, flexWrap: direction === "row" ? "wrap" : undefined, alignItems: direction === "row" ? "center" : undefined },
+                    m(direction === "row" ? FlexRow : FlexCol, { 
+                        gap: direction === "row" ? "1.25rem" : "10px", 
+                        flexWrap: direction === "row" ? "wrap" : undefined, 
+                        alignItems: direction === "row" ? "center" : undefined 
+                    },
                         vnode.children.map((o, i)=> m(Tappable, {
                             key: String(o?.value != null ? o.value : (typeof o === "string" || typeof o === "number" ? o : i)),
                             style: {
@@ -1097,6 +1099,7 @@ function RadioButtons() {
 /*
 * 
 * input que solo se utiliza para fechas en formato aaaa/mm/dd o dd/mm/aaaa
+* NO ME GUSTA EL NOMBRE !!!
 *
 */
 function DateSelector() {
@@ -1163,10 +1166,15 @@ function DateSelector() {
 
     function formatDateValue(format){
         if(format == 'dd/mm/aaaa'){
-            return day ? `${day}${day?.length == 2 ? '/':''}${month ? month : ''}${month?.length == 2 ? '/':''}${year}` : ''
+            return addBackSlash(day, 2) + addBackSlash(month, 2) + year
+        } else {
+            return addBackSlash(year, 4) + addBackSlash(month, 2) + day
         }
 
-        return year ? `${year}${month ? '/'+ month : ''}${day ? '/'+ day : ''}` : ''
+        function addBackSlash(txt, length){
+            if(!txt) return ''
+            else return txt + (txt.length == length ? '/' : '')
+        }
     }
 
     function getDateDigits(format){
@@ -1296,10 +1304,8 @@ function DateSelector() {
                                     outline:'none',
                                     whiteSpace:'nowrap',
                                     margin: 0,
-
                                     //fontSize:'1.4rem',
-                                    color: data && name && data[name] ? 'black' : 'grey',
-                                    //...(config.fonts?.default || config.defaultFont || {}),
+                                    color: data && name && data[name] ? 'black' : 'grey',                                    
                                 },
                                 id: 'date-input',
                                 placeholder: selectedFormat,
