@@ -439,7 +439,7 @@ function Modal(){
     }
     
     let dimmerStyle = {
-        backgroundColor: '#000000a8',
+        backgroundColor: '#000000d9',
         transition:'animate ease-in',
         position:'fixed',
         fontFamily: config.fontFamily || 'Poppins',
