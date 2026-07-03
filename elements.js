@@ -1289,6 +1289,14 @@ function SVGIcon() {
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
         ],
+        event_seat: [
+            m("path", { d: "M5 10V7a2 2 0 0 1 4 0v3" }),
+            m("path", { d: "M15 10V7a2 2 0 0 1 4 0v3" }),
+            m("path", { d: "M4 10h16" }),
+            m("path", { d: "M6 14v4" }),
+            m("path", { d: "M18 14v4" }),
+            m("path", { d: "M4 18h16" }),
+        ],
         google: {
             viewBox: "0 0 256 262",
             nodes: [
