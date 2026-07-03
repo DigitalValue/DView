@@ -1197,6 +1197,12 @@ function SVGIcon() {
             m("path", { d: "m20 13-4.2-4.2a2 2 0 0 0-2.8 0L9 13" }),
             m("path", { d: "M8 17h8" })
         ],
+        case_sensitive: [
+            m("path", { d: "m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" }),
+            m("path", { d: "M22 9v7" }),
+            m("path", { d: "M3.304 13h6.392" }),
+            m("circle", { cx: 18.5, cy: 12.5, r: 3.5 }),
+        ],
         check_circle: [
             m("path", {d:"M21.801 10A10 10 0 1 1 17 3.335"}),
             m("path", {d:"m9 11 3 3L22 4"})
@@ -1233,6 +1239,23 @@ function SVGIcon() {
         clock: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 6v6l4 2" })
+        ],
+        columns: [
+            m("rect", { width: "18", height: "18", x: "3", y: "3", rx: "2" }),
+            m("path", { d: "M9 3v18" }),
+            m("path", { d: "M15 3v18" })
+        ],
+        more_horizontal: [
+            m("circle", { cx: "5", cy: "12", r: "1.4", fill: "currentColor", stroke: "none" }),
+            m("circle", { cx: "12", cy: "12", r: "1.4", fill: "currentColor", stroke: "none" }),
+            m("circle", { cx: "19", cy: "12", r: "1.4", fill: "currentColor", stroke: "none" })
+        ],
+        list_checks: [
+            m("path", { d: "M11 18H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8" }),
+            m("path", { d: "m15 18 2 2 4-4" }),
+            m("path", { d: "M21 18v2a2 2 0 0 1-2 2H7" }),
+            m("path", { d: "M7 8h8" }),
+            m("path", { d: "M7 12h5" })
         ],
         clone: [
             m("rect", {width:"14", height:"14", x:"8", y:"8", rx:"2", ry:"2"}),
