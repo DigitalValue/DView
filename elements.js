@@ -9,7 +9,7 @@ export {
     Sidebar, Label,
     Message, Card, Spinner,
     BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell, TableFooter,
+    Table, TableHead, TableBody, TableRow, TableCell, TableFooter, SecondaryMenu,
     SVGIcon
 }
 
@@ -38,6 +38,69 @@ function Img() {
     }
 }
 
+
+function SecondaryMenu(){
+    let activeIndex= 0;
+
+    return {
+        oninit:(vnode)=>{
+            if(vnode.attrs.startingIndex){
+                activeIndex = vnode.attrs.startingIndex
+            }
+        },
+        view:(vnode)=>{
+            let { onclick} = vnode.attrs
+
+            return m(FlexRow, { border: `1px solid rgb(204 204 204 / 21%)`, background: config.colors.lightgrey, gap: '0.5em', padding: '0.2em', borderRadius: config.borderRadius },
+
+            vnode.children.map((child, i)=>
+                Item({
+                    text: child.text,
+                    onclick: (e) => {
+                        activeIndex = i;
+                        if(onclick){
+                            onclick(child)
+                        }
+                    },
+                    active: activeIndex == i
+                }),
+            )
+          )
+        }
+    }
+
+    function Item({ text, active, onclick }) {
+      return m(Tappable, {
+        style: {
+          padding: '0.5rem',
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          textAlign: 'center',
+          minWidth: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex:1,
+          borderRadius: config.borderRadius,
+          ...active ? {
+            background: 'white',
+            fontWeight: 'bold',
+            border:`1px solid ${config.colors.border}`
+          } : {}
+        },
+        hover: {
+          color: 'black',
+          background: '#ffffff'
+        },
+        onclick: () => {
+          onclick()
+        }
+      },
+        m(Text,text ),
+
+      )
+    }
+}
 
 
 
@@ -430,8 +493,8 @@ function Button() {
         },
         positive: {
             color: 'white',
-            border: '1px solid #00c853',
-            background: '#00c853',
+            border: `1px solid ${config.colors.green || '#00c853'}`,
+            background: config.colors.green || '#00c853',
             hover,
             onmousedown
         },

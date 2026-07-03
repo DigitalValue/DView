@@ -120,16 +120,13 @@ let config = {
 
 function setConfig(newConfig) {
 
-
     mergeDeep(config, newConfig)
-
-    console.log('config', config)
-
 
     function isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item));
     }
 
+    
     function mergeDeep(target, ...sources) {
         if (!sources.length) return target;
         const source = sources.shift();
