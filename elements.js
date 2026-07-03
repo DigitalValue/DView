@@ -1134,6 +1134,12 @@ function SVGIcon() {
             m("path", { d: "m20 13-4.2-4.2a2 2 0 0 0-2.8 0L9 13" }),
             m("path", { d: "M8 17h8" })
         ],
+        case_sensitive: [
+            m("path", { d: "m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" }),
+            m("path", { d: "M22 9v7" }),
+            m("path", { d: "M3.304 13h6.392" }),
+            m("circle", { cx: 18.5, cy: 12.5, r: 3.5 }),
+        ],
         check_circle: [
             m("path", {d:"M21.801 10A10 10 0 1 1 17 3.335"}),
             m("path", {d:"m9 11 3 3L22 4"})
