@@ -1119,6 +1119,9 @@ function SVGIcon() {
             m("path", { d: "m15 9-6 6" }),
             m("path", { d: "m9 9 6 6" })
         ],
+        circle: [
+            m("circle", { cx: 12, cy: 12, r: 10 })
+        ],
         csv: [
             m("path", {d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"}),
             m("path", {d: "M14 2v4a2 2 0 0 0 2 2h4"}),
@@ -1383,6 +1386,13 @@ function SVGIcon() {
         reset: [
             m("path", {d:"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}),
             m("path", {d:"M3 3v5h5"})
+        ],
+        rotate: [
+            m("path", { d: "M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" }),
+            m("path", { d: "M21 3v5h-5" })
+        ],
+        square: [ 
+            m("rect", { width: 18, height: 18, x: 3, y: 3, rx: 2 })
         ],
         sticky_note: [
            m("path", {d:"M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"}),
