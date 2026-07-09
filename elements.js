@@ -9,7 +9,7 @@ export {
     Sidebar, Label,
     Message, Card, Spinner,
     BreadCrumb,
-    Table, TableHead, TableBody, TableRow, TableCell, TableFooter,
+    Table, TableHead, TableBody, TableRow, TableCell, TableFooter, SecondaryMenu,
     SVGIcon
 }
 
@@ -38,6 +38,69 @@ function Img() {
     }
 }
 
+
+function SecondaryMenu(){
+    let activeIndex= 0;
+
+    return {
+        oninit:(vnode)=>{
+            if(vnode.attrs.startingIndex){
+                activeIndex = vnode.attrs.startingIndex
+            }
+        },
+        view:(vnode)=>{
+            let { onclick} = vnode.attrs
+
+            return m(FlexRow, { border: `1px solid rgb(204 204 204 / 21%)`, background: config.colors.lightgrey, gap: '0.5em', padding: '0.2em', borderRadius: config.borderRadius },
+
+            vnode.children.map((child, i)=>
+                Item({
+                    text: child.text,
+                    onclick: (e) => {
+                        activeIndex = i;
+                        if(onclick){
+                            onclick(child)
+                        }
+                    },
+                    active: activeIndex == i
+                }),
+            )
+          )
+        }
+    }
+
+    function Item({ text, active, onclick }) {
+      return m(Tappable, {
+        style: {
+          padding: '0.5rem',
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          textAlign: 'center',
+          minWidth: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex:1,
+          borderRadius: config.borderRadius,
+          ...active ? {
+            background: 'white',
+            fontWeight: 'bold',
+            border:`1px solid ${config.colors.border}`
+          } : {}
+        },
+        hover: {
+          color: 'black',
+          background: '#ffffff'
+        },
+        onclick: () => {
+          onclick()
+        }
+      },
+        m(Text,text ),
+
+      )
+    }
+}
 
 
 
@@ -118,6 +181,7 @@ function Table() {
     return {
         view: (vnode) => {
             return m("table", {
+                "data-keep-last-row-borders": vnode.attrs.keepLastRowBorders ? "true" : undefined,
                 style: {
                     ...tableStyle,
                     ...config.elements?.table?.table || {},
@@ -201,7 +265,7 @@ function TableBody() {
             return m("tbody", {
                 style: {
                     ...config.elements?.table?.body || {},
-                    ...vnode.attrs
+                    ...(vnode.attrs.style || vnode.attrs),
                 }
             }, vnode.children)
         }
@@ -248,11 +312,20 @@ function TableCell() {
                 colspan: vnode.attrs.colspan,
                 onclick: vnode.attrs.onclick ? vnode.attrs.onclick : null,
                 oncreate:(vnode)=>{
-                    
-                    let tr = vnode.dom.parentElement
-                    let isLastRow = tr.parentElement.lastElementChild === tr
-                    if(isLastRow) vnode.dom.style.border = 'none'
-                    
+                    if (vnode.attrs.header) return
+
+                    const tr = vnode.dom.parentElement
+                    const section = tr?.parentElement
+                    const table = section?.parentElement
+                    if (!tr || section?.tagName !== "TBODY" || !table) return
+
+                    if (table.dataset.keepLastRowBorders === "true") return
+
+                    // No quitar bordes si hay pie de tabla: la última fila de datos debe mantener línea inferior.
+                    if (table.querySelector("tfoot")) return
+
+                    const isLastRow = section.lastElementChild === tr
+                    if (isLastRow) vnode.dom.style.borderBottom = "none"
                 },
                 style: {
                     textAlign: 'left',
@@ -277,6 +350,7 @@ function RippleEffect() {
     let rippleEffect = false
     let x, y
     let type = 'dark'
+    let touchHandled = false
 
     let background = {
         dark: 'rgb(0,0,0,0.2)',
@@ -284,6 +358,18 @@ function RippleEffect() {
     }
 
     let time1, time2;
+
+    function showRippleAt(target, clientX, clientY) {
+        const item = target.getBoundingClientRect()
+        x = `${clientX - item.left}px`
+        y = `${clientY - item.top}px`
+        rippleEffect = true
+        time1 = new Date().getTime()
+        setTimeout(() => {
+            rippleEffect = false
+            m.redraw()
+        }, 1000)
+    }
 
     function RippleSpan() {
 
@@ -321,29 +407,42 @@ function RippleEffect() {
                 style: {
                     position: "relative",
                     overflow: "hidden",
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
                     ...vnode.attrs.style
                 },
+                ontouchstart: (e) => {
+                    if (vnode.attrs.disabled) return
+
+                    // Evita que el input pierda el foco antes de ejecutar la acción.
+                    if (vnode.attrs.onclick) e.preventDefault()
+
+                    const touch = e.changedTouches[0]
+                    showRippleAt(e.currentTarget, touch.clientX, touch.clientY)
+                },
+                ontouchend: (e) => {
+                    if (vnode.attrs.disabled || !vnode.attrs.onclick) return
+
+                    e.preventDefault()
+                    touchHandled = true
+                    vnode.attrs.onclick(e)
+                    m.redraw()
+                    setTimeout(() => { touchHandled = false }, 400)
+                },
                 onmousedown: (e) => {
-                    //Datos para que el ripple aparezca donde se hace click
-                    const item = e.currentTarget.getBoundingClientRect()
-                    x = `${e.clientX - item.left}px`;
-                    y = `${e.clientY - item.top}px`;
+                    if (e.pointerType === 'touch') return
 
-                    rippleEffect = true
-                    time1 = new Date().getTime()
-
-                    setTimeout(() => {
-                        rippleEffect = false
-                        m.redraw()
-                    }, 1000)
+                    showRippleAt(e.currentTarget, e.clientX, e.clientY)
                 },
                 //onmouseout:(e)=> rippleEffect = false,
                 onmouseup: (e) => {
+                    if (touchHandled || e.pointerType === 'touch') return
+
                     time2 = new Date().getTime()
 
                     if (vnode.attrs.onclick) {
                         setTimeout(() => {
-                            vnode.attrs.onclick();
+                            vnode.attrs.onclick(e)
                             m.redraw()
                         }, time2 - time1 > 500 ? 0 : 500 - (time2 - time1))
                     }
@@ -394,8 +493,8 @@ function Button() {
         },
         positive: {
             color: 'white',
-            border: '1px solid #00c853',
-            background: '#00c853',
+            border: `1px solid ${config.colors.green || '#00c853'}`,
+            background: config.colors.green || '#00c853',
             hover,
             onmousedown
         },
@@ -1075,6 +1174,10 @@ function SVGIcon() {
             m("path", {d:"M6 12h.01"}),
             m("circle", {cx:"12", cy:"12", r:"2"})
         ],
+        bell: [
+            m("path", { d: "M10.268 21a2 2 0 0 0 3.464 0" }),
+            m("path", { d: "M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" }),
+        ],
         calendar: [
             m("path", { d: "M8 2v4" }),
             m("path", { d: "M16 2v4" }),
@@ -1093,6 +1196,12 @@ function SVGIcon() {
             m("circle", { cx: "9", cy: "8", r: "1.8" }),
             m("path", { d: "m20 13-4.2-4.2a2 2 0 0 0-2.8 0L9 13" }),
             m("path", { d: "M8 17h8" })
+        ],
+        case_sensitive: [
+            m("path", { d: "m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" }),
+            m("path", { d: "M22 9v7" }),
+            m("path", { d: "M3.304 13h6.392" }),
+            m("circle", { cx: 18.5, cy: 12.5, r: 3.5 }),
         ],
         check_circle: [
             m("path", {d:"M21.801 10A10 10 0 1 1 17 3.335"}),
@@ -1134,6 +1243,23 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 6v6l4 2" })
         ],
+        columns: [
+            m("rect", { width: "18", height: "18", x: "3", y: "3", rx: "2" }),
+            m("path", { d: "M9 3v18" }),
+            m("path", { d: "M15 3v18" })
+        ],
+        more_horizontal: [
+            m("circle", { cx: "5", cy: "12", r: "1.4", fill: "currentColor", stroke: "none" }),
+            m("circle", { cx: "12", cy: "12", r: "1.4", fill: "currentColor", stroke: "none" }),
+            m("circle", { cx: "19", cy: "12", r: "1.4", fill: "currentColor", stroke: "none" })
+        ],
+        list_checks: [
+            m("path", { d: "M11 18H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h8" }),
+            m("path", { d: "m15 18 2 2 4-4" }),
+            m("path", { d: "M21 18v2a2 2 0 0 1-2 2H7" }),
+            m("path", { d: "M7 8h8" }),
+            m("path", { d: "M7 12h5" })
+        ],
         clone: [
             m("rect", {width:"14", height:"14", x:"8", y:"8", rx:"2", ry:"2"}),
             m("path", {d:"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"})
@@ -1165,6 +1291,14 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
+        ],
+        event_seat: [
+            m("path", { d: "M5 10V7a2 2 0 0 1 4 0v3" }),
+            m("path", { d: "M15 10V7a2 2 0 0 1 4 0v3" }),
+            m("path", { d: "M4 10h16" }),
+            m("path", { d: "M6 14v4" }),
+            m("path", { d: "M18 14v4" }),
+            m("path", { d: "M4 18h16" }),
         ],
         google: {
             viewBox: "0 0 256 262",

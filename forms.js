@@ -178,7 +178,7 @@ function Input(){
     
     return {
         view: (vnode)=>{
-            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup} = vnode.attrs
+            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
 
             return [
 
@@ -244,6 +244,8 @@ function Input(){
                             disabled: disabled || false,
 
                             ...onkeyup ? {onkeyup: onkeyup} : {},
+                            ...inputmode ? { inputmode: inputmode } : {},
+                            ...enterkeyhint ? { enterkeyhint: enterkeyhint } : {},
                             ...vnode.attrs.autocomplete ? { autocomplete: vnode.attrs.autocomplete} : {},
 
                             onchange:(e)=>{
@@ -1031,16 +1033,20 @@ function RadioButtons() {
     
     return {
         view:(vnode)=>{
-            let { data, name, label, onchange, disabled=false, info, description, required } = vnode.attrs
-
-
+            let { data, name, label, onchange, disabled=false, info, description, required, direction } = vnode.attrs
+            
             return [
                 m(FlexCol,{width:'100%', gap: "5px", ...vnode.attrs.style},
 
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
-                    m(FlexCol, { gap: "10px" },
-                        vnode.children.map((o)=> m(Tappable, {
+                    m(direction === "row" ? FlexRow : FlexCol, { 
+                        gap: direction === "row" ? "1.25rem" : "10px", 
+                        flexWrap: direction === "row" ? "wrap" : undefined, 
+                        alignItems: direction === "row" ? "center" : undefined 
+                    },
+                        vnode.children.map((o, i)=> m(Tappable, {
+                            key: String(o?.value != null ? o.value : (typeof o === "string" || typeof o === "number" ? o : i)),
                             style: {
                                 display: "flex",
                                 gap: "0.5em",
@@ -1093,6 +1099,7 @@ function RadioButtons() {
 /*
 * 
 * input que solo se utiliza para fechas en formato aaaa/mm/dd o dd/mm/aaaa
+* NO ME GUSTA EL NOMBRE !!!
 *
 */
 function DateSelector() {
@@ -1159,10 +1166,15 @@ function DateSelector() {
 
     function formatDateValue(format){
         if(format == 'dd/mm/aaaa'){
-            return day ? `${day}${day?.length == 2 ? '/':''}${month ? month : ''}${month?.length == 2 ? '/':''}${year}` : ''
+            return addBackSlash(day, 2) + addBackSlash(month, 2) + year
+        } else {
+            return addBackSlash(year, 4) + addBackSlash(month, 2) + day
         }
 
-        return year ? `${year}${month ? '/'+ month : ''}${day ? '/'+ day : ''}` : ''
+        function addBackSlash(txt, length){
+            if(!txt) return ''
+            else return txt + (txt.length == length ? '/' : '')
+        }
     }
 
     function getDateDigits(format){
@@ -1272,14 +1284,7 @@ function DateSelector() {
                         },
                         onclick:(e)=> {
                             e.stopPropagation()
-                            // how can i focus the hidden input here??
-                            if(focused){
-                                focused = false
-                                document.getElementById('date-input').blur()
-                            } else {
-                                focused = true
-                                document.getElementById('date-input').focus()
-                            }
+                            document.getElementById('date-input').focus()
                         },
                         style: {
                             ...(config.form?.baseStyle),
@@ -1298,18 +1303,25 @@ function DateSelector() {
                                     border:'none',
                                     outline:'none',
                                     whiteSpace:'nowrap',
-                                    userSelect:'none',
                                     margin: 0,
-
                                     //fontSize:'1.4rem',
-                                    color: data && name && data[name] ? 'black' : 'grey',
-                                    //...(config.fonts?.default || config.defaultFont || {}),
+                                    color: data && name && data[name] ? 'black' : 'grey',                                    
                                 },
                                 id: 'date-input',
                                 placeholder: selectedFormat,
                                 type: 'text',
+                                inputmode: 'numeric',
                                 maxlength: 10,
                                 value: dateValue,
+                                onclick:(e)=> e.stopPropagation(),
+                                onfocus:(e)=> {
+                                    focused = true
+                                    m.redraw()
+                                },
+                                onblur:(e)=> {
+                                    focused = false
+                                    m.redraw()
+                                },
                                 onkeydown:(e)=> {
                                     if(e.key != 'Backspace' && e.key != 'Delete') return
 
@@ -1658,89 +1670,83 @@ function HtmlIntegerInput(){
 
 function InfoTooltip(){
     let showingInfo
+    let hovered = false
 
-    let tooltipstyle = `pointer-events: none;
-        position: absolute;
-        text-transform: none;
-        text-align: left;
-        white-space: nowrap;
-        font-size: 1rem;
-        border: 1px solid #d4d4d5;
-        line-height: 1.4285em;
-        max-width: none;
-        cursor:pointer;
-        background: #fff;
-        padding: .833em 1em;
-        font-style: bold;
-        color: rgba(0,0,0,.87);
-        border-radius: .28571429rem;
-        -webkit-box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15);
-        box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15);
-        z-index: 1;
-        left: 50%;
-        -webkit-transform: translateX(-50%);
-        transform: translateX(-50%);
-        bottom: 100%;
-        margin-bottom: .5em;
-    `
+    const positions = {
+        top: {
+            left: "50%",
+            transform: "translateX(-50%)",
+            bottom: "100%",
+            marginBottom: "6px",
+        },
+    }
+
+    function triggerStyle() {
+        return {
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "13px",
+            height: "13px",
+            borderRadius: "50%",
+            border: `1px solid ${hovered || showingInfo ? "#cbd5e1" : "#e2e8f0"}`,
+            color: hovered || showingInfo ? "#64748b" : "#94a3b8",
+            fontSize: "8px",
+            fontWeight: 700,
+            fontFamily: "Georgia, serif",
+            fontStyle: "italic",
+            lineHeight: 1,
+            cursor: "help",
+            flexShrink: 0,
+            userSelect: "none",
+            position: "relative",
+            boxSizing: "border-box",
+            marginLeft: "4px",
+            transition: "color 0.15s, border-color 0.15s",
+        }
+    }
+
+    function panelStyle(inverted) {
+        return {
+            pointerEvents: "none",
+            position: "absolute",
+            display: showingInfo ? "block" : "none",
+            textTransform: "none",
+            textAlign: "left",
+            whiteSpace: "normal",
+            fontSize: "0.8125rem",
+            lineHeight: 1.45,
+            maxWidth: "280px",
+            minWidth: "160px",
+            border: inverted ? "none" : "1px solid #e2e8f0",
+            background: inverted ? "rgba(15, 23, 42, 0.92)" : "#ffffff",
+            color: inverted ? "#f8fafc" : "#334155",
+            padding: "8px 10px",
+            borderRadius: "6px",
+            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
+            zIndex: 100000,
+            ...positions.top,
+        }
+    }
 
     return {
         view:(vnode)=>{
-            let { text, inverted } = vnode.attrs
+            let { text, inverted = false } = vnode.attrs
+            const content = text || vnode.children
 
-            return [
-
-                /** ANIMACIONES SCALEIN AND OUT */
-                m("style",`
-                    .fadein {
-                        animation: fadein 0.3s;
-                    }
-                    .fadeout {
-                        animation: fadeout 0.3s;
-                    }
-                    @keyframes fadein {
-                        0% { opacity:0; }
-                        100% { opacity:1; }
-                    }
-                    @keyframes fadeout {
-                        0% { opacity:1; }
-                        100% { opacity:0; }
-                    }
-                `),
-
-                // Cambiar esto por un icono de google  ??
-                // m("i.blue.question.circle.outline.link.icon.visible", {
-                //     class: showingInfo ? 'visible' : '',
-                //     onmouseover:(e)=> showingInfo = true,
-                //     onmouseout:(e)=> showingInfo = false,
-                //     style:"margin-left:5px; position:relative",
-                // },
-                m(Tappable, {
-                    onhover: (hovering)=> { showingInfo = hovering },
-                    style: {
-                        marginLeft:"5px",
-                        marginBottom:"5px",
-                        display: "flex",
-                        alignItems: "center",
-                        position: "relative"
-                    }
+            return m(Tappable, {
+                onhover: (isHovered) => {
+                    hovered = isHovered
+                    showingInfo = isHovered
+                    m.redraw()
                 },
-                    m(SVGIcon, {
-                        icon: "info",
-                        color: "#2185d0",
-                        width: 16,
-                        height: 16,
-                    }),
-
-                    m("div",{
-                        class: showingInfo ? 'fadein' : showingInfo != undefined ? 'fadeout':'',
-                        style: showingInfo == undefined || !showingInfo ? 'display:none' :
-                               tooltipstyle + (inverted ? 'background:#000000de; color:white;' : ''),
-                        onmouseover:(e)=> showingInfo = true,
-                        onmouseout:(e)=> showingInfo = false,
-                    },  m.trust(text || vnode.children))
-                )
-            ]
+                style: triggerStyle(),
+            },
+                "i",
+                m("span", {
+                    style: panelStyle(inverted),
+                }, m.trust(content))
+            )
         }
     }
 }

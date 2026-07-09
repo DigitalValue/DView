@@ -118,7 +118,7 @@ function alertDialog(options={
 
     var elem = document.createElement("div")
 
-    elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : 'position:fixed')
+    elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : ';position:fixed')
     elem.id = Math.random()*10000 + ''
     document.body.appendChild(elem);
 
@@ -211,7 +211,7 @@ function promptDialog(options={
 }){
     var elem = document.createElement("div")
 
-    elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : 'position:fixed') // cambia algo el position ??
+    elem.style = 'inset:0px;z-index:100000' + (options.multiple ? ';position:absolute' : ';position:fixed')
     elem.id = Math.random()*10000 + ''
     document.body.appendChild(elem);
 
@@ -439,7 +439,7 @@ function Modal(){
     }
     
     let dimmerStyle = {
-        backgroundColor: '#000000a8',
+        backgroundColor: '#000000d9',
         transition:'animate ease-in',
         position:'fixed',
         fontFamily: config.fontFamily || 'Poppins',

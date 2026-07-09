@@ -10,6 +10,7 @@ let config = {
     secondaryColor: '',
     accentColor: '',
     background: '#f5f5f5',
+    borderRadius: '.28571429rem',
 
     fontFamily: 'Poppins, Karla, Raleway, Lato, sans-serif',
 
@@ -119,17 +120,13 @@ let config = {
 
 function setConfig(newConfig) {
 
-    console.log('SETTINGNEWCONFIG', newConfig)
-
     mergeDeep(config, newConfig)
-
-    console.log('config', config)
-
 
     function isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item));
     }
 
+    
     function mergeDeep(target, ...sources) {
         if (!sources.length) return target;
         const source = sources.shift();

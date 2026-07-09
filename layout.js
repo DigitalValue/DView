@@ -564,7 +564,7 @@ function Animate() {
             }*/
 
         },
-        onbeforeremove: ({attrs, dom})=> {
+        onbeforeremove: ({ attrs, dom })=> {
             let { exit={} } = attrs
             
             clearTimeout(styleTimeout)
@@ -583,15 +583,17 @@ function Animate() {
 
             if(attrs.animation){
                 let animation = animations[attrs.animation] || {}
-
+                
                 attrs.from = {
                     ...(animation.from || {}),
                     ...(attrs.from || {})
                 }
+
                 attrs.to = {
                     ...(animation.to || {}),
                     ...(attrs.to || {})
                 }
+                
                 attrs.exit = {
                     ...(animation.exit || {}),
                     ...(attrs.exit || {})
@@ -607,19 +609,16 @@ function Animate() {
                 // Animacion Hover, hace falta aquí ???
                 ...(attrs.hover && {
                     onmouseenter: (e)=> {
-                        let target = e.currentTarget
-
                         Object.keys(attrs.hover).forEach(a => {
-                            target.style[a] = attrs.hover[a]
+                            e.target.style[a] = attrs.hover[a]
                         })
 
                         if(attrs.onmouseenter && typeof attrs.onmouseenter == "function") attrs.onmouseenter()
                     },
                     onmouseleave: (e)=> {
-                        let target = e.currentTarget
 
                         Object.keys(attrs.hover).forEach(a => {
-                            target.style[a] = attrs?.style?.[a] || ""
+                            e.target.style[a] = attrs?.style?.[a] || ""
                         })
 
                         if(attrs.onmouseleave && typeof attrs.onmouseleave == "function") attrs.onmouseleave()
@@ -629,17 +628,13 @@ function Animate() {
                 // Animacion click
                 ...(attrs.click && {
                     onmousedown: (e)=> {
-                        let target = e.currentTarget
-
                         Object.keys(attrs.click).forEach(a => {
-                            target.style[a] = attrs.click[a]
+                            e.target.style[a] = attrs.click[a]
                         })
                     },
                     onmouseup: (e)=> {
-                        let target = e.currentTarget
-
                         Object.keys(attrs.click).forEach(a => {
-                            target.style[a] = attrs?.style?.[a] || ""
+                            e.target.style[a] = attrs?.style?.[a] || ""
                         })
                     }
                 }),
