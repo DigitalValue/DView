@@ -669,10 +669,13 @@ function Icon() {
 function Span() {
     return {
         view: (vnode) => {
+            const attrs = vnode.attrs || {}
             return m("span", {
-                style: {
-                    ...vnode.attrs
-                }
+                class: attrs.class || attrs.className,
+                title: attrs.title,
+                onclick: attrs.onclick,
+                id: attrs.id,
+                style: attrs.style || {}
             }, vnode.children)
         }
     }
