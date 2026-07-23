@@ -108,7 +108,7 @@ let config = {
         grey: '#dedede',
         purple: '#6435c9',
         red: '#db2828',
-        lightgrey: 'whitesmoke',
+        lightgrey: '#f8fafc',
         borderColor: '#22242626',
         secondaryText: '#555',
         inverted: '#545454',

@@ -380,6 +380,7 @@ function Tappable(){
 
                     ...vnode.attrs.style 
                 },
+                tabindex: vnode.attrs.tabindex,
                 id: vnode.attrs.id,
                 title: vnode.attrs.title,
                 onclick: vnode.attrs.onclick
@@ -565,7 +566,14 @@ function Animate() {
 
         },
         onbeforeremove: ({ attrs, dom })=> {
-            let { exit={} } = attrs
+            let { exit={}, cancelExit} = attrs
+
+            console.log('EXIT', exit)
+
+            if(!exit || cancelExit){
+                return true;
+                
+            }
             
             clearTimeout(styleTimeout)
             

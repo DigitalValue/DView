@@ -170,7 +170,7 @@ function CheckboxLabel(){
         )
       }
     }
-  }
+}
 
 function Input(){
 
@@ -178,13 +178,15 @@ function Input(){
     
     return {
         view: (vnode)=>{
+
+
             let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
 
             return [
 
                 // TO DO: editar el estilo de focus
                 m(FlexCol,{
-                   width: "100%"
+                   width: config.form.expandInputs == false ? 'auto': "100%"
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
@@ -313,7 +315,10 @@ function DateInput(){
           
 
             return [
-                m(FlexCol, { width: '100%', ...style },
+                m(FlexCol, { 
+                    width: config.form.expandInputs == false ? 'auto': "100%",
+                    ...style 
+                },
                     label ? m(FormLabel, { required }, label) : null,
 
                     m(Tappable, {
@@ -541,6 +546,7 @@ function DateInput(){
             top: 'calc(100% + 4px)',
             left: '0px',
             right: '0px',
+            minWidth:'200px',
             background: '#fff',
             border: '1px solid #ccc',
             borderRadius: '0.5em',
@@ -996,7 +1002,10 @@ function Dropdown(){
 
 
             return [
-                m(FlexCol,{width:'100%', ...vnode.attrs.style},
+                m(FlexCol, {
+                    width: config.form.expandInputs == false ? 'auto': "100%",
+                    ...vnode.attrs.style
+                },
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
                     m("select",{

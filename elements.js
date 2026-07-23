@@ -76,7 +76,7 @@ function SecondaryMenu(){
           paddingLeft: '1rem',
           paddingRight: '1rem',
           textAlign: 'center',
-          minWidth: '60px',
+          minWidth: '80px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -314,6 +314,7 @@ function TableCell() {
                 oncreate:(vnode)=>{
                     if (vnode.attrs.header) return
 
+                    // guarrada, repasaar
                     const tr = vnode.dom.parentElement
                     const section = tr?.parentElement
                     const table = section?.parentElement
@@ -570,7 +571,7 @@ function Button() {
     return {
 
         view: (vnode) => {
-            let { type = 'primary', onclick, disabled, fluid, icon, size } = vnode.attrs
+            let { type = 'primary', onclick, disabled, fluid, icon, size, tabindex } = vnode.attrs
 
             // REPASAR ESTO, MUCHAS CONDICIONES
             return m(Tappable, {
@@ -597,6 +598,7 @@ function Button() {
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
+                role:'button',
                 onclick: !disabled && onclick,
                 hover: !disabled && {
                     ...config.elements?.button?.hover,
@@ -608,6 +610,7 @@ function Button() {
                     ...config.elements?.button?.onmousedown,
                     ...types[type]?.onmousedown
                 },
+                tabindex: tabindex,
                 id: vnode.attrs.id
             },
                 icon ? [
@@ -1471,7 +1474,7 @@ function SVGIcon() {
             m("path", {d:"m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"}),
             m("path", {d:"M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"})
         ],
-        
+
         paste: [
             m("path", {d:"M11 14h10"}),
             m("path", {d:"M16 4h2a2 2 0 0 1 2 2v1.344"}),
@@ -1578,7 +1581,15 @@ function SVGIcon() {
             m("path",{d:"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"})
         ],
 
-       
+        svg: [
+            m("path", { d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" }),
+            m("path", { d: "M14 2v5a1 1 0 0 0 1 1h5" }),
+            m("path", { d: "M8 13h2" }),
+            m("path", { d: "M14 13h2" }),
+            m("path", { d: "M8 17h2" }),
+            m("path", { d: "M14 17h2" })
+        ],
+
         tv: [
             m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
             m("path", { d: "M8 21h8" }),
