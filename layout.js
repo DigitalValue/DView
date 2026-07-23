@@ -373,7 +373,12 @@ function Tappable(){
                         Object.keys(vnode.attrs.onmousedown).forEach(h => elem.style[h] = vnode.attrs.style && vnode.attrs.style[h] || '')
                     }
                 },
-                style:{ 
+                class: vnode.attrs.class || vnode.attrs.className,
+                role: vnode.attrs.role,
+                "aria-haspopup": vnode.attrs["aria-haspopup"],
+                "aria-expanded": vnode.attrs["aria-expanded"],
+                onkeydown: vnode.attrs.onkeydown,
+                style:{
                     cursor:'pointer', 
                     // para que no salga el highlight azul en mobile
                     "-webkit-tap-highlight-color": 'transparent',

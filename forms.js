@@ -120,10 +120,10 @@ function CheckboxLabel(){
             alignItems: 'center',
             display: 'flex',
             whiteSpace:'wrap',
+            ...style,
             ...isChecked ? {
               background: config.colors.lightgrey
             } : {},
-            ...style
           },
           onclick: () => {
             
@@ -1021,15 +1021,15 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true, selected:true }, placeholder ||  "Selecciona una opción"),
-
+                        m("option",{ disabled:true }, placeholder ||  "Selecciona una opción"),
+                        //, selected:true
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
                             selected: data && name != undefined 
                                 ? typeof o == 'object' 
                                 ? data[name] == o.value 
                                 : data[name] == o 
-                                : value
+                                : value == o.value
                         }, o.label || o))
                     )
                 )
