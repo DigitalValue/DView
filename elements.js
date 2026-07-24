@@ -1361,6 +1361,17 @@ function SVGIcon() {
             m("circle", { cx: "19", cy: "9", r: "2" }),
             m("path", { d: "M22.5 20c0-2.2-1.8-4-4-4" })
         ],
+        grip: [
+            m("circle", { cx: 12, cy: 5, r: 1 }),
+            m("circle", { cx: 19, cy: 5, r: 1 }),
+            m("circle", { cx: 5, cy: 5, r: 1 }),
+            m("circle", { cx: 12, cy: 12, r: 1 }),
+            m("circle", { cx: 19, cy: 12, r: 1 }),
+            m("circle", { cx: 5, cy: 12, r: 1 }),
+            m("circle", { cx: 12, cy: 19, r: 1 }),
+            m("circle", { cx: 19, cy: 19, r: 1 }),
+            m("circle", { cx: 5, cy: 19, r: 1 }),
+        ],
         help: [
             //m("circle", {cx:"12", cy:"12", r:"10"}),
             m("path", {d:"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"}),
