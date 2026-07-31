@@ -334,7 +334,7 @@ function openDialog(Component, options = {}) {
 
     m.mount(elem, {
         onremove: ()=> {
-            console.log("ELIMINAR")
+            // console.log("ELIMINAR")
         },
         view: () => m(Component, {
             ...(options.attrs ? options.attrs : {}),
