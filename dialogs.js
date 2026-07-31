@@ -274,7 +274,11 @@ function promptDialog(options={
                 m(Div,{padding:'1em'},
                     m(Input,{
                         label: options.message,
-                        type: options.type || 'text',
+                        type: options.inputType || (
+                          ['text', 'number', 'email', 'tel', 'password'].includes(options.type)
+                            ? options.type
+                            : 'text'
+                        ),
                         data: data,
                         name: name,
                         onchange: options.onchange || (()=>{}),
@@ -309,7 +313,7 @@ function promptDialog(options={
                         fluid:options.fluid,
                         type:'negative'
                     },
-                        options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cerrar',va:"Tancar"})
+                        options.buttonLabels ? (options.buttonLabels[1] || options.buttonLabels[0]) : localize({es:'Cerrar',va:"Tancar"})
                     )
                 )
             )
@@ -351,45 +355,105 @@ function openDialog(Component, options = {}) {
 }
 
 
-// cuadrado que sale debajo de la pantalla, está bien para móviles !!
-function showSnackbar({message, duration = 3000, fixed = false, id, background = '#1a1a1a'} = {}){
+// Toast inferior (móvil). No usa barra negra a ancho completo.
+function showSnackbar({
+    message,
+    duration = 3000,
+    fixed = false,
+    id,
+    background,
+    type = 'info',
+} = {}){
+    let accents = {
+        info: '#435b63',
+        success: '#2d8a5a',
+        warning: '#c47d1a',
+        error: '#c0392b',
+    }
+    let accent = accents[type] || accents.info
+    let bg = background || '#ffffff'
+    let textColor = background ? '#ffffff' : '#1a2428'
 
     var elem = document.createElement("div")
-
-    elem.style = 'position:fixed;inset:0px;z-index:100000'
+    elem.style = 'position:fixed;left:0;right:0;bottom:0;z-index:100000;pointer-events:none;display:flex;justify-content:center;padding:0 1rem max(1rem, env(safe-area-inset-bottom));box-sizing:border-box'
     elem.id = id || Math.random() * 10000 + ''
     document.body.appendChild(elem);
 
     m.mount(elem, {
-        view: () =>  m(Animate,{
-            from: { transform: 'translateY(100%)' },
-            to: { transform: 'translateY(0%)' },
-            duration: duration || 300,
-            oncreate:(vnode)=>{
-                if(!fixed){
+        view: () => m(Animate, {
+            from: { transform: 'translateY(120%)', opacity: '0' },
+            to: { transform: 'translateY(0%)', opacity: '1' },
+            duration: 280,
+            oncreate: (vnode) => {
+                if (!fixed) {
                     setTimeout(() => {
-                        vnode.dom.style.transform = 'translateY(100%)';
-
-                        setTimeout(()=>{
+                        vnode.dom.style.transition = 'transform 280ms ease, opacity 280ms ease'
+                        vnode.dom.style.transform = 'translateY(120%)'
+                        vnode.dom.style.opacity = '0'
+                        setTimeout(() => {
                             m.mount(elem, null)
                             elem.remove()
-                        }, duration || 300 )
-                    }, 2000);
+                        }, 280)
+                    }, duration)
                 }
             },
             style: {
-                background: background,
-                padding:'1rem',
-                position:'fixed',
-                bottom:0, minHeight:'60px', 
-                display:'flex', alignItems:'center', justifyContent:'center',
-                zIndex:10, left:0, right:0
-            }
-        },  m(Text, {color:'white'}, message)
+                pointerEvents: 'none',
+                width: '100%',
+                maxWidth: '420px',
+                marginBottom: '0.35rem',
+                background: bg,
+                color: textColor,
+                borderRadius: '12px',
+                border: background ? 'none' : '1px solid rgba(67, 91, 99, 0.14)',
+                boxShadow: background
+                    ? '0 8px 24px rgba(0,0,0,0.22)'
+                    : '0 10px 28px rgba(67, 91, 99, 0.16)',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'stretch',
+                minHeight: '52px',
+            },
+        },
+            m('div', {
+                style: {
+                    width: '4px',
+                    flexShrink: 0,
+                    background: accent,
+                },
+            }),
+            m(FlexRow, {
+                style: {
+                    flex: 1,
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                    padding: '0.85rem 1rem',
+                },
+            },
+                m(SVGIcon, {
+                    icon: type === 'success'
+                        ? 'check_circle'
+                        : type === 'error'
+                            ? 'error'
+                            : type === 'warning'
+                                ? 'warning'
+                                : 'info',
+                    color: accent,
+                    width: 20,
+                }),
+                m(Text, {
+                    style: {
+                        color: textColor,
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '0.92rem',
+                        fontWeight: '500',
+                        lineHeight: '1.35',
+                        flex: 1,
+                    },
+                }, message)
+            )
         )
     })
-
-
 }
 
 
