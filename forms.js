@@ -1567,9 +1567,9 @@ function IntegerInput(){
                             ),
 
                             m(FlexRow,
-                                m(Icon,{
-                                    icon:'remove',
-                                    color: data[name] && data[name] > 0 && data[name]>min ? 'black' : 'lightgrey',
+                                m(IconButton,{
+                                    icon:'minus',
+                                    color: data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
                                     onclick:(e)=>{
                                         if((min == undefined || data[name]>min) &&  data[name] && data[name] > 0){
                                             data[name] -= jump
@@ -1579,9 +1579,9 @@ function IntegerInput(){
                                     }
                                 }),
 
-                                m(Icon,{
+                                m(IconButton,{
                                     icon:'add',
-                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey': 'black',
+                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey':  config.colors.green,
                                     onclick:(e)=>{
                                         if(!data[name]) data[name] = 0
 
