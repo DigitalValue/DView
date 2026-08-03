@@ -382,6 +382,10 @@ function Tappable(){
                 },
                 id: vnode.attrs.id,
                 title: vnode.attrs.title,
+                ...vnode.attrs.tabindex != undefined ?
+                { tabindex: vnode.attrs.tabindex }
+                : {},
+
                 onclick: vnode.attrs.onclick
             }, vnode.children)
         }
