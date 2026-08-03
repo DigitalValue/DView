@@ -120,10 +120,10 @@ function CheckboxLabel(){
             alignItems: 'center',
             display: 'flex',
             whiteSpace:'wrap',
+            ...style,
             ...isChecked ? {
               background: config.colors.lightgrey
             } : {},
-            ...style
           },
           onclick: () => {
             
@@ -178,7 +178,7 @@ function CheckboxLabel(){
         )
       }
     }
-  }
+}
 
 function Input(){
 
@@ -188,12 +188,14 @@ function Input(){
         view: (vnode)=>{
             let { data, name, oninput, type, label, required, flexStyle, style, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
 
+
+
             return [
 
                 // TO DO: editar el estilo de focus
                 m(FlexCol,{
-                   width: "100%",
-                   flexStyle
+                   flexStyle,
+                   width: config.form.expandInputs == false ? 'auto': "100%"
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
                     ? [
@@ -213,7 +215,7 @@ function Input(){
                                 //...(config.fonts?.default || config.defaultFont || {}),
                                 ...(config.form?.baseStyle),
                                 ...(config.form?.input || {}),
-                                ...(vnode.attrs.style || {}),
+                                ...(style || {}),
                             },
                             oninput:(e)=>{
                                 data && name ? data[name] = e.target.value : ''
@@ -322,7 +324,10 @@ function DateInput(){
           
 
             return [
-                m(FlexCol, { width: '100%', ...style },
+                m(FlexCol, { 
+                    width: config.form.expandInputs == false ? 'auto': "100%",
+                    ...style 
+                },
                     label ? m(FormLabel, { required }, label) : null,
 
                     m(Tappable, {
@@ -550,6 +555,7 @@ function DateInput(){
             top: 'calc(100% + 4px)',
             left: '0px',
             right: '0px',
+            minWidth:'200px',
             background: '#fff',
             border: '1px solid #ccc',
             borderRadius: '0.5em',
@@ -1004,7 +1010,10 @@ function Dropdown(){
 
 
             return [
-                m(FlexCol,{width:'100%', ...vnode.attrs.style},
+                m(FlexCol, {
+                    width: config.form.expandInputs == false ? 'auto': "100%",
+                    ...vnode.attrs.style
+                },
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
                     m("select",{
@@ -1020,15 +1029,15 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true, selected:true }, placeholder ||  "Selecciona una opción"),
-
+                        m("option",{ disabled:true }, placeholder ||  "Selecciona una opción"),
+                        //, selected:true
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
                             selected: data && name != undefined 
                                 ? typeof o == 'object' 
                                 ? data[name] == o.value 
                                 : data[name] == o 
-                                : value
+                                : value == o.value
                         }, o.label || o))
                     )
                 )
@@ -1566,9 +1575,9 @@ function IntegerInput(){
                             ),
 
                             m(FlexRow,
-                                m(Icon,{
-                                    icon:'remove',
-                                    color: data[name] && data[name] > 0 && data[name]>min ? 'black' : 'lightgrey',
+                                m(IconButton,{
+                                    icon:'minus',
+                                    color: data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
                                     onclick:(e)=>{
                                         if((min == undefined || data[name]>min) &&  data[name] && data[name] > 0){
                                             data[name] -= jump
@@ -1578,9 +1587,9 @@ function IntegerInput(){
                                     }
                                 }),
 
-                                m(Icon,{
+                                m(IconButton,{
                                     icon:'add',
-                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey': 'black',
+                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey':  config.colors.green,
                                     onclick:(e)=>{
                                         if(!data[name]) data[name] = 0
 

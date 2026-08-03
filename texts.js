@@ -114,9 +114,10 @@ function TinyText(){
         view:(vnode)=>{
             return m("p",{
                 style:{
+                    fontFamily: config.fontFamily,
                     fontSize: '0.75rem',
-                    //fontSize: '0.8em', utilizar em o px ??
-                    ...vnode.attrs
+                    margin: 0,
+                    ...(vnode.attrs?.style || {})
                 }
             }, vnode.children)
         }

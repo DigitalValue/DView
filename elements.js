@@ -76,7 +76,7 @@ function SecondaryMenu(){
           paddingLeft: '1rem',
           paddingRight: '1rem',
           textAlign: 'center',
-          minWidth: '60px',
+          minWidth: '80px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -314,6 +314,7 @@ function TableCell() {
                 oncreate:(vnode)=>{
                     if (vnode.attrs.header) return
 
+                    // guarrada, repasaar
                     const tr = vnode.dom.parentElement
                     const section = tr?.parentElement
                     const table = section?.parentElement
@@ -597,6 +598,7 @@ function Button() {
                     ...sizes[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
+                role:'button',
                 onclick: !disabled && onclick,
                 hover: !disabled && {
                     ...config.elements?.button?.hover,
@@ -670,10 +672,13 @@ function Icon() {
 function Span() {
     return {
         view: (vnode) => {
+            const attrs = vnode.attrs || {}
             return m("span", {
-                style: {
-                    ...vnode.attrs
-                }
+                class: attrs.class || attrs.className,
+                title: attrs.title,
+                onclick: attrs.onclick,
+                id: attrs.id,
+                style: attrs.style || {}
             }, vnode.children)
         }
     }
@@ -1229,6 +1234,9 @@ function SVGIcon() {
             m("path", { d: "m15 9-6 6" }),
             m("path", { d: "m9 9 6 6" })
         ],
+        circle: [
+            m("circle", { cx: 12, cy: 12, r: 10 })
+        ],
         csv: [
             m("path", {d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"}),
             m("path", {d: "M14 2v4a2 2 0 0 0 2 2h4"}),
@@ -1380,6 +1388,17 @@ function SVGIcon() {
             m("circle", { cx: "19", cy: "9", r: "2" }),
             m("path", { d: "M22.5 20c0-2.2-1.8-4-4-4" })
         ],
+        grip: [
+            m("circle", { cx: 12, cy: 5, r: 1 }),
+            m("circle", { cx: 19, cy: 5, r: 1 }),
+            m("circle", { cx: 5, cy: 5, r: 1 }),
+            m("circle", { cx: 12, cy: 12, r: 1 }),
+            m("circle", { cx: 19, cy: 12, r: 1 }),
+            m("circle", { cx: 5, cy: 12, r: 1 }),
+            m("circle", { cx: 12, cy: 19, r: 1 }),
+            m("circle", { cx: 19, cy: 19, r: 1 }),
+            m("circle", { cx: 5, cy: 19, r: 1 }),
+        ],
         help: [
             //m("circle", {cx:"12", cy:"12", r:"10"}),
             m("path", {d:"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"}),
@@ -1499,7 +1518,7 @@ function SVGIcon() {
             m("path", {d:"m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"}),
             m("path", {d:"M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"})
         ],
-        
+
         paste: [
             m("path", {d:"M11 14h10"}),
             m("path", {d:"M16 4h2a2 2 0 0 1 2 2v1.344"}),
@@ -1545,6 +1564,13 @@ function SVGIcon() {
         reset: [
             m("path", {d:"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}),
             m("path", {d:"M3 3v5h5"})
+        ],
+        rotate: [
+            m("path", { d: "M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" }),
+            m("path", { d: "M21 3v5h-5" })
+        ],
+        square: [ 
+            m("rect", { width: 18, height: 18, x: 3, y: 3, rx: 2 })
         ],
         sticky_note: [
            m("path", {d:"M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"}),
@@ -1605,6 +1631,16 @@ function SVGIcon() {
             m("path",{d:"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}),
             m("path",{d:"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"})
         ],
+
+        svg: [
+            m("path", { d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" }),
+            m("path", { d: "M14 2v5a1 1 0 0 0 1 1h5" }),
+            m("path", { d: "M8 13h2" }),
+            m("path", { d: "M14 13h2" }),
+            m("path", { d: "M8 17h2" }),
+            m("path", { d: "M14 17h2" })
+        ],
+
         tv: [
             m("rect", { x: "2", y: "5", width: "20", height: "14", rx: "2" }),
             m("path", { d: "M8 21h8" }),
