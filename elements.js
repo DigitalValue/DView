@@ -1542,6 +1542,14 @@ function SVGIcon() {
             m("path", { d: "M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" }),
             m("path", { d: "M21 3v5h-5" })
         ],
+        router: [
+            m("rect",{width:"20", height:"8", x:"2", y:"14", rx:"2"}),
+            m("path", {d:"M6.01 18H6"}),
+            m("path", {d:"M10.01 18H10"}),
+            m("path", {d:"M15 10v4"}),
+            m("path", {d:"M17.84 7.17a4 4 0 0 0-5.66 0"}),
+            m("path", {d:"M20.66 4.34a8 8 0 0 0-11.31 0"})
+        ],
         square: [ 
             m("rect", { width: 18, height: 18, x: 3, y: 3, rx: 2 })
         ],
