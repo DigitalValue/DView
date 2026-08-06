@@ -1129,13 +1129,13 @@ function IconButton() {
 
     return {
         view: (vnode) => {
-            let { icon, color, onclick, filled, size, hoverColor, width, title="", style={} } = vnode.attrs
+            let { icon, color, hover, onclick, filled, size, hoverColor, width, title="", style={} } = vnode.attrs
 
             return m(Tappable, {
                 title: title,
                 onclick: onclick,
-                style: {display:'flex'},
                 onhover: (hover) => hovered = hover,
+                hover: hover,
                 style: {
                     display: "flex",
                     ...style
@@ -1280,6 +1280,20 @@ function SVGIcon() {
             m("path", { d: "M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" }),
             m("path", { d: "M6 2v2" })
         ],
+        database: [
+            m("ellipse", {
+                cx: 12,
+                cy: 5,
+                rx: 9,
+                ry: 3
+            }),
+            m("path", {
+                d: "M3 5V19A9 3 0 0 0 21 19V5"
+            }),
+            m("path", {
+                d: "M3 12A9 3 0 0 0 21 12"
+            })
+        ],
         download: [
             m("path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
             m("path", { d: "m7 10 5 5 5-5" }),
@@ -1347,6 +1361,19 @@ function SVGIcon() {
         ],
         filter: [
             m("path", { d: "M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z" })
+        ],
+        folder_search: [
+            m("path", {
+                d: "M10.7 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v4.1"
+            }),
+            m("path", {
+                d: "m21 21-1.9-1.9"
+            }),
+            m("circle", {
+                cx: 17,
+                cy: 17,
+                r: 3
+            })        
         ],
         gallery: [
             m("rect", { x: "3", y: "4", width: "18", height: "16", rx: "2" }),

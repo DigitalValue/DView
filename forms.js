@@ -107,7 +107,7 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick, info, style={} } = vnode.attrs
+        let { data, name, label, checked, onclick, info, style={}, icon, iconColor } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
@@ -163,9 +163,17 @@ function CheckboxLabel(){
           }),
 
           m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label)),
+          
 
           info 
           ? m(InfoTooltip, {text:info}) 
+          : null,
+
+          icon 
+          ? [
+            m("div", {flex:1}),
+            m(SVGIcon, {icon: icon, color: iconColor}) 
+          ]
           : null
         )
       }
@@ -178,14 +186,15 @@ function Input(){
     
     return {
         view: (vnode)=>{
+            let { data, name, oninput, type, label, required, flexStyle, style, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
 
 
-            let { data, name, oninput, type, label, required, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
 
             return [
 
                 // TO DO: editar el estilo de focus
                 m(FlexCol,{
+                   flexStyle,
                    width: config.form.expandInputs == false ? 'auto': "100%"
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
@@ -206,7 +215,7 @@ function Input(){
                                 //...(config.fonts?.default || config.defaultFont || {}),
                                 ...(config.form?.baseStyle),
                                 ...(config.form?.input || {}),
-                                ...(vnode.attrs.style || {}),
+                                ...(style || {}),
                             },
                             oninput:(e)=>{
                                 data && name ? data[name] = e.target.value : ''
@@ -853,7 +862,7 @@ function TranslationInput(){
 
         },
         view:(vnode)=>{
-            let {data, name, label, required, type, rows, info, onfocusout, onchange } = vnode.attrs
+            let {data, name, label, required, type, rows, info, onfocusout, onchange, style } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
@@ -861,8 +870,7 @@ function TranslationInput(){
             let value = data[name]
 
 
-
-            return m(FlexCol,{width:'100%', },
+            return m(FlexCol,{ width:'100%', style },
 
                 label ? m(FormLabel,{ required:required, info:info }, label) : null,
 
