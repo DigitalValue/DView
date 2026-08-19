@@ -1,4 +1,4 @@
-import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
+import { FlexCol, FlexRow, Box, Div, Tappable, Animate  } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 import { Icon, Button, SVGIcon, IconButton } from './elements.js'
 import { config } from "./config.js"
@@ -35,8 +35,8 @@ function FormLabel(){
                     // label debería ser Text ??
                     m("label", {
                         style: {
+                            fontFamily: config.fontFamily,
                             ...(config.form?.formLabel || style),
-                            fontFamily: config.fontFamily
                         }
                     }, 
                         typeof vnode.children?.[0] == 'object' ? null : vnode.children 
@@ -162,7 +162,13 @@ function CheckboxLabel(){
             }
           }),
 
-          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label)),
+          m(Text,{
+            ...(config.form?.formLabel || {}),
+            maxWidth:'70%', 
+            userSelect:'none', 
+            padding:'0em',
+            marginBottom:'0px'
+          }, localize(label)),
           
 
           info 
@@ -1012,7 +1018,7 @@ function Dropdown(){
             return [
                 m(FlexCol, {
                     width: config.form.expandInputs == false ? 'auto': "100%",
-                    ...vnode.attrs.style
+                    ...vnode.attrs.flexStyle
                 },
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
@@ -1020,6 +1026,7 @@ function Dropdown(){
                         disabled,
                         style: {
                             ...(config.form?.baseStyle),
+                            ...vnode.attrs.style
                             // appearance: 'none',
                             // WebkitAppearance: 'none',
                         },
@@ -1029,7 +1036,7 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true }, placeholder ||  "Selecciona una opción"),
+                        m("option",{ disabled:true, selected: true}, placeholder ||  "Selecciona una opción"),
                         //, selected:true
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
@@ -1386,26 +1393,116 @@ function HtmlDropdown() {
     let open = false;
 
     let val = ''
+    let menuMaxHeight = '14.01428571rem'
+    let menuOverflowY = 'hidden'
+    let menuPlacement = 'bottom'
+
+    function resetMenuBounds() {
+        menuMaxHeight = '14.01428571rem'
+        menuOverflowY = 'hidden'
+        menuPlacement = 'bottom'
+    }
+
+    function getDefaultMaxHeight() {
+        let fontSize = window.getComputedStyle(document.documentElement).fontSize
+        return 14.01428571 * (parseFloat(fontSize) || 16)
+    }
+
+    function fitMenu(dom) {
+        requestAnimationFrame(() => {
+            let margin = 8
+            let trigger = dom.parentElement
+            let triggerRect = trigger.getBoundingClientRect()
+            let viewportHeight = window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight
+            let maxHeight = getDefaultMaxHeight()
+            let bottomSpace = Math.max(0, viewportHeight - triggerRect.bottom - margin)
+            let topSpace = Math.max(0, triggerRect.top - margin)
+            let desiredHeight = Math.min(dom.scrollHeight, maxHeight)
+            let nextPlacement = desiredHeight > bottomSpace && topSpace > bottomSpace ? 'top' : 'bottom'
+            let availableHeight = nextPlacement == 'top' ? topSpace : bottomSpace
+            let nextMaxHeight = Math.max(40, Math.min(maxHeight, availableHeight))
+            let nextMenuMaxHeight = `${nextMaxHeight}px`
+            let nextMenuOverflowY = dom.scrollHeight > nextMaxHeight ? 'scroll' : 'hidden'
+
+            if (
+                menuPlacement != nextPlacement ||
+                menuMaxHeight != nextMenuMaxHeight ||
+                menuOverflowY != nextMenuOverflowY
+            ) {
+                menuPlacement = nextPlacement
+                menuMaxHeight = nextMenuMaxHeight
+                menuOverflowY = nextMenuOverflowY
+                m.redraw()
+            }
+        })
+    }
 
     return {
+        
         view: (vnode) => {
-            let { data, name, label, onchange, required} = vnode.attrs
+            let { data, name, label, onchange, flexStyle, style, required} = vnode.attrs
 
+            if(data && name && data[name] && !val){
+                console.log('getting value')
+                val = vnode.children?.find((o)=> o.value == data[name]).label
+            }
 
             return [
-                m(FlexCol,{width:'100%'},
+                m("style", `
+                    .dview-html-dropdown-menu {
+                        scrollbar-width: thin;
+                        scrollbar-color: ${config.colors?.border || '#cccccc'} #ffffff;
+                    }
+
+                    .dview-html-dropdown-menu::-webkit-scrollbar {
+                        width: 10px;
+                        height: 10px;
+                    }
+
+                    .dview-html-dropdown-menu::-webkit-scrollbar-track {
+                        background: #ffffff;
+                        border-left: 1px solid ${config.colors?.border || '#cccccc'};
+                        border-radius: 0;
+                    }
+
+                    .dview-html-dropdown-menu::-webkit-scrollbar-thumb {
+                        background: ${config.colors?.border || '#cccccc'};
+                        border-radius: 0;
+                    }
+
+                    .dview-html-dropdown-menu::-webkit-scrollbar-corner {
+                        background: #ffffff;
+                        border-radius: 0;
+                    }
+                `),
+
+                m(FlexCol,{width:'100%', ...flexStyle},
                     m(FormLabel,{required}, label),
 
                     m(Tappable, {
                         style: {
-                            /*
-                             ...(open 
-                            ? {
-                                borderBottomLeftRadius:'0em',
-                                borderBottomRightRadius:'0em',
-                            } : {}),*/
                             ...(config.form?.baseStyle),
                             ...open && (config.form?.focusStyle || {}),
+                            ...(open 
+                            ? {
+                                ...(menuPlacement == 'top' 
+                                    ? {
+                                        borderTopLeftRadius:'0em',
+                                        borderTopRightRadius:'0em',
+                                    }
+                                    : {
+                                        borderBottomLeftRadius:'0em',
+                                        borderBottomRightRadius:'0em',
+                                    }
+                                )
+                            } : {
+                                borderTopLeftRadius:config.borderRadius,
+                                borderTopRightRadius:config.borderRadius,
+                                borderBottomLeftRadius:config.borderRadius,
+                                borderBottomRightRadius:config.borderRadius,
+
+                            }),
+                            ...style || {}, 
                             position: 'relative'
                         },
                         clickout:(e)=> {
@@ -1414,7 +1511,10 @@ function HtmlDropdown() {
                                 m.redraw()
                             }
                         },
-                        onclick:(e)=> open = !open
+                        onclick:(e)=> {
+                            open = !open
+                            if(open) resetMenuBounds()
+                        }
                     },
                         m(FlexRow, { justifyContent:'space-between', alignItems:'center', height:'100%'},
                             
@@ -1425,58 +1525,96 @@ function HtmlDropdown() {
                                 whiteSpace:'nowrap',
                                 color:  data && name && data[name] ? 'black' : 'grey'
                             }, 
-                            val ? val : data && name && data[name] ? data[name] : 'Selecciona'),
+
+                                val ? val : data && name && data[name] ? data[name] : 'Selecciona'
+                            ),
 
                             // is there a built-in icon without using a library??
 
                             m(SVGIcon, { 
-                                icon: open ? 'chevron_up' : 'chevron_down', 
+                                icon: 'chevron_down', 
+                                style : {
+                                    transition:'0.1s all',
+                                    ...open ? {
+                                        transform: 'rotate(180deg)',
+                                    }: {
+
+                                    }
+                                },
                                 color:'rgba(34, 36, 38)' 
                             })
                         ),
 
                         open ?
-                        m(FlexCol, {
-                            border:'1px solid #ccc',
-                            borderRadius:'0.5em',
-                            borderTopLeftRadius:'0em',
-                            borderTopRightRadius:'0em',
-                            position: 'absolute',
-                            left:'0px',
-                            top:'100%',
-                            right: '0px',
-                            boxShadow: '0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15)',
-                            background:'#fff',
-                            zIndex:1000,
-                        }, vnode.children.map((o)=>
-                            m(Tappable, {
-                                style: {
-                                    padding: '0.5em 1em',
-                                    cursor: 'pointer',
-                                    ...config.form?.dropdown?.option
-                                },
-                                hover: {
-                                    background: '#f0f0f0'
-                                },
-                                onclick:(e)=>{
-                                    e.preventDefault()
-                                    e.stopPropagation()
-
-                                    if(data && name != undefined) {
-                                        data[name] = o.value != undefined ? o.value : o
-
-                                        if(o.label){
-                                            val = o.label
-                                        }
-                                    }
-
-                                    open = !open
-
-                                    if(onchange) onchange(o)
-                                        
-                                    open = false
+                        m(Animate, {
+                            class: 'dview-html-dropdown-menu',
+                            oncreate: ({ dom }) => fitMenu(dom),
+                            style: {
+                                border:'1px solid #ccc',
+                                borderRadius:'0.5em',
+                                ...(menuPlacement == 'top'
+                                ? {
+                                    borderBottomLeftRadius:'0em',
+                                    borderBottomRightRadius:'0em',
                                 }
-                            }, m(Text, o.label || o))
+                                : {
+                                    borderTopLeftRadius:'0em',
+                                    borderTopRightRadius:'0em',
+                                }
+                                ),
+                                position: 'absolute',
+                                padding:'0',
+                                left: 0,
+                                marginLeft:'-1px',
+                                width: `calc(100% + 1.5px)`,
+                                minWidth: `calc(100% + 1.5px)`,
+                                top: menuPlacement == 'top' ? 'auto' : '100%',
+                                bottom: menuPlacement == 'top' ? '100%' : 'auto',
+                                background:'#fff',
+                                zIndex:1000,
+                                maxHeight: menuMaxHeight,
+                                overflowX:'hidden',
+                                overflowY: menuOverflowY,
+                                ...config.form?.focusStyle || {}
+                            },
+                            duration: 0,
+                            animation:'slideDown'
+                        }, 
+                            m(FlexCol, {overflow:'hidden'},
+                                vnode.children.map((o)=>
+                                m(Tappable, {
+                                    style: {
+                                        padding: '0.8em 1em',
+                                        cursor: 'pointer',
+                                        borderBottom:`1px solid ${config.colors?.border}`,
+                                        ...config.form?.dropdown?.option
+                                    },
+                                    hover: {
+                                        background: '#f0f0f0'
+                                    },
+                                    onclick:(e)=>{
+                                        e.preventDefault()
+                                        e.stopPropagation()
+
+                                        if(data && name != undefined) {
+                                            data[name] = o.value != undefined ? o.value : o
+
+                                            if(o.label){
+                                                val = o.label
+                                            }
+                                        }
+
+                                        open = !open
+
+                                        if(onchange) onchange(o)
+                                            
+                                        open = false
+                                    }
+                                }, m(Text, {
+                                    userSelect:'none',
+                                    fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
+                                }, o.label || o))
+                            )
                         ))
                         : null
                 

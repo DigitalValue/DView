@@ -98,6 +98,7 @@ let config = {
     },
 
     colors: {
+        accentRed:'#f64a59',
         blue: '#2185d0',
         green: '#21ba45',
         orange: '#00b5ad',
@@ -109,11 +110,12 @@ let config = {
         purple: '#6435c9',
         red: '#db2828',
         lightgrey: '#f8fafc',
-        borderColor: '#22242626',
+        borderColor: '#03030326',
         secondaryText: '#555',
         inverted: '#545454',
         dark: '#334156',
-        border: 'rgba(34, 36, 38, 0.15)'
+        border: 'rgba(34, 36, 38, 0.15)',
+        pageBackground:'#f1f5f9'
     }
 
 }

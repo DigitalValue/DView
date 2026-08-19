@@ -249,7 +249,10 @@ function promptDialog(options={
         },
         'clone':{
             icon:'clone',
-        }
+        },
+        'question':{
+            icon:'question',
+        },
     }
 
     // TODO!! AÑADIR TRANSICIÓN DE SALIDA !!
