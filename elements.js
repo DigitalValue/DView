@@ -49,17 +49,18 @@ function SecondaryMenu(){
             }
         },
         view:(vnode)=>{
-            let { onclick} = vnode.attrs
+            let { onclick, minWidth} = vnode.attrs
 
-            return m(FlexRow, { border: `1px solid rgb(204 204 204 / 21%)`, background: config.colors.lightgrey, gap: '0.5em', padding: '0.2em', borderRadius: config.borderRadius },
+            return m(FlexRow, { border: `1px solid rgb(204 204 204 / 21%)`, flexWrap:'wrap', background: config.colors.lightgrey, gap: '0.5em', padding: '0.2em', borderRadius: config.borderRadius },
 
             vnode.children.map((child, i)=>
                 Item({
-                    text: child.text,
+                    minWidth: minWidth,
+                    text: child?.text || child,
                     onclick: (e) => {
                         activeIndex = i;
                         if(onclick){
-                            onclick(child)
+                            onclick(child, i)
                         }
                     },
                     active: activeIndex == i
@@ -69,14 +70,14 @@ function SecondaryMenu(){
         }
     }
 
-    function Item({ text, active, onclick }) {
+    function Item({ text, active, onclick, minWidth }) {
       return m(Tappable, {
         style: {
           padding: '0.5rem',
           paddingLeft: '1rem',
           paddingRight: '1rem',
           textAlign: 'center',
-          minWidth: '80px',
+          minWidth: minWidth || '100px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -704,7 +705,7 @@ function Message() {
     // set different types 
     return {
         view: (vnode) => {
-            let { type = 'info' } = vnode.attrs
+            let { type = 'info', isHtml } = vnode.attrs
 
             return m(Segment, {
                 style: {
@@ -735,7 +736,9 @@ function Message() {
                             }, vnode.attrs.message)
 
                         ) :
-                        m(Text, {
+                        isHtml ? 
+                        vnode.children 
+                        : m(Text, {
                             //color: type == 'error' ? '#7f1d1d': 'black'
                         }, vnode.children)
                 )

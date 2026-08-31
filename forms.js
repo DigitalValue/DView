@@ -122,7 +122,7 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...style,
             ...isChecked ? {
-              background: config.colors.lightgrey
+              background: '#aecbe742' || config.colors.lightgrey
             } : {},
           },
           onclick: () => {
@@ -136,7 +136,7 @@ function CheckboxLabel(){
             if(!data[name]){
               data[name] = true
             } else {
-              delete data[name]
+              data[name] = false
             }
 
             m.redraw()
@@ -162,7 +162,7 @@ function CheckboxLabel(){
             }
           }),
 
-          m(SmallText,{maxWidth:'70%', userSelect:'none'}, localize(label)),
+          m(SmallText,{maxWidth:'70%', userSelect:'none', whiteSpace:'nowrap'}, localize(label)),
           
 
           info 
@@ -191,10 +191,9 @@ function Input(){
 
 
             return [
-
                 // TO DO: editar el estilo de focus
                 m(FlexCol,{
-                   flexStyle,
+                   ...flexStyle || {},
                    width: config.form.expandInputs == false ? 'auto': "100%"
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 
@@ -862,7 +861,7 @@ function TranslationInput(){
 
         },
         view:(vnode)=>{
-            let {data, name, label, required, type, rows, info, onfocusout, onchange, style } = vnode.attrs
+            let {data, name, label, required, type, rows, info, onfocusout, onchange, flexStyle, style = {} } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
@@ -870,7 +869,7 @@ function TranslationInput(){
             let value = data[name]
 
 
-            return m(FlexCol,{ width:'100%', style },
+            return m(FlexCol,{ width:'100%', ...(flexStyle || style) },
 
                 label ? m(FormLabel,{ required:required, info:info }, label) : null,
 
@@ -1385,16 +1384,18 @@ function DateSelector() {
 function HtmlDropdown() {
     let open = false;
 
-    let val = ''
-
     return {
         view: (vnode) => {
-            let { data, name, label, onchange, required} = vnode.attrs
+            let { data, name, label, onchange, required, placeholder = 'Selecciona', style = {}, flexStyle } = vnode.attrs
+            let selectedOption = vnode.children.find((option) =>
+                data && name != undefined && option?.value == data[name]
+            )
+            let selectedLabel = selectedOption?.label || (data && name ? data[name] : '')
 
 
             return [
-                m(FlexCol,{width:'100%'},
-                    m(FormLabel,{required}, label),
+                m(FlexCol,{width:'100%', ...(flexStyle || style) },
+                    label ? m(FormLabel,{required}, label) : null,
 
                     m(Tappable, {
                         style: {
@@ -1424,8 +1425,7 @@ function HtmlDropdown() {
                                 textOverflow:'ellipsis',
                                 whiteSpace:'nowrap',
                                 color:  data && name && data[name] ? 'black' : 'grey'
-                            }, 
-                            val ? val : data && name && data[name] ? data[name] : 'Selecciona'),
+                            }, selectedLabel || placeholder),
 
                             // is there a built-in icon without using a library??
 
@@ -1464,10 +1464,6 @@ function HtmlDropdown() {
 
                                     if(data && name != undefined) {
                                         data[name] = o.value != undefined ? o.value : o
-
-                                        if(o.label){
-                                            val = o.label
-                                        }
                                     }
 
                                     open = !open
@@ -1568,7 +1564,7 @@ function IntegerInput(){
                         }
                     }, 
                         m(FlexRow,{alignItems:'center',justifyContent:'space-between'},
-                            m("div",
+                            m("div", {style:"display:flex;align-items:center;gap:0.5em"},
                                 data && name && data[name] ? data[name]: 0,
                                 // se le puede pasar elementos dentro
                                 vnode.children 
