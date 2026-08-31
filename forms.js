@@ -200,7 +200,7 @@ function Input(){
 
                 // TO DO: editar el estilo de focus
                 m(FlexCol,{
-                   flexStyle,
+                   ...flexStyle,
                    width: config.form.expandInputs == false ? 'auto': "100%"
                 }, // pensar otra manera sin necesidad de meter width: 100%
                     label 

@@ -82,29 +82,30 @@ function SecondaryMenu(){
 
             vnode.children.map((child, i)=>
                 Item({
-                    text: child.text || child.label,
+                    text: child.text || child.label || child,
                     onclick: (e) => {
                         activeIndex = i;
                         if(onclick){
                             onclick(child, i)
                         }
                     },
-                    icon: child.icon,
-                    active: activeIndex == i
+                    icon: child?.icon,
+                    active: activeIndex == i,
+                    minWidth: vnode.attrs.minWidth
                 }),
             )
           )
         }
     }
 
-    function Item({ text, active, onclick, icon }) {
+    function Item({ text, active, onclick, icon, minWidth }) {
       return m(Tappable, {
         style: {
           padding: '0.5rem',
           paddingLeft: '1rem',
           paddingRight: '1rem',
           textAlign: 'center',
-          minWidth: '80px',
+          minWidth:  minWidth || '80px',
           display: 'flex',
           gap:'0.5em',
           alignItems: 'center',
