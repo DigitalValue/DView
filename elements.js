@@ -98,7 +98,7 @@ function SecondaryMenu(){
         }
     }
 
-    function Item({ text, active, onclick, icon, minWidth }) {
+    function Item({ text, active, onclick, icon, minWidth ='80px' }) {
       return m(Tappable, {
         style: {
           padding: '0.5rem',
@@ -110,7 +110,7 @@ function SecondaryMenu(){
           gap:'0.5em',
           alignItems: 'center',
           justifyContent: 'center',
-          flex: '1 1 300px',
+          flex: `1 1  ${minWidth}`,
           
           borderRadius: config.borderRadius,
           ...active ? {
@@ -758,7 +758,7 @@ function Message() {
     // set different types 
     return {
         view: (vnode) => {
-            let { type = 'info' } = vnode.attrs
+            let { type = 'info', isHtml } = vnode.attrs
 
             return m(Segment, {
                 style: {
@@ -789,7 +789,9 @@ function Message() {
                             }, vnode.attrs.message)
 
                         ) :
-                        m(Text, {
+                        isHtml ? 
+                        vnode.children 
+                        : m(Text, {
                             //color: type == 'error' ? '#7f1d1d': 'black'
                         }, vnode.children)
                 )
