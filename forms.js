@@ -107,13 +107,13 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick, info, style={}, icon, iconColor } = vnode.attrs
+        let { data, name, label, checked, onclick, info, style={}, icon, iconColor, description, small } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
         return m(Tappable, {
           style: {
-            border: `1px solid ${config.colors.border}`,
+            ...config.form.baseStyle,
             gap: '0.5em',
             borderRadius: config.borderRadius,
             padding: '0.5em',
@@ -122,7 +122,9 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...style,
             ...isChecked ? {
-              background: '#aecbe742' || config.colors.lightgrey
+                //...config.form?.focusStyle,
+                //borderColor: config.colors.blue
+                background: config.colors.lightgrey
             } : {},
           },
           onclick: () => {
@@ -162,7 +164,12 @@ function CheckboxLabel(){
             }
           }),
 
-          m(SmallText,{maxWidth:'70%', userSelect:'none', whiteSpace:'nowrap'}, localize(label)),
+          m(FlexCol, {maxWidth:'85%', width:'85%', gap:'0.2em', marginLeft:'0.5em'},
+            m(small ? SmallText : Text,{ userSelect:'none', whiteSpace:'nowrap'}, localize(label)),
+
+            description ? 
+            m(SmallText, {color:config.colors.secondaryText}, localize(description)): null
+          ),
           
 
           info 
