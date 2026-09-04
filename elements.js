@@ -763,7 +763,13 @@ function Message() {
             return m(Segment, {
                 style: {
                     ...types[type] || {},
-                    ...vnode.attrs?.style
+                    ...vnode.attrs?.style,
+                    minHeight:'40px',
+                    padding:'0em',
+                    paddingLeft:'1.5rem',
+                    display:'flex',
+                    alignItems:'center',
+                    paddingRight:'1.5rem'
                 },
                 type: 'secondary',
             },
@@ -1512,6 +1518,13 @@ function SVGIcon() {
             m("circle", { cx: "3", cy: "12", r: "1" }),
             m("circle", { cx: "3", cy: "18", r: "1" })
         ],
+        list_start: [
+            m("path", {d:"M3 5h6"}),
+            m("path", {d:"M3 12h13"}),
+            m("path", {d:"M3 19h13"}),
+            m("path", {d:"m16 8-3-3 3-3"}),
+            m("path", {d:"M21 19V7a2 2 0 0 0-2-2h-6"})
+        ],
         list_filter: [
             m("path", { d: "M2 5h20" }),
             m("path", { d: "M6 12h12" }),
@@ -1694,6 +1707,12 @@ function SVGIcon() {
             m("path", { d: "M7 12h10" }),
             m("path", { d: "M7 16h10" })
         ],
+
+        smartphone: [
+            m('rect', { width: 14, height: 20, x: 5, y: 2, rx: 2, ry: 2 }),
+            m('path', { d: 'M12 18h.01' })
+        ],
+
         square_pen: [
             m("path",{d:"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}),
             m("path",{d:"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"})

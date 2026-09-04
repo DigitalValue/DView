@@ -6,58 +6,59 @@ import { localize, translateSALT } from "./util.js"
 
 
 export {
-    FormLabel, Input, TranslationInput, Dropdown, CheckboxLabel,
-    IntegerInput, Switch, InfoTooltip, Checkbox, RadioButtons,
-    HtmlIntegerInput, HtmlDropdown, DateSelector, DateInput
+  FormLabel, Input, TranslationInput, Dropdown, CheckboxLabel, SwitchLabel,
+  IntegerInput, Switch, InfoTooltip, Checkbox, RadioButtons, SwitchRow,
+  HtmlIntegerInput, HtmlDropdown, DateSelector, DateInput
 }
 
 
 
 
 // repensar si añadir localize a estas funciones !!
-function FormLabel(){
-    let style = {
-        fontWeight:'normal',
-        display: 'block',
-        color: 'black',
-        fontSize: '1em',
-        fontFamily: config.fontFamily,
-        marginBottom: '0.2em',
-        whiteSpace: 'normal',
+function FormLabel() {
+  let style = {
+    fontWeight: 'normal',
+    display: 'block',
+    color: 'black',
+    fontSize: '1em',
+    fontFamily: config.fontFamily,
+    marginBottom: '0.2em',
+    whiteSpace: 'normal',
+  }
+
+  return {
+    view: (vnode) => {
+      let { required, description, info } = vnode.attrs
+
+      return m(FlexCol, [
+
+        m(FlexRow,
+          // label debería ser Text ??
+          m("label", {
+            style: {
+              fontFamily: config.fontFamily,
+              ...(config.form?.formLabel || style),
+            }
+          },
+            typeof vnode.children?.[0] == 'object' ? null : vnode.children
+          ),
+
+          required
+            ? m("span", { style: "color:red; margin-left:0.5em; line-height: 1.21429em;" }, '*')
+            : null,
+
+          info
+            ? m(InfoTooltip, { text: info })
+            : null
+        ),
+
+        description
+          ? m(SmallText, { paddingBottom: "5px", color: "gray" }, description)
+          : null
+
+      ])
     }
-
-    return {
-        view:(vnode)=>{
-            let { required, description, info} = vnode.attrs
-
-            return m(FlexCol, [
-                m(FlexRow,
-                    // label debería ser Text ??
-                    m("label", {
-                        style: {
-                            fontFamily: config.fontFamily,
-                            ...(config.form?.formLabel || style),
-                        }
-                    }, 
-                        typeof vnode.children?.[0] == 'object' ? null : vnode.children 
-                    ),
-                    
-                    required 
-                    ? m("span", {style:"color:red; margin-left:0.5em; line-height: 1.21429em;"}, '*')
-                    : null,
-
-                    info 
-                    ? m(InfoTooltip,{text:info})
-                    : null
-                ),
-              
-                description
-                ? m(SmallText, { paddingBottom: "5px", color: "gray" }, description)
-                : null
-                
-            ])
-        }
-    }
+  }
 }
 
 
@@ -118,6 +119,7 @@ function CheckboxLabel(){
             gap: '0.5em',
             borderRadius: config.borderRadius,
             padding: '0.5em',
+            background:'white',
             alignItems: 'center',
             display: 'flex',
             whiteSpace:'wrap',
@@ -188,110 +190,245 @@ function CheckboxLabel(){
     }
 }
 
-function Input(){
 
-    let focused = false;
-    
-    return {
-        view: (vnode)=>{
-            let { data, name, oninput, type, label, required, flexStyle, style, rows, icon,  readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint} = vnode.attrs
+function SwitchLabel(){
 
+  return {
+    view:(vnode)=>{
+      let { data, name, label, checked, onclick, info, style={}, icon, iconColor, description } = vnode.attrs
+      
+      let isChecked = checked || data && name && data[name] === true
 
+      return m(Tappable, {
+        style: {
+          border: `1px solid ${config.colors.border}`,
+          gap: '1em',
+          borderRadius: config.borderRadius,
+          padding: '0.5em',
+          alignItems: 'center',
+          display: 'flex',
+          whiteSpace:'wrap',
+          background:'white',
+          
+          ...style,
+          ...isChecked ? {
+            background: '#aecbe742' || config.colors.lightgrey
+          } : {},
+        },
+        onclick: () => {
+          
+          if(onclick){ // mirar de añadir data name ??
+              onclick()
+          }
+          
+          if(!data && !name) return;
+          
+          if(!data[name]){
+            data[name] = true
+          } else {
+            data[name] = false
+          }
 
-            return [
-                // TO DO: editar el estilo de focus
-                m(FlexCol,{
-                   ...flexStyle || {},
-                   width: config.form.expandInputs == false ? 'auto': "100%"
-                }, // pensar otra manera sin necesidad de meter width: 100%
-                    label 
-                    ? [
-                        m(FormLabel,{required: required, description, info:info}, label),
-                    ] : null,
-
-                    m(Div, {position:'relative', width:'100%', display:'flex'},
-                        m(type =='textarea'? "textarea": "input", {
-                            readonly: readonly || false, // es lo mismo que disabbled==
-                            rows:rows,
-                            style:  {
-                                transition:' box-shadow 0.1s ease-in-out, outline 0.1s ease-in-out',
-                                width:'100%',
-                                fontFamily: config.fontFamily,
-                                ...(config.form?.baseStyle),
-                                ...icon ? {paddingLeft:'32px'}:{},
-                                //...(config.fonts?.default || config.defaultFont || {}),
-                                ...(config.form?.baseStyle),
-                                ...(config.form?.input || {}),
-                                ...(style || {}),
-                            },
-                            oninput:(e)=>{
-                                data && name ? data[name] = e.target.value : ''
-                                oninput ? oninput(e): ''
-                            },
-                            
-                            onfocus:(e)=> {
-                                Object.keys(config.form?.focusStyle || {}).forEach((key)=>{
-                                    e.target.style[key] = config.form.focusStyle[key]
-                                })
-
-                                focused = true;
-                                
-                                if(vnode.attrs.onfocus){
-                                    vnode.attrs.onfocus(e)
-                                }
-                            },
-                            onblur:(e)=>{
-                                focused = false;
-                                Object.keys(config.form?.focusStyle || {}).forEach((key)=>{
-                                    e.target.style[key] = config.form.baseStyle[key]
-                                })
-
-                                if(vnode.attrs.onblur){
-                                    vnode.attrs.onblur(e)
-                                }
-                            },
-                            ...( value ? {value:value}:{} ),
-                            ...( data && data[name] ? {value:data[name]}:{} ),
-                            ...type && type != 'textarea' ? {type:type}: {},
-                            ...vnode.attrs.min && vnode.attrs.max ? {min:vnode.attrs.min, max:vnode.attrs.max}: {},
-                            ...vnode.attrs.minlength && vnode.attrs.maxlength ? {minlength:vnode.attrs.minlength, maxlength:vnode.attrs.maxlength}: {},
-                            ...pattern ? {pattern: pattern} : {},
-                            ...(vnode.attrs.id ? { id: vnode.attrs.id }: {}),
-                            ...title ? {title: title} : {},
-                            ...placeholder ? {placeholder: placeholder} : {},
-                            disabled: disabled || false,
-
-                            ...onkeyup ? {onkeyup: onkeyup} : {},
-                            ...inputmode ? { inputmode: inputmode } : {},
-                            ...enterkeyhint ? { enterkeyhint: enterkeyhint } : {},
-                            ...vnode.attrs.autocomplete ? { autocomplete: vnode.attrs.autocomplete} : {},
-
-                            onchange:(e)=>{
-                                if(onchange) onchange(e)
-                            },
-                        },
-                    
-                            
-                        ),
-                        
-                        icon ?
-                        m(SVGIcon,{
-                            icon:icon, width:18, height:19, color: focused ? 'black': 'grey',
-                            style: { 
-                                position:'absolute', top:'50%', transform:'translateY(-50%)', left:'8px',
-                                ...vnode.attrs?.iconPosition || {}
-                            },
-                            onclick: vnode.attrs.iconclick
-                        }) : null,
-
-                        vnode.children
-                    )
-
-                )
-
-            ]
+          m.redraw()
         }
+      },  
+
+        icon 
+        ? m(SVGIcon, {icon: icon, size: 'large'})
+        : null,
+        
+
+        m(FlexCol, {gap: '0.2em', flex:1},
+
+          m(Text,{
+            ...(config.form?.formLabel || {}),
+            maxWidth:'70%', 
+            userSelect:'none', 
+            padding:'0em',
+            marginBottom:'0px'
+          }, localize(label)),
+
+          description ?
+          m(SmallText, localize(description)) 
+          : null,
+        ),
+        
+
+
+        m(Switch, {isActive: isChecked, disabled: true})
+
+
+      )
     }
+  }
+}
+
+
+function SwitchRow() {
+
+  return {
+    view: ({ attrs }) => {
+      let { isActive, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label, description } = attrs
+
+      return m(FlexRow, { gap: '0.5em', justifyContent: 'space-between'  }, // tal vez se pueda quitar el margin
+
+        m(FlexCol,
+          label && m(Text, { style: config.form.formLabel }, label),
+
+          description ? m(SmallText, localize(description)) : null
+        ),
+
+        m('div', {
+          style: {
+            background: isActive || data && name && data[name] ? activeBg : '#eee',
+            width: '60px',
+            height: '30px',
+            padding: '5px',
+            borderRadius: '50px',
+            cursor: 'pointer',
+
+          },
+          onclick: () => {
+
+            if (data && name) {
+              if (data[name] == undefined) data[name] = false
+              data[name] = !data[name]
+              isActive = data[name]
+            }
+
+
+            if (onchange && typeof onchange == "function") onchange()
+          }
+        }, [
+          m('input', {
+            style: { display: 'none' },
+            type: 'checkbox',
+            checked: isActive || data && name && data[name] ? true : false,
+          }),
+          m('label', {
+            style: {
+              width: '20px',
+              height: '20px',
+              background: isActive || data && name && data[name] ? activeColor : '#ccc',
+              display: 'flex',
+              cursor: 'pointer',
+              borderRadius: '50px',
+              transition: 'all 0.25s ease 0s',
+              marginLeft: isActive || data && name && data[name] ? '30px' : '0px',
+            }
+          })
+        ]),
+
+      )
+    }
+  }
+}
+
+function Input() {
+
+  let focused = false;
+
+  return {
+    view: (vnode) => {
+      let { data, name, oninput, type, label, required, flexStyle, style, rows, icon, readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint } = vnode.attrs
+
+
+
+      return [
+        // TO DO: editar el estilo de focus
+        m(FlexCol, {
+          ...flexStyle || {},
+          width: config.form.expandInputs == false ? 'auto' : "100%"
+        }, // pensar otra manera sin necesidad de meter width: 100%
+          label
+            ? [
+              m(FormLabel, { required: required, description, info: info }, label),
+            ] : null,
+
+          m(Div, { position: 'relative', width: '100%', display: 'flex' },
+            m(type == 'textarea' ? "textarea" : "input", {
+              readonly: readonly || false, // es lo mismo que disabbled==
+              rows: rows,
+              style: {
+                transition: ' box-shadow 0.1s ease-in-out, outline 0.1s ease-in-out',
+                width: '100%',
+                fontFamily: config.fontFamily,
+                ...(config.form?.baseStyle),
+                ...icon ? { paddingLeft: '32px' } : {},
+                //...(config.fonts?.default || config.defaultFont || {}),
+                ...(config.form?.baseStyle),
+                ...(config.form?.input || {}),
+                ...(type == 'color' ? {padding:'0.1em'} : {}),
+                ...(style || {}),
+              },
+              oninput: (e) => {
+                data && name ? data[name] = e.target.value : ''
+                oninput ? oninput(e) : ''
+              },
+
+              onfocus: (e) => {
+                Object.keys(config.form?.focusStyle || {}).forEach((key) => {
+                  e.target.style[key] = config.form.focusStyle[key]
+                })
+
+                focused = true;
+
+                if (vnode.attrs.onfocus) {
+                  vnode.attrs.onfocus(e)
+                }
+              },
+              onblur: (e) => {
+                focused = false;
+                Object.keys(config.form?.focusStyle || {}).forEach((key) => {
+                  e.target.style[key] = config.form.baseStyle[key]
+                })
+
+                if (vnode.attrs.onblur) {
+                  vnode.attrs.onblur(e)
+                }
+              },
+              ...(value ? { value: value } : {}),
+              ...(data && data[name] ? { value: data[name] } : {}),
+              ...type && type != 'textarea' ? { type: type } : {},
+              ...vnode.attrs.min && vnode.attrs.max ? { min: vnode.attrs.min, max: vnode.attrs.max } : {},
+              ...vnode.attrs.minlength && vnode.attrs.maxlength ? { minlength: vnode.attrs.minlength, maxlength: vnode.attrs.maxlength } : {},
+              ...pattern ? { pattern: pattern } : {},
+              ...(vnode.attrs.id ? { id: vnode.attrs.id } : {}),
+              ...title ? { title: title } : {},
+              ...placeholder ? { placeholder: placeholder } : {},
+              disabled: disabled || false,
+
+              ...onkeyup ? { onkeyup: onkeyup } : {},
+              ...inputmode ? { inputmode: inputmode } : {},
+              ...enterkeyhint ? { enterkeyhint: enterkeyhint } : {},
+              ...vnode.attrs.autocomplete ? { autocomplete: vnode.attrs.autocomplete } : {},
+
+              onchange: (e) => {
+                if (onchange) onchange(e)
+              },
+            },
+
+
+            ),
+
+            icon ?
+              m(SVGIcon, {
+                icon: icon, width: 18, height: 19, color: focused ? 'black' : 'grey',
+                style: {
+                  position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '8px',
+                  ...vnode.attrs?.iconPosition || {}
+                },
+                onclick: vnode.attrs.iconclick
+              }) : null,
+
+            vnode.children
+          )
+
+        )
+
+      ]
+    }
+  }
 }
 
 
@@ -869,7 +1006,7 @@ function TranslationInput(){
 
         },
         view:(vnode)=>{
-            let {data, name, label, required, type, rows, info, onfocusout, onchange, flexStyle, style = {} } = vnode.attrs
+            let {data, name, label, required, type, rows, info, onfocusout, onchange, flexStyle, style = {}, oninput } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
@@ -889,7 +1026,9 @@ function TranslationInput(){
                         data: typeof value !== "object" ? data : data[name],
                         name: typeof value !== "object" ? name : languages[selectedlang],
                         oninput: (e)=> {
-                            if (!e.target.value.length && typeof value == "object") delete data[name][languages[selectedlang]]
+                          if (!e.target.value.length && typeof value == "object") delete data[name][languages[selectedlang]]
+
+                          if(oninput) oninput()
                         },
                         type: type,
                         onfocusout: onfocusout,
@@ -1053,6 +1192,7 @@ function Dropdown(){
         }
     }
 }
+
 
 function RadioButtons() {
     
@@ -1808,59 +1948,59 @@ function HtmlDropdown() {
 // TO DO, que el switch se pueda hacer más pequeño !!
 function Switch() {
 
-    return {
-        view: ({ attrs })=>{
-            let { isActive, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
+  return {
+    view: ({ attrs }) => {
+      let { isActive, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
 
-            
-            return m(FlexRow, {gap:'0.5em', alignItems:'center', marginTop:'0.5em'}, // tal vez se pueda quitar el margin
-            
-                m('div',{
-                    style: {
-                        background: isActive || data && name && data[name] ? activeBg : '#eee',
-                        width: '60px',
-                        height: '30px',
-                        padding: '5px',
-                        borderRadius: '50px',
-                        cursor: 'pointer',
-                        
-                    },
-                    onclick: ()=> {
-                        
-                        if(data && name) {
-                            if(data[name] == undefined) data[name] = false
-                            data[name] = !data[name]
-                            isActive = data[name]
-                        }
+      return m(FlexRow, { gap: '0.5em', alignItems: 'center', marginTop: '0.5em' }, // tal vez se pueda quitar el margin
+
+        m('div', {
+          style: {
+            background: isActive || data && name && data[name] ? activeBg : '#eee',
+            width: '60px',
+            height: '30px',
+            padding: '5px',
+            borderRadius: '50px',
+            cursor: 'pointer',
+
+          },
+          onclick: () => {
+
+            if (data && name) {
+              if (data[name] == undefined) data[name] = false
+              data[name] = !data[name]
+              isActive = data[name]
+            }
 
 
-                        if(onchange && typeof onchange == "function") onchange()
-                    }
-                },[
-                    m('input',{
-                        style: { display: 'none' },
-                        type: 'checkbox',
-                        checked: isActive || data && name && data[name] ? true : false,
-                    }),
-                    m('label', {
-                        style: {
-                            width: '20px',
-                            height: '20px',
-                            background: isActive || data && name && data[name] ? activeColor : '#ccc',
-                            display: 'flex',
-                            cursor: 'pointer',
-                            borderRadius: '50px',
-                            transition: 'all 0.25s ease 0s',
-                            marginLeft: isActive || data && name && data[name] ? '30px' : '0px',
-                        }
-                    })
-                ]),
+            if (onchange && typeof onchange == "function") onchange()
+          }
+        }, [
+          m('input', {
+            style: { display: 'none' },
+            type: 'checkbox',
+            checked: isActive || data && name && data[name] ? true : false,
+          }),
+          m('label', {
+            style: {
+              width: '20px',
+              height: '20px',
+              background: isActive || data && name && data[name] ? activeColor : '#ccc',
+              display: 'flex',
+              cursor: 'pointer',
+              borderRadius: '50px',
+              transition: 'all 0.25s ease 0s',
+              marginLeft: isActive || data && name && data[name] ? '30px' : '0px',
+            }
+          })
+        ]),
 
-                label && m(Text, label)
-            )
-        }
+        label && m(Text, label)
+      )
     }
+  }
 }
+
 
 
 // input that only gets integers
@@ -2018,8 +2158,8 @@ function InfoTooltip(){
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "13px",
-            height: "13px",
+            width: "16px",
+            height: "16px",
             borderRadius: "50%",
             border: `1px solid ${hovered || showingInfo ? "#cbd5e1" : "#e2e8f0"}`,
             color: hovered || showingInfo ? "#64748b" : "#94a3b8",
@@ -2029,6 +2169,7 @@ function InfoTooltip(){
             fontStyle: "italic",
             lineHeight: 1,
             cursor: "help",
+            background:'white',
             flexShrink: 0,
             userSelect: "none",
             position: "relative",
