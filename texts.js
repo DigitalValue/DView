@@ -51,7 +51,7 @@ function H3(){
         view:(vnode)=>{
             return m("h3",{
                 style: {
-                    fontSize: '1.2rem',
+                    fontSize: '1.25rem',
                     fontFamily: config.fontFamily,
                     margin: 0,
                     ...(config.fonts.h3 || {}),

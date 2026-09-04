@@ -109,13 +109,13 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick, info, style={}, icon, iconColor } = vnode.attrs
+        let { data, name, label, checked, onclick, info, style={}, icon, iconColor, description, small } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
         return m(Tappable, {
           style: {
-            border: `1px solid ${config.colors.border}`,
+            ...config.form.baseStyle,
             gap: '0.5em',
             borderRadius: config.borderRadius,
             padding: '0.5em',
@@ -125,7 +125,9 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...style,
             ...isChecked ? {
-              background: '#aecbe742' || config.colors.lightgrey
+                //...config.form?.focusStyle,
+                //borderColor: config.colors.blue
+                background: config.colors.lightgrey
             } : {},
           },
           onclick: () => {
@@ -165,14 +167,20 @@ function CheckboxLabel(){
             }
           }),
 
+          m(FlexCol, {maxWidth:'85%', width:'85%', gap:'0.2em', marginLeft:'0.5em'},
+            m(small ? SmallText : Text,{ 
+                ...(config.form?.formLabel || {}),
+                maxWidth:'70%', 
+                userSelect:'none', 
+                padding:'0em',
+                marginBottom:'0px'
+            }, localize(label)),
 
-          m(Text,{
-            ...(config.form?.formLabel || {}),
-            maxWidth:'70%', 
-            userSelect:'none', 
-            padding:'0em',
-            marginBottom:'0px'
-          }, localize(label)),
+            description ? 
+            m(SmallText, {color:config.colors.secondaryText}, localize(description)): null
+          ),
+
+        
           
 
           info 
@@ -1862,8 +1870,8 @@ function HtmlDropdown() {
             currentOnchange = onchange
 
             if(data && name && data[name] && !val){
-                console.log('getting value')
-                val = vnode.children?.find((o)=> o.value == data[name]).label
+                console.log('getting value', data[name], vnode.children)
+                val = vnode.children?.find((o)=> o.value == data[name])?.label
             }
 
             return [
@@ -2007,10 +2015,44 @@ function Switch() {
 function IntegerInput(){ 
 
     let on = false;
+    let data = {}
+    let name = ''
+
+    function canShowInput({ canEdit, disabled, max }) {
+        return canEdit && !disabled && data && name && (!max || max > 5)
+    }
+
+    function value() {
+        return data && name && data[name] ? data[name] : 0
+    }
+
+    function writeValue(nextValue, { max, min=0 }) {
+        let parsed = parseInt(nextValue)
+
+        if (isNaN(parsed)) {
+            data[name] = min || 0
+            return
+        }
+
+        if (max != undefined && parsed >= max) {
+            data[name] = max
+            return
+        }
+
+        if (min != undefined && parsed <= min) {
+            data[name] = min
+            return
+        }
+
+        data[name] = parsed
+    }
 
     return {
         view: (vnode)=>{
-            let { data, name, max, min=0, label, onchange, jump=1, required, style = {} } = vnode.attrs
+            let { max, min=0, label, onchange, jump=1, required, style = {}, canEdit, disabled, hideValue } = vnode.attrs
+
+            data = vnode.attrs.data || {}
+            name = vnode.attrs.name || ''
             
             return [
                 m(FlexCol,
@@ -2023,8 +2065,51 @@ function IntegerInput(){
                         }
                     }, 
                         m(FlexRow,{alignItems:'center',justifyContent:'space-between'},
-                            m("div", {style:"display:flex;align-items:center;gap:0.5em"},
-                                data && name && data[name] ? data[name]: 0,
+                            m("div", {style:{ opacity: disabled ? '0.6' : '1', display:'flex', alignItems:'center', gap:'0.5em', position:'relative' }},
+                                canShowInput(vnode.attrs) && on ?
+                                m("input",{
+                                    type:"number",
+                                    value: value(),
+                                    style:{
+                                        width:'100%',
+                                        maxWidth:'80px',
+                                        border:0,
+                                        outline:0,
+                                        padding:0,
+                                        fontFamily: config.fontFamily,
+                                        fontSize:'1em',
+                                        color:'inherit'
+                                    },
+                                    oncreate:({dom})=> dom.focus(),
+                                    onblur: () => on = false,
+                                    onkeydown:(e)=>{
+                                        if(e.key =='Enter' || e.key =='Escape') on = false
+                                    },
+                                    oninput:(e)=> writeValue(e.target.value, vnode.attrs)
+                                })
+                                : !hideValue ? [
+                                    canShowInput(vnode.attrs) ?
+                                    m(Tappable, {
+                                        style: { position:'absolute', left:'-10px', top:'50%', transform:'translateY(-50%)' },
+                                        onclick:(e)=>{
+                                            on = true
+                                            e.stopPropagation()
+                                        }
+                                    }, m(SVGIcon, { icon:'edit', width: 12, height:12 })) : null,
+
+                                    m("span",{
+                                        style: {
+                                            paddingLeft: canShowInput(vnode.attrs) ? '0.5em': '',
+                                            cursor: canShowInput(vnode.attrs) ? 'text' : 'default',
+                                        },
+                                        onclick:(e)=> {
+                                            if(!canShowInput(vnode.attrs)) return
+                                            on = true
+                                            e.stopPropagation()
+                                        }
+                                    }, value())
+                                ] : null,
+
                                 // se le puede pasar elementos dentro
                                 vnode.children 
                             ),
@@ -2032,8 +2117,9 @@ function IntegerInput(){
                             m(FlexRow,
                                 m(IconButton,{
                                     icon:'minus',
-                                    color: data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
+                                    color: !disabled && data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
                                     onclick:(e)=>{
+                                        if(disabled) return
                                         if((min == undefined || data[name]>min) &&  data[name] && data[name] > 0){
                                             data[name] -= jump
                                             
@@ -2044,8 +2130,9 @@ function IntegerInput(){
 
                                 m(IconButton,{
                                     icon:'add',
-                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey':  config.colors.green,
+                                    color: disabled || max !=undefined && (data[name] == max || max == 0) ? 'lightgrey':  config.colors.green,
                                     onclick:(e)=>{
+                                        if(disabled) return
                                         if(!data[name]) data[name] = 0
 
                                         console.log('MAX', max,  data[name])
