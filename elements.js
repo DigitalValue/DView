@@ -41,63 +41,107 @@ function Img() {
 
 function SecondaryMenu(){
     let activeIndex= 0;
+    let activeColor = 'white'
+    let borderColor = config.colors?.border
+    let activeTextColor = 'black'
 
     return {
         oninit:(vnode)=>{
             if(vnode.attrs.startingIndex){
                 activeIndex = vnode.attrs.startingIndex
             }
+
+            if(vnode.attrs.activeColor){ 
+                activeColor = vnode.attrs.activeColor
+            }
+
+            if(vnode.attrs.borderColor){ 
+                borderColor = vnode.attrs.borderColor
+            }
+
+            if(vnode.attrs.activeTextColor){ 
+                activeTextColor = vnode.attrs.activeTextColor
+            }
         },
         view:(vnode)=>{
-            let { onclick, minWidth} = vnode.attrs
+            let { onclick } = vnode.attrs
 
-            return m(FlexRow, { border: `1px solid rgb(204 204 204 / 21%)`, flexWrap:'wrap', background: config.colors.lightgrey, gap: '0.5em', padding: '0.2em', borderRadius: config.borderRadius },
+            if(vnode.attrs.activeIndex != undefined){
+                activeIndex = vnode.attrs.activeIndex
+            }
+            
+            return m(FlexRow, { 
+                border: `1px solid rgb(204 204 204 / 21%)`, 
+                background: config.colors.lightgrey, 
+                gap: '0.5em', 
+                padding: '0.2em', 
+                flexWrap:'wrap',
+                borderRadius: config.borderRadius ,
+                ...vnode.attrs.style
+            },
 
             vnode.children.map((child, i)=>
                 Item({
-                    minWidth: minWidth,
-                    text: child?.text || child,
+                    text: child.text || child.label || child,
                     onclick: (e) => {
                         activeIndex = i;
                         if(onclick){
                             onclick(child, i)
                         }
                     },
-                    active: activeIndex == i
+                    icon: child?.icon,
+                    active: activeIndex == i,
+                    minWidth: vnode.attrs.minWidth
                 }),
             )
           )
         }
     }
 
-    function Item({ text, active, onclick, minWidth }) {
+    function Item({ text, active, onclick, icon, minWidth ='80px' }) {
       return m(Tappable, {
         style: {
           padding: '0.5rem',
           paddingLeft: '1rem',
           paddingRight: '1rem',
           textAlign: 'center',
-          minWidth: minWidth || '100px',
+          minWidth:  minWidth || '80px',
           display: 'flex',
+          gap:'0.5em',
           alignItems: 'center',
           justifyContent: 'center',
-          flex:1,
+          flex: `1 1  ${minWidth}`,
+          
           borderRadius: config.borderRadius,
           ...active ? {
-            background: 'white',
-            fontWeight: 'bold',
-            border:`1px solid ${config.colors.border}`
-          } : {}
+            background: activeColor,
+            color: activeTextColor,
+
+            //fontWeight: 'bold',
+            border:`1px solid ${borderColor}`
+          } : {
+            color:'black'
+          },
         },
-        hover: {
+        hover: !active ? {
+          //filter:'brightness(90%)',
           color: 'black',
           background: '#ffffff'
-        },
+        }: null,
         onclick: () => {
           onclick()
         }
       },
-        m(Text,text ),
+        icon ? m(SVGIcon,{ 
+            size:'small', 
+            style: {
+                opacity: active ? 1 : 0.8
+            }, 
+            icon:icon, 
+            color: active && activeColor != 'white' ? 'white': 'black' 
+        }): null,
+
+        m(Text, text ),
 
       )
     }
@@ -114,7 +158,7 @@ function Segment() {
             ...config.elements?.segment?.primary,
         },
         secondary: {
-            backgroundColor: '#f0f0f0',
+            background: config.colors?.lightgrey || '#f0f0f0',
             border: '1px solid #e5e7eb',
             color: '#4b5563',
             ...config.elements?.segment?.secondary,
@@ -521,6 +565,15 @@ function Button() {
             hover,
             onmousedown
         },
+
+        brown: {
+            color: 'white',
+            border: `1px solid ${config.colors?.brown}`,
+            background: config.colors?.brown,
+            hover,
+            onmousedown
+        },
+
         danger: {
             color: 'red',
             border: '1px solid red',
@@ -1672,6 +1725,17 @@ function SVGIcon() {
             m("path", { d: "M9 9h.01" }),
             m("path", { d: "m15 9-6 6" }),
             m("path", { d: "M15 15h.01" })
+        ],
+        theater: [
+          m("path", {d:"M2 10s3-3 3-8"}),
+          m("path", {d:"M22 10s-3-3-3-8"}),
+          m("path", {d:"M10 2c0 4.4-3.6 8-8 8"}),
+          m("path", {d:"M14 2c0 4.4 3.6 8 8 8"}),
+          m("path", {d:"M2 10s2 2 2 5"}),
+          m("path", {d:"M22 10s-2 2-2 5"}),
+          m("path", {d:"M8 15h8"}),
+          m("path", {d:"M2 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"}),
+          m("path", {d:"M14 22v-1a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"})
         ],
         trash: [
             m("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" }),

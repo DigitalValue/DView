@@ -1,4 +1,4 @@
-import { FlexCol, FlexRow, Box, Div, Tappable  } from "./layout.js"
+import { FlexCol, FlexRow, Box, Div, Tappable } from "./layout.js"
 import { Text, SmallText } from "./texts.js"
 import { Icon, Button, SVGIcon, IconButton } from './elements.js'
 import { config } from "./config.js"
@@ -35,8 +35,8 @@ function FormLabel(){
                     // label debería ser Text ??
                     m("label", {
                         style: {
+                            fontFamily: config.fontFamily,
                             ...(config.form?.formLabel || style),
-                            fontFamily: config.fontFamily
                         }
                     }, 
                         typeof vnode.children?.[0] == 'object' ? null : vnode.children 
@@ -103,6 +103,7 @@ function Checkbox(){
 }
 
 
+// QUE ES ESTO ??
 function CheckboxLabel(){
 
     return {
@@ -165,11 +166,19 @@ function CheckboxLabel(){
           }),
 
           m(FlexCol, {maxWidth:'85%', width:'85%', gap:'0.2em', marginLeft:'0.5em'},
-            m(small ? SmallText : Text,{ userSelect:'none', whiteSpace:'nowrap'}, localize(label)),
+            m(small ? SmallText : Text,{ 
+                ...(config.form?.formLabel || {}),
+                maxWidth:'70%', 
+                userSelect:'none', 
+                padding:'0em',
+                marginBottom:'0px'
+            }, localize(label)),
 
             description ? 
             m(SmallText, {color:config.colors.secondaryText}, localize(description)): null
           ),
+
+        
           
 
           info 
@@ -1018,7 +1027,7 @@ function Dropdown(){
             return [
                 m(FlexCol, {
                     width: config.form.expandInputs == false ? 'auto': "100%",
-                    ...vnode.attrs.style
+                    ...vnode.attrs.flexStyle
                 },
                     label ? m(FormLabel,{info:info, description, required:required}, label): null,
 
@@ -1026,6 +1035,7 @@ function Dropdown(){
                         disabled,
                         style: {
                             ...(config.form?.baseStyle),
+                            ...vnode.attrs.style
                             // appearance: 'none',
                             // WebkitAppearance: 'none',
                         },
@@ -1035,7 +1045,7 @@ function Dropdown(){
                             m.redraw()
                         }
                     },
-                        m("option",{ disabled:true }, placeholder ||  "Selecciona una opción"),
+                        m("option",{ disabled:true, selected: true}, placeholder ||  "Selecciona una opción"),
                         //, selected:true
                         vnode.children.map((o)=> m("option",{
                             value: o.value != undefined ? o.value : o, 
@@ -1387,33 +1397,363 @@ function DateSelector() {
 
 
 
+function Menu() {
+    let visible = false
+    let expanded = false
+    let menuMaxHeight = '14.01428571rem'
+    let closeTimeout = null
+    let animationFrame = null
+    let domElement = null
+    let scrollElement = null
+    let lastOpen = false
+    let animationDuration = 160
+    let hasScroll = false
+    let scrollThumbHeight = 0
+    let scrollThumbTop = 0
+
+    function resetMenuBounds() {
+        menuMaxHeight = '14.01428571rem'
+    }
+
+    function getDefaultMaxHeight() {
+        let fontSize = window.getComputedStyle(document.documentElement).fontSize
+        return 14.01428571 * (parseFloat(fontSize) || 16)
+    }
+
+    function fitMenu() {
+        if(!domElement || !domElement.parentElement) return
+
+        let margin = 8
+        let triggerRect = domElement.parentElement.getBoundingClientRect()
+        let viewportHeight = window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight
+        let maxHeight = getDefaultMaxHeight()
+        let bottomSpace = Math.max(0, viewportHeight - triggerRect.bottom - margin)
+        let nextMaxHeight = Math.max(40, Math.min(maxHeight, bottomSpace))
+        let nextMenuMaxHeight = `${nextMaxHeight}px`
+
+        if (menuMaxHeight != nextMenuMaxHeight) {
+            menuMaxHeight = nextMenuMaxHeight
+        }
+    }
+
+    function updateScrollState() {
+        if(!scrollElement) return false
+
+        let clientHeight = scrollElement.clientHeight
+        let scrollHeight = scrollElement.scrollHeight
+        let nextHasScroll = scrollHeight > clientHeight + 1
+        let trackHeight = Math.max(0, clientHeight - 12)
+        let nextThumbHeight = 0
+        let nextThumbTop = 0
+
+        if(nextHasScroll) {
+            nextThumbHeight = Math.min(trackHeight, Math.max(28, trackHeight * clientHeight / scrollHeight))
+            nextThumbTop = scrollElement.scrollTop / Math.max(1, scrollHeight - clientHeight) * Math.max(0, trackHeight - nextThumbHeight)
+        }
+
+        let changed = hasScroll != nextHasScroll || scrollThumbHeight != nextThumbHeight || scrollThumbTop != nextThumbTop
+
+        hasScroll = nextHasScroll
+        scrollThumbHeight = nextThumbHeight
+        scrollThumbTop = nextThumbTop
+
+        return changed
+    }
+
+    function setVisible(value, onvisiblechange) {
+        if(visible == value) return
+
+        visible = value
+        if(onvisiblechange) onvisiblechange(value)
+    }
+
+    function clearAnimation() {
+        if(closeTimeout) clearTimeout(closeTimeout)
+        if(animationFrame) cancelAnimationFrame(animationFrame)
+
+        closeTimeout = null
+        animationFrame = null
+    }
+
+    function focusMenu() {
+        if(!scrollElement) return
+
+        scrollElement.scrollTop = 0
+        updateScrollState()
+
+        if(document.activeElement != scrollElement) {
+            scrollElement.focus({ preventScroll: true })
+        }
+    }
+
+    function openMenu(onvisiblechange) {
+        clearAnimation()
+        resetMenuBounds()
+        setVisible(true, onvisiblechange)
+        expanded = false
+
+        animationFrame = requestAnimationFrame(() => {
+            fitMenu()
+            expanded = true
+            focusMenu()
+            animationFrame = null
+            m.redraw()
+        })
+    }
+
+    function closeMenu(onvisiblechange) {
+        clearAnimation()
+        expanded = false
+
+        closeTimeout = setTimeout(() => {
+            closeTimeout = null
+            setVisible(false, onvisiblechange)
+            m.redraw()
+        }, animationDuration)
+    }
+
+    function syncOpen(open, onvisiblechange) {
+        if(open == lastOpen) return
+
+        lastOpen = open
+
+        if(open) {
+            openMenu(onvisiblechange)
+        } else {
+            closeMenu(onvisiblechange)
+        }
+    }
+
+    return {
+        oninit: (vnode) => {
+            syncOpen(vnode.attrs.open, vnode.attrs.onvisiblechange)
+        },
+        onbeforeupdate: (vnode) => {
+            syncOpen(vnode.attrs.open, vnode.attrs.onvisiblechange)
+        },
+        onremove: () => {
+            clearAnimation()
+        },
+        view: (vnode) => {
+            let { data, name, onselect } = vnode.attrs
+
+            if(!visible) return null
+
+            return [
+                m("style", `
+                    .dview-html-dropdown-menu {
+                        position: relative;
+                    }
+
+                    .dview-html-dropdown-scroll {
+                        scrollbar-width: thin;
+                        scrollbar-color: ${config.colors?.border || '#cccccc'} #ffffff;
+                    }
+
+                    .dview-html-dropdown-scroll::-webkit-scrollbar {
+                        display: block;
+                        width: 10px;
+                        height: 10px;
+                    }
+
+                    .dview-html-dropdown-scroll::-webkit-scrollbar-track {
+                        background: #ffffff;
+                        border-left: 1px solid ${config.colors?.border || '#cccccc'};
+                        border-radius: 0;
+                    }
+
+                    .dview-html-dropdown-scroll::-webkit-scrollbar-thumb {
+                        background: ${config.colors?.border || '#cccccc'};
+                        border-radius: 0;
+                    }
+
+                    .dview-html-dropdown-scroll::-webkit-scrollbar-corner {
+                        background: #ffffff;
+                        border-radius: 0;
+                    }
+                `),
+
+                m('div', {
+                    class: 'dview-html-dropdown-menu',
+                    oncreate: ({ dom }) => {
+                        domElement = dom
+                        fitMenu()
+                    },
+                    onupdate: ({ dom }) => {
+                        domElement = dom
+                        if(lastOpen) fitMenu()
+                    },
+                    style: {
+                        border:'1px solid #ccc',
+                        borderRadius:'0.5em',
+                        borderTopLeftRadius:'0em',
+                        borderTopRightRadius:'0em',
+                        position: 'absolute',
+                        padding:'0',
+                        left: 0,
+                        marginLeft:'-1px',
+                        width: `calc(100% + 1.5px)`,
+                        minWidth: `calc(100% + 1.5px)`,
+                        top: '100%',
+                        background:'#fff',
+                        zIndex:1000,
+                        maxHeight: expanded ? menuMaxHeight : '0px',
+                        opacity: expanded ? 1 : 0,
+                        transform: expanded ? 'translateY(0)' : 'translateY(-4px)',
+                        transformOrigin: 'top center',
+                        transition: `max-height ${animationDuration}ms ease, opacity ${animationDuration}ms ease, transform ${animationDuration}ms ease`,
+                        pointerEvents: expanded ? 'auto' : 'none',
+                        overflow:'hidden',
+                        ...config.form?.focusStyle || {}
+                    },
+                },
+                    [
+                        m('div', {
+                            class: 'dview-html-dropdown-scroll',
+                            tabindex: -1,
+                            oncreate: ({ dom }) => {
+                                scrollElement = dom
+                                if(lastOpen) focusMenu()
+                                if(updateScrollState()) m.redraw()
+                            },
+                            onupdate: ({ dom }) => {
+                                scrollElement = dom
+                                if(updateScrollState()) m.redraw()
+                            },
+                            onscroll: () => {
+                                if(updateScrollState()) m.redraw()
+                            },
+                            style: {
+                                maxHeight: menuMaxHeight,
+                                overflowX:'hidden',
+                                overflowY: expanded ? 'scroll' : 'hidden',
+                                scrollbarGutter:'stable',
+                                outline:'none',
+                                boxSizing:'border-box',
+                            }
+                        },
+                            m(FlexCol, {overflow:'hidden'},
+                                vnode.children.map((o)=>
+                                m(Tappable, {
+                                    style: {
+                                        padding: '0.8em 1em',
+                                        cursor: 'pointer',
+                                        borderBottom:`1px solid ${config.colors?.border}`,
+                                        ...config.form?.dropdown?.option
+                                    },
+                                    hover: {
+                                        background: '#f0f0f0'
+                                    },
+                                    onclick:(e)=>{
+                                        e.preventDefault()
+                                        e.stopPropagation()
+
+                                        if(onselect) onselect(o)
+                                    }
+                                }, m(Text, {
+                                    userSelect:'none',
+                                    fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
+                                }, o.label || o))
+                            )
+                        )),
+
+                        hasScroll ? m('div', {
+                            style: {
+                                position:'absolute',
+                                top:'6px',
+                                right:'4px',
+                                bottom:'6px',
+                                width:'6px',
+                                borderRadius:'999px',
+                                background:'#eef2f7',
+                                opacity: expanded ? 1 : 0,
+                                pointerEvents:'none',
+                                transition:`opacity ${animationDuration}ms ease`,
+                            }
+                        },
+                            m('div', {
+                                style: {
+                                    position:'absolute',
+                                    top:`${scrollThumbTop}px`,
+                                    right:0,
+                                    left:0,
+                                    height:`${scrollThumbHeight}px`,
+                                    borderRadius:'999px',
+                                    background:'#94a3b8',
+                                }
+                            })
+                        ) : null
+                    ]
+                )
+            ]
+        }
+    }
+}
+
+
 // dropdown sin utilizar el select html
 function HtmlDropdown() {
     let open = false;
+    let menuVisible = false
+
+    let val = ''
+    let currentData = null
+    let currentName = null
+    let currentOnchange = null
+
+    function setMenuVisible(visible) {
+        menuVisible = visible
+    }
+
+    function selectOption(o) {
+        if(currentData && currentName != undefined) {
+            currentData[currentName] = o.value != undefined ? o.value : o
+
+            if(o.label){
+                val = o.label
+            }
+        }
+
+        if(currentOnchange) currentOnchange(o)
+
+        open = false
+    }
 
     return {
-        view: (vnode) => {
-            let { data, name, label, onchange, required, placeholder = 'Selecciona', style = {}, flexStyle } = vnode.attrs
-            let selectedOption = vnode.children.find((option) =>
-                data && name != undefined && option?.value == data[name]
-            )
-            let selectedLabel = selectedOption?.label || (data && name ? data[name] : '')
 
+        view: (vnode) => {
+            let { data, name, label, onchange, flexStyle, style, required} = vnode.attrs
+            let fieldOpen = open || menuVisible
+
+            currentData = data
+            currentName = name
+            currentOnchange = onchange
+
+            if(data && name && data[name] && !val){
+                console.log('getting value', data[name], vnode.children)
+                val = vnode.children?.find((o)=> o.value == data[name])?.label
+            }
 
             return [
-                m(FlexCol,{width:'100%', ...(flexStyle || style) },
-                    label ? m(FormLabel,{required}, label) : null,
+                m(FlexCol,{width:'100%', ...flexStyle},
+                    m(FormLabel,{required}, label),
 
                     m(Tappable, {
                         style: {
-                            /*
-                             ...(open 
+                            ...(config.form?.baseStyle),
+                            ...fieldOpen && (config.form?.focusStyle || {}),
+                            ...(fieldOpen
                             ? {
                                 borderBottomLeftRadius:'0em',
                                 borderBottomRightRadius:'0em',
-                            } : {}),*/
-                            ...(config.form?.baseStyle),
-                            ...open && (config.form?.focusStyle || {}),
+                            } : {
+                                borderTopLeftRadius:config.borderRadius,
+                                borderTopRightRadius:config.borderRadius,
+                                borderBottomLeftRadius:config.borderRadius,
+                                borderBottomRightRadius:config.borderRadius,
+
+                            }),
+                            ...style || {},
                             position: 'relative'
                         },
                         clickout:(e)=> {
@@ -1422,7 +1762,9 @@ function HtmlDropdown() {
                                 m.redraw()
                             }
                         },
-                        onclick:(e)=> open = !open
+                        onclick:(e)=> {
+                            open = !open
+                        }
                     },
                         m(FlexRow, { justifyContent:'space-between', alignItems:'center', height:'100%'},
                             
@@ -1432,56 +1774,34 @@ function HtmlDropdown() {
                                 textOverflow:'ellipsis',
                                 whiteSpace:'nowrap',
                                 color:  data && name && data[name] ? 'black' : 'grey'
-                            }, selectedLabel || placeholder),
+                            }, 
+
+                                val ? val : data && name && data[name] ? data[name] : 'Selecciona'
+                            ),
 
                             // is there a built-in icon without using a library??
 
                             m(SVGIcon, { 
-                                icon: open ? 'chevron_up' : 'chevron_down', 
+                                icon: 'chevron_down', 
+                                style : {
+                                    transition:'0.1s all',
+                                    ...open ? {
+                                        transform: 'rotate(180deg)',
+                                    }: {
+
+                                    }
+                                },
                                 color:'rgba(34, 36, 38)' 
                             })
                         ),
 
-                        open ?
-                        m(FlexCol, {
-                            border:'1px solid #ccc',
-                            borderRadius:'0.5em',
-                            borderTopLeftRadius:'0em',
-                            borderTopRightRadius:'0em',
-                            position: 'absolute',
-                            left:'0px',
-                            top:'100%',
-                            right: '0px',
-                            boxShadow: '0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.15)',
-                            background:'#fff',
-                            zIndex:1000,
-                        }, vnode.children.map((o)=>
-                            m(Tappable, {
-                                style: {
-                                    padding: '0.5em 1em',
-                                    cursor: 'pointer',
-                                    ...config.form?.dropdown?.option
-                                },
-                                hover: {
-                                    background: '#f0f0f0'
-                                },
-                                onclick:(e)=>{
-                                    e.preventDefault()
-                                    e.stopPropagation()
-
-                                    if(data && name != undefined) {
-                                        data[name] = o.value != undefined ? o.value : o
-                                    }
-
-                                    open = !open
-
-                                    if(onchange) onchange(o)
-                                        
-                                    open = false
-                                }
-                            }, m(Text, o.label || o))
-                        ))
-                        : null
+                        m(Menu, {
+                            open,
+                            data,
+                            name,
+                            onselect: selectOption,
+                            onvisiblechange: setMenuVisible,
+                        }, vnode.children)
                 
                     )
 
@@ -1555,10 +1875,44 @@ function Switch() {
 function IntegerInput(){ 
 
     let on = false;
+    let data = {}
+    let name = ''
+
+    function canShowInput({ canEdit, disabled, max }) {
+        return canEdit && !disabled && data && name && (!max || max > 5)
+    }
+
+    function value() {
+        return data && name && data[name] ? data[name] : 0
+    }
+
+    function writeValue(nextValue, { max, min=0 }) {
+        let parsed = parseInt(nextValue)
+
+        if (isNaN(parsed)) {
+            data[name] = min || 0
+            return
+        }
+
+        if (max != undefined && parsed >= max) {
+            data[name] = max
+            return
+        }
+
+        if (min != undefined && parsed <= min) {
+            data[name] = min
+            return
+        }
+
+        data[name] = parsed
+    }
 
     return {
         view: (vnode)=>{
-            let { data, name, max, min=0, label, onchange, jump=1, required, style = {} } = vnode.attrs
+            let { max, min=0, label, onchange, jump=1, required, style = {}, canEdit, disabled, hideValue } = vnode.attrs
+
+            data = vnode.attrs.data || {}
+            name = vnode.attrs.name || ''
             
             return [
                 m(FlexCol,
@@ -1571,8 +1925,51 @@ function IntegerInput(){
                         }
                     }, 
                         m(FlexRow,{alignItems:'center',justifyContent:'space-between'},
-                            m("div", {style:"display:flex;align-items:center;gap:0.5em"},
-                                data && name && data[name] ? data[name]: 0,
+                            m("div", {style:{ opacity: disabled ? '0.6' : '1', display:'flex', alignItems:'center', gap:'0.5em', position:'relative' }},
+                                canShowInput(vnode.attrs) && on ?
+                                m("input",{
+                                    type:"number",
+                                    value: value(),
+                                    style:{
+                                        width:'100%',
+                                        maxWidth:'80px',
+                                        border:0,
+                                        outline:0,
+                                        padding:0,
+                                        fontFamily: config.fontFamily,
+                                        fontSize:'1em',
+                                        color:'inherit'
+                                    },
+                                    oncreate:({dom})=> dom.focus(),
+                                    onblur: () => on = false,
+                                    onkeydown:(e)=>{
+                                        if(e.key =='Enter' || e.key =='Escape') on = false
+                                    },
+                                    oninput:(e)=> writeValue(e.target.value, vnode.attrs)
+                                })
+                                : !hideValue ? [
+                                    canShowInput(vnode.attrs) ?
+                                    m(Tappable, {
+                                        style: { position:'absolute', left:'-10px', top:'50%', transform:'translateY(-50%)' },
+                                        onclick:(e)=>{
+                                            on = true
+                                            e.stopPropagation()
+                                        }
+                                    }, m(SVGIcon, { icon:'edit', width: 12, height:12 })) : null,
+
+                                    m("span",{
+                                        style: {
+                                            paddingLeft: canShowInput(vnode.attrs) ? '0.5em': '',
+                                            cursor: canShowInput(vnode.attrs) ? 'text' : 'default',
+                                        },
+                                        onclick:(e)=> {
+                                            if(!canShowInput(vnode.attrs)) return
+                                            on = true
+                                            e.stopPropagation()
+                                        }
+                                    }, value())
+                                ] : null,
+
                                 // se le puede pasar elementos dentro
                                 vnode.children 
                             ),
@@ -1580,8 +1977,9 @@ function IntegerInput(){
                             m(FlexRow,
                                 m(IconButton,{
                                     icon:'minus',
-                                    color: data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
+                                    color: !disabled && data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
                                     onclick:(e)=>{
+                                        if(disabled) return
                                         if((min == undefined || data[name]>min) &&  data[name] && data[name] > 0){
                                             data[name] -= jump
                                             
@@ -1592,8 +1990,9 @@ function IntegerInput(){
 
                                 m(IconButton,{
                                     icon:'add',
-                                    color: max !=undefined && (data[name] == max || max == 0) ? 'lightgrey':  config.colors.green,
+                                    color: disabled || max !=undefined && (data[name] == max || max == 0) ? 'lightgrey':  config.colors.green,
                                     onclick:(e)=>{
+                                        if(disabled) return
                                         if(!data[name]) data[name] = 0
 
                                         console.log('MAX', max,  data[name])
