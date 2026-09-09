@@ -741,69 +741,94 @@ function Span() {
 
 function Message() {
 
-    let types = {
+    const types = {
         'error': {
             background: '#fef2f2',
             color: '#B91C1C',
+            borderColor: '#fecaca',
             icon: 'shield_error'
+        },
+        'warning': {
+            background: '#fffbeb',
+            color: '#92400e',
+            borderColor: '#fde68a',
+            icon: 'warning'
+        },
+        'success': {
+            background: '#f0fdf4',
+            color: '#166534',
+            borderColor: '#bbf7d0',
+            icon: 'check_circle'
+        },
+        'neutral': {
+            background: '#f8fafc',
+            color: '#475569',
+            borderColor: '#e2e8f0',
+            icon: 'info'
         },
         'info': {
             color: 'black',
-            background:'white',
+            background: config.colors.lightgrey,
+            borderColor: config.colors.border,
             icon: 'info'
         }
-    }
-    
-    
-    // set different types 
+    };
+
     return {
         view: (vnode) => {
-            let { type = 'info', isHtml } = vnode.attrs
+            const { type = 'info', isHtml } = vnode.attrs;
+            const { icon, ...messageStyle } = types[type] || types.info;
 
             return m(Segment, {
                 style: {
-                    ...types[type] || {},
+                    minHeight: '40px',
+                    padding: '0.75rem 1rem',
+                    boxSizing: 'border-box',
+                    border: '1px solid',
+                    borderRadius: config.borderRadius,
+                    ...messageStyle,
+                    ...config.elements?.message?.baseStyle,
+                    ...config.elements?.message?.[type],
                     ...vnode.attrs?.style,
-                    minHeight:'40px',
-                    padding:'0em',
-                    paddingLeft:'1.5rem',
-                    display:'flex',
-                    alignItems:'center',
-                    paddingRight:'1.5rem'
                 },
                 type: 'secondary',
             },
-                m(FlexRow, { alignItems: 'center', gap: '1em' },
-                    m(SVGIcon, {
-                        icon: types[type]?.icon || 'info',
+                m(FlexRow, { alignItems: 'center', gap: '0.75rem', minWidth: 0 },
+                    m(Div, { display: 'flex', flexShrink: 0 }, m(SVGIcon, {
+                        icon: icon,
                         size: 'small',
-                        color: type == 'error' ? 'red' : 'black'
-                    }),
+                        color: 'currentColor'
+                    })),
 
                     vnode.attrs.header || vnode.attrs.message ?
-                        m(FlexCol,
+                        m(FlexCol, { minWidth: 0, overflowWrap: 'anywhere', gap: '0.25rem' },
 
                             vnode.attrs.header && m(Text, {
-                                marginBottom: '0.5em',
-                                fontWeight: 'bold',
+                                color: 'inherit',
+                                lineHeight: '1.5',
+                                fontWeight: 600,
 
                             }, vnode.attrs.header),
 
                             vnode.attrs.message &&
                             m(Text, {
-                                //color: type == 'error' ? '#7f1d1d': 'black'
+                                color: 'inherit',
+                                lineHeight: '1.5',
                             }, vnode.attrs.message)
 
                         ) :
                         isHtml ? 
                         vnode.children 
                         : m(Text, {
-                            //color: type == 'error' ? '#7f1d1d': 'black'
+                            color: 'inherit',
+                            lineHeight: '1.5',
+                            minWidth: 0,
+                            overflowWrap: 'anywhere',
                         }, vnode.children)
                 )
-            )
+            );
         }
-    }
+    };
 }
 
 
