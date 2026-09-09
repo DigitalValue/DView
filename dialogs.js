@@ -7,7 +7,7 @@ import { H2, Text } from "./texts.js";
 
 
 export {
-    alertDialog, confirmDialog,  openDialog,
+    alertDialog, bottomDialog, confirmDialog,  openDialog,
     Dimmer, Modal, ModalContent, ModalFooter,  ModalHeader, 
     openPopup, promptDialog, showSnackbar
 };
@@ -357,6 +357,239 @@ function openDialog(Component, options = {}) {
     })
 }
 
+
+function bottomDialog(Component, options = {}) {
+    if (!Component) return
+
+    const elem = document.createElement("div")
+    const duration = options.duration || 300
+    const dragCloseDistance = options.dragCloseDistance || 90
+    let opened = false
+    let closing = false
+    let sheetDom
+    let dimmerDom
+    let dragging = false
+    let dragReady = false
+    let dragStartY = 0
+    let dragOffset = 0
+    let dragScrollDom
+    let dragScrollTop = 0
+    let dragStartedAt = 0
+    let openTimeout
+    let closeTimeout
+
+    elem.style = `position:fixed;inset:0px;z-index:${options.multiple ? '10000000':'100000'}`
+    elem.id = options.id || Math.random() * 10000 + ''
+    document.body.appendChild(elem)
+
+    function close(e) {
+        if (e?.stopPropagation) e.stopPropagation()
+        if (closing) return
+
+        closing = true
+        if (sheetDom) {
+            sheetDom.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.2, 1)`
+            sheetDom.style.transform = 'translateY(100%)'
+        }
+        if (dimmerDom) {
+            dimmerDom.style.transition = `opacity ${duration}ms ease`
+            dimmerDom.style.opacity = 0
+        }
+        m.redraw()
+
+        closeTimeout = setTimeout(() => {
+            m.mount(elem, null)
+            elem.remove()
+        }, duration)
+    }
+
+    function dragStart(e) {
+        if (options.dragToClose === false || closing) return
+        if (options.dragHandleOnly && !e.target.closest?.('[data-bottom-dialog-handle]')) return
+        if (e.button != undefined && e.button !== 0) return
+
+        let touch = e.touches ? e.touches[0] : e
+        let target = e.target.nodeType === 1 ? e.target : e.target.parentElement
+
+        dragScrollDom = sheetDom
+
+        while (target && target !== sheetDom) {
+            if (target.scrollHeight > target.clientHeight) {
+                dragScrollDom = target
+                break
+            }
+
+            target = target.parentElement
+        }
+
+        dragReady = true
+        dragging = false
+        dragStartY = touch.clientY
+        dragOffset = 0
+        dragScrollTop = dragScrollDom?.scrollTop || 0
+        dragStartedAt = Date.now()
+    }
+
+    function dragMove(e) {
+        if (!dragReady || closing || !sheetDom) return
+
+        let touch = e.touches ? e.touches[0] : e
+        let offset = Math.max(0, touch.clientY - dragStartY)
+
+        if (!dragging && (offset < 8 || dragScrollTop > 0 || dragScrollDom?.scrollTop > 0)) return
+
+        dragging = true
+        dragOffset = offset
+        e.preventDefault()
+
+        sheetDom.style.transition = 'none'
+        sheetDom.style.transform = `translateY(${dragOffset}px)`
+
+        if (dimmerDom) {
+            dimmerDom.style.transition = 'none'
+            dimmerDom.style.opacity = Math.max(0, 1 - (dragOffset / 260))
+        }
+    }
+
+    function dragEnd(e) {
+        if (!dragReady) return
+
+        let velocity = dragOffset / Math.max(1, Date.now() - dragStartedAt)
+
+        dragReady = false
+
+        if (!dragging || !sheetDom) return
+
+        dragging = false
+
+        if (dragOffset > dragCloseDistance || (dragOffset > 40 && velocity > 0.7)) {
+            close(e)
+            return
+        }
+
+        dragOffset = 0
+        sheetDom.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.2, 1)`
+        sheetDom.style.transform = 'translateY(0)'
+
+        if (dimmerDom) {
+            dimmerDom.style.transition = `opacity ${duration}ms ease`
+            dimmerDom.style.opacity = 1
+        }
+    }
+
+    m.mount(elem, {
+        onremove: () => {
+            clearTimeout(openTimeout)
+            clearTimeout(closeTimeout)
+        },
+        view: () => {
+            return m("div", {
+                tabindex: -1,
+                style: {
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: options.multiple ? '10000000' : '100000',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    fontFamily: config.fontFamily || 'Poppins',
+                    outline: 'none',
+                    ...options.containerStyle,
+                },
+                oncreate: ({ dom }) => {
+                    openTimeout = setTimeout(() => {
+                        opened = true
+                        m.redraw()
+                        dom.focus()
+                    }, 20)
+                },
+                onkeyup: (e) => {
+                    if (e.key === "Escape" && options.closeOnEscape !== false) close(e)
+                },
+            },
+                m("div", {
+                    style: {
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundColor: options.dimmerColor || '#00000080',
+                        opacity: opened && !closing ? 1 : 0,
+                        transition: `opacity ${duration}ms ease`,
+                        ...options.overlayStyle,
+                    },
+                    oncreate: ({ dom }) => {
+                        dimmerDom = dom
+                    },
+                    onclick: (e) => {
+                        if (options.closeOnOverlay !== false) close(e)
+                    },
+                }),
+
+                m("div", {
+                    role: 'dialog',
+                    "aria-modal": "true",
+                    style: {
+                        position: 'relative',
+                        zIndex: 1,
+                        width: options.width || '100%',
+                        maxWidth: options.maxWidth || '640px',
+                        maxHeight: options.maxHeight || '85dvh',
+                        background: options.background || 'white',
+                        borderRadius: options.borderRadius || '16px 16px 0 0',
+                        boxShadow: '0 -12px 32px rgba(0, 0, 0, 0.22)',
+                        overflowX: 'hidden',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transform: opened && !closing ? 'translateY(0)' : 'translateY(100%)',
+                        transition: `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+                        paddingBottom: 'env(safe-area-inset-bottom)',
+                        touchAction: 'pan-y',
+                        overscrollBehaviorY: 'contain',
+                        cursor: 'default',
+                        ...config.dialogs?.bottomDialog,
+                        ...options.style,
+                    },
+                    oncreate: ({ dom }) => {
+                        sheetDom = dom
+                    },
+                    onmousedown: dragStart,
+                    onmousemove: dragMove,
+                    onmouseup: dragEnd,
+                    onmouseleave: dragEnd,
+                    ontouchstart: dragStart,
+                    ontouchmove: dragMove,
+                    ontouchend: dragEnd,
+                    ontouchcancel: dragEnd,
+                    onclick: (e) => {
+                        e.stopPropagation()
+                    },
+                },
+                    options.handle === false ? null : m("div", {
+                        "data-bottom-dialog-handle": "true",
+                        style: {
+                            width: '42px',
+                            height: '4px',
+                            borderRadius: '99px',
+                            background: '#d1d5db',
+                            margin: '0.75rem auto 0.25rem',
+                            flexShrink: 0,
+                            cursor: options.dragToClose === false ? 'default' : 'grab',
+                            ...options.handleStyle,
+                        },
+                    }),
+
+                    m(Component, {
+                        ...(options.attrs ? options.attrs : {}),
+                        onCancel: close,
+                        close: close,
+                    })
+                )
+            )
+        }
+    })
+
+    return close
+}
 
 // Toast inferior (móvil). No usa barra negra a ancho completo.
 function showSnackbar({

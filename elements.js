@@ -1,4 +1,5 @@
 import { config } from "./config.js"
+import { bottomDialog } from "./dialogs.js"
 import { Box, Div, FlexCol, FlexRow, Tappable } from "./layout.js"
 import { SmallText, Text } from "./texts.js"
 
@@ -45,6 +46,8 @@ function SecondaryMenu(){
     let borderColor = config.colors?.border
     let activeTextColor = 'black'
 
+    let children, onclick;
+
     return {
         oninit:(vnode)=>{
             if(vnode.attrs.startingIndex){
@@ -64,11 +67,13 @@ function SecondaryMenu(){
             }
         },
         view:(vnode)=>{
-            let { onclick } = vnode.attrs
 
             if(vnode.attrs.activeIndex != undefined){
                 activeIndex = vnode.attrs.activeIndex
             }
+
+            onclick = vnode.attrs.onclick
+            children = vnode.children
             
             return m(FlexRow, { 
                 border: `1px solid rgb(204 204 204 / 21%)`, 
@@ -80,8 +85,12 @@ function SecondaryMenu(){
                 ...vnode.attrs.style
             },
 
-            vnode.children.map((child, i)=>
-                Item({
+            vnode.children.map((child, i)=> {
+                if(vnode.attrs.resizable && window.innerWidth < 768 && activeIndex != i){
+                    return;
+                }
+
+                return Item({
                     text: child.text || child.label || child,
                     onclick: (e) => {
                         activeIndex = i;
@@ -92,11 +101,56 @@ function SecondaryMenu(){
                     icon: child?.icon,
                     active: activeIndex == i,
                     minWidth: vnode.attrs.minWidth
-                }),
-            )
+                })
+            }),
+
+            vnode.attrs.resizable && window.innerWidth < 768
+            ? m(IconButton, {
+                style: {
+                    background: 'white',
+                    borderRadius: config.borderRadius,
+                    padding: '0.5rem',
+                    paddingLeft: '1rem',
+                    paddingRight: '1rem',
+                    border:`1px solid ${config.colors.border}`
+                },
+                onclick:(e)=>{
+                    bottomDialog(
+                        BottomMenu
+                    )
+                },
+                icon:'menu',  })
+            : null
+
           )
         }
     }
+
+
+    function BottomMenu(){
+        return {
+            view:(vnode)=>{
+                return m(FlexCol, 
+                    children.map((child, i)=> {
+                        return Item({
+                            text: child.text || child.label || child,
+                            onclick: (e) => {
+                                activeIndex = i;
+                                if(onclick){
+                                    onclick(child, i)
+                                }
+                                vnode.attrs.close()
+                            },
+                            icon: child?.icon,
+                            active: activeIndex == i,
+                            minWidth: vnode.attrs.minWidth
+                        })
+                    })
+                )
+            }
+        }
+    }
+    
 
     function Item({ text, active, onclick, icon, minWidth ='80px' }) {
       return m(Tappable, {
@@ -186,6 +240,7 @@ function Segment() {
     return {
         view: (vnode) => {
             let { type = 'default' } = vnode.attrs || {}
+
 
             return m(Div, {
                 padding: '1rem',
@@ -638,6 +693,7 @@ function Button() {
                     fontFamily: config.fontFamily,
                     minHeight:'40px',
                     width: fluid ? '100%': 'auto',
+                    userSelect:'none',
                     //userSelect:'none',
                     filter:`brightness(100%)`,
                     borderRadius:config.borderRadius || '1em',
@@ -829,9 +885,9 @@ function Label() {
             ...config.elements?.label?.secondary || {}
         },
         tertiary: {
-            backgroundColor: "#e8e8e8",
-            color: "#00000099",
-            border: "1px solid #e8e8e8",
+            backgroundColor: config.colors.lightgrey,
+            color: "black",
+            border: `1px solid ${config.colors.border}`,
         },
         positive: {
             backgroundColor: "#dcfce7",

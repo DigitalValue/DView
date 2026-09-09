@@ -100,6 +100,7 @@ let config = {
     colors: {
         accentRed:'#f64a59',
         blue: '#2185d0',
+        
         green: '#21ba45',
         orange: '#00b5ad',
         teal: '#00b5ad',
@@ -115,6 +116,7 @@ let config = {
         inverted: '#545454',
         dark: '#334156',
         border: 'rgba(34, 36, 38, 0.15)',
+        selected:`#aecbe742`,
         pageBackground:'#f1f5f9'
     }
 

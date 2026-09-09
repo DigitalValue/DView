@@ -16,7 +16,7 @@ export {
 
 // repensar si añadir localize a estas funciones !!
 function FormLabel() {
-  let style = {
+  let labelStyle = {
     fontWeight: 'normal',
     display: 'block',
     color: 'black',
@@ -28,7 +28,7 @@ function FormLabel() {
 
   return {
     view: (vnode) => {
-      let { required, description, info } = vnode.attrs
+      let { required, description, info, style, disabled } = vnode.attrs
 
       return m(FlexCol, [
 
@@ -36,8 +36,11 @@ function FormLabel() {
           // label debería ser Text ??
           m("label", {
             style: {
+              userSelect:'none',
               fontFamily: config.fontFamily,
-              ...(config.form?.formLabel || style),
+              ...(config.form?.formLabel || labelStyle),
+              ...(disabled ? {opacity:0.6}: {}),
+              ...style
             }
           },
             typeof vnode.children?.[0] == 'object' ? null : vnode.children
@@ -65,17 +68,28 @@ function FormLabel() {
 function Checkbox(){
 
     let checkboxStyle = {
-        width:'17px', 
-        minWidth:'17px', 
-        height:'17px',
-        minHeight:'17px',
+        
         cursor:'pointer',
+        borderRadius: config.borderRadius
         //marginBottom: "5px"
+    }
+
+    let sizes = {
+        'small': {
+            width:'14px',
+            height:'14px',
+        },
+        'normal': {
+            width:'17px', 
+            minWidth:'17px', 
+            height:'17px',
+            minHeight:'17px',
+        }
     }
 
     return {
         view:(vnode)=>{
-            let {data, name, info, description, required, onchange,label, disabled=false, checked, vertical=false} = vnode.attrs
+            let { data, name, info, description, required, onchange,label, disabled=false, checked, vertical=false, size = 'normal'} = vnode.attrs
 
             return [
                 m(FlexRow, { flexDirection: vertical ? "column-reverse" : "row", gap:'0.5em', alignItems:'start' },
@@ -84,7 +98,10 @@ function Checkbox(){
                         type:'checkbox',
                         disabled,
                         checked: data && name ? data[name] : checked,
-                        style: checkboxStyle,
+                        style: {
+                            ...checkboxStyle,
+                            ...sizes[size]
+                        },
                         onchange:(e)=>{
                             if(data && name){
                                 data[name] = e.target.checked
@@ -95,7 +112,9 @@ function Checkbox(){
                     }),
 
                    
-                    m(FormLabel, { info: info, description, required: required }, label),
+                    m(size == 'small' ? SmallText: FormLabel, 
+                        { info: info, description, required: required, style: {padding:0, margin:0},  disabled: disabled }, 
+                    label),
                     
                 )
             ]
@@ -109,7 +128,7 @@ function CheckboxLabel(){
 
     return {
       view:(vnode)=>{
-        let { data, name, label, checked, onclick, info, style={}, icon, iconColor, description, small } = vnode.attrs
+        let { data, name, label, checked, onclick, info, style={}, icon, infoPosition, iconColor, description, small } = vnode.attrs
         
         let isChecked = checked || data && name && data[name] === true
 
@@ -125,9 +144,7 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...style,
             ...isChecked ? {
-                //...config.form?.focusStyle,
-                //borderColor: config.colors.blue
-                background: config.colors.lightgrey
+                background: config.colors.selected
             } : {},
           },
           onclick: () => {
@@ -162,6 +179,7 @@ function CheckboxLabel(){
               borderRadius: '50%',
               background: isChecked ? config.colors.blue : 'transparent',
               display: 'flex',
+              background:'white',
               alignItems: 'center',
               justifyContent: 'center'
             }
@@ -184,7 +202,7 @@ function CheckboxLabel(){
           
 
           info 
-          ? m(InfoTooltip, {text:info}) 
+          ? m(InfoTooltip, {text:info, position: infoPosition}) 
           : null,
 
           icon 
@@ -220,13 +238,13 @@ function SwitchLabel(){
           
           ...style,
           ...isChecked ? {
-            background: '#aecbe742' || config.colors.lightgrey
+            background: config.colors.selected 
           } : {},
         },
         onclick: () => {
           
           if(onclick){ // mirar de añadir data name ??
-              onclick()
+            onclick()
           }
           
           if(!data && !name) return;
@@ -2049,7 +2067,7 @@ function IntegerInput(){
 
     return {
         view: (vnode)=>{
-            let { max, min=0, label, onchange, jump=1, required, style = {}, canEdit, disabled, hideValue } = vnode.attrs
+            let { max, min=0, label, onchange, jump=1, required, style = {}, canEdit, disabled, extra, hideValue } = vnode.attrs
 
             data = vnode.attrs.data || {}
             name = vnode.attrs.name || ''
@@ -2107,7 +2125,11 @@ function IntegerInput(){
                                             on = true
                                             e.stopPropagation()
                                         }
-                                    }, value())
+                                    }, value()),
+
+                                    extra ? 
+                                    m("span", extra ): null,
+
                                 ] : null,
 
                                 // se le puede pasar elementos dentro
@@ -2238,6 +2260,12 @@ function InfoTooltip(){
             bottom: "100%",
             marginBottom: "6px",
         },
+
+        top_left: {
+            right: "100%",
+            bottom: "100%",
+            marginBottom: "6px",
+        },
     }
 
     function triggerStyle() {
@@ -2266,32 +2294,11 @@ function InfoTooltip(){
         }
     }
 
-    function panelStyle(inverted) {
-        return {
-            pointerEvents: "none",
-            position: "absolute",
-            display: showingInfo ? "block" : "none",
-            textTransform: "none",
-            textAlign: "left",
-            whiteSpace: "normal",
-            fontSize: "0.8125rem",
-            lineHeight: 1.45,
-            maxWidth: "280px",
-            minWidth: "160px",
-            border: inverted ? "none" : "1px solid #e2e8f0",
-            background: inverted ? "rgba(15, 23, 42, 0.92)" : "#ffffff",
-            color: inverted ? "#f8fafc" : "#334155",
-            padding: "8px 10px",
-            borderRadius: "6px",
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
-            zIndex: 100000,
-            ...positions.top,
-        }
-    }
+    
 
     return {
         view:(vnode)=>{
-            let { text, inverted = false } = vnode.attrs
+            let { text, inverted = false, position } = vnode.attrs
             const content = text || vnode.children
 
             return m(Tappable, {
@@ -2304,7 +2311,26 @@ function InfoTooltip(){
             },
                 "i",
                 m("span", {
-                    style: panelStyle(inverted),
+                    style: {
+                        pointerEvents: "none",
+                        position: "absolute",
+                        display: showingInfo ? "block" : "none",
+                        textTransform: "none",
+                        textAlign: "left",
+                        whiteSpace: "normal",
+                        fontSize: "0.8125rem",
+                        lineHeight: 1.45,
+                        maxWidth: "280px",
+                        minWidth: "160px",
+                        border: inverted ? "none" : "1px solid #e2e8f0",
+                        background: inverted ? "rgba(15, 23, 42, 0.92)" : "#ffffff",
+                        color: inverted ? "#f8fafc" : "#334155",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        boxShadow: "0 4px 12px rgba(15, 23, 42, 0.12)",
+                        zIndex: 100000,
+                        ...(positions[position] || positions['top']),
+                    },
                 }, m.trust(content))
             )
         }
