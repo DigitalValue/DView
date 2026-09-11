@@ -915,7 +915,7 @@ function Label() {
             border: `1px solid ${config.colors.border}`,
         },
         positive: {
-            backgroundColor: "#dcfce7",
+            background: "#dcfce7",
             color: "#166534",
             border: "1px solid #dcfce7"
         },
@@ -1394,6 +1394,13 @@ function SVGIcon() {
         clock: [
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 6v6l4 2" })
+        ],
+        clipboard_clock: [
+            m("path", { d: "M16 14v2.2l1.6 1" }),
+            m("path", { d: "M16 4h2a2 2 0 0 1 2 2v.832" }),
+            m("path", { d: "M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2" }),
+            m("circle", { cx: "16", cy: "16", r: "6" }),
+            m("rect", { x: "8", y: "2", width: "8", height: "4", rx: "1" })
         ],
         columns: [
             m("rect", { width: "18", height: "18", x: "3", y: "3", rx: "2" }),

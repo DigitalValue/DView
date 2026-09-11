@@ -583,7 +583,8 @@ function bottomDialog(Component, options = {}) {
                         onCancel: close,
                         close: close,
                     })
-                )
+                ),
+                m("style", "html, body { overflow: hidden !important; }")
             )
         }
     })
@@ -810,7 +811,9 @@ function Modal(){
                     ) : null,
 
                     vnode.children
-                )
+                ),
+                // Se restaura el scroll al desaparecer el último modal del DOM.
+                m("style", "html, body { overflow: hidden !important; }")
             )
         }
     }
@@ -824,6 +827,7 @@ function ModalContent(){
                 style:{
                     padding:'1em',
                     overflowY:'auto',
+                    overscrollBehavior: 'contain',
                     maxHeight:'70vh',
                     ...(vnode.attrs.style || vnode.attrs)
                 },

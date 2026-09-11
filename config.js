@@ -102,7 +102,7 @@ let config = {
         blue: '#2185d0',
         
         green: '#21ba45',
-        orange: '#00b5ad',
+        orange: '#f2711c',
         teal: '#00b5ad',
         olive: '#b5cc18',
         brown: '#a5673f',
