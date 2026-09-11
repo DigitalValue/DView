@@ -169,12 +169,14 @@ function CheckboxLabel(){
           ? m(SVGIcon,{
             icon:'circle_check',
             color: config.colors.blue,
-            width:16
+            width:18
           })
           : m(Div, {
             style: {
               width: '16px',
               height: '16px',
+              minWidth: '16px',
+              minHeight: '16px',
               border: `1px solid ${config.colors.border}`,
               borderRadius: '50%',
               background: isChecked ? config.colors.blue : 'transparent',
