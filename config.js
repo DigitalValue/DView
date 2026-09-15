@@ -76,9 +76,7 @@ let config = {
     },
 
     elements: {
-        segment: {
-
-        },
+       
         /*
         button: {
         }*/
@@ -91,6 +89,7 @@ let config = {
     
     app: {
         appBar: {
+            borderBottom:`1px solid rgba(34, 36, 38, 0.15)`
             //background:'#ffffff'
         },
         //background: ''

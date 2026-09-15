@@ -119,7 +119,7 @@ function SecondaryMenu(){
                         BottomMenu
                     )
                 },
-                icon:'menu',  })
+                icon:'ellipsis',  })
             : null
 
           )
@@ -226,6 +226,9 @@ function Segment() {
             backgroundColor: '#374151',
             border: '1px solid #374151',
             color: 'white'
+        },
+        warning: {
+
         }
     }
 
@@ -607,9 +610,8 @@ function Button() {
             onmousedown
         },
         default: {
-            color: '#4b4b4b',
-            border: '1px solid #4b4b4b',
-            background: 'transparent',
+            background:  config.colors.lightgrey,
+            border: `1px solid ${config.colors.border}`,
             hover,
             onmousedown
         },
@@ -620,7 +622,13 @@ function Button() {
             hover,
             onmousedown
         },
-
+        
+        grey: {
+            background:  config.colors.grey,
+            border: `1px solid ${config.colors.border}`,
+            hover,
+            onmousedown
+        },
         brown: {
             color: 'white',
             border: `1px solid ${config.colors?.brown}`,
@@ -857,30 +865,30 @@ function Message() {
                     })),
 
                     vnode.attrs.header || vnode.attrs.message ?
-                        m(FlexCol, { minWidth: 0, overflowWrap: 'anywhere', gap: '0.25rem' },
+                    m(FlexCol, { minWidth: 0, overflowWrap: 'anywhere', gap: '0.25rem' },
 
-                            vnode.attrs.header && m(Text, {
-                                color: 'inherit',
-                                lineHeight: '1.5',
-                                fontWeight: 600,
-
-                            }, vnode.attrs.header),
-
-                            vnode.attrs.message &&
-                            m(Text, {
-                                color: 'inherit',
-                                lineHeight: '1.5',
-                            }, vnode.attrs.message)
-
-                        ) :
-                        isHtml ? 
-                        vnode.children 
-                        : m(Text, {
+                        vnode.attrs.header && m(Text, {
                             color: 'inherit',
                             lineHeight: '1.5',
-                            minWidth: 0,
-                            overflowWrap: 'anywhere',
-                        }, vnode.children)
+                            fontWeight: 600,
+
+                        }, vnode.attrs.header),
+
+                        vnode.attrs.message &&
+                        m(Text, {
+                            color: 'inherit',
+                            lineHeight: '1.5',
+                        }, vnode.attrs.message)
+
+                    ) :
+                    isHtml ? 
+                    vnode.children 
+                    : m(Text, {
+                        color: 'inherit',
+                        lineHeight: '1.5',
+                        minWidth: 0,
+                        overflowWrap: 'anywhere',
+                    }, vnode.children)
                 )
             );
         }
@@ -996,7 +1004,7 @@ function Label() {
                 },
                     vnode.attrs.icon || vnode.attrs.text ?
                     m(FlexRow, { gap: '0.5em', alignItems: 'center' },
-                        vnode.attrs.icon && m(Icon, { icon: vnode.attrs.icon, size: 'small', color: types[type]?.color || 'white' }),
+                        vnode.attrs.icon && m(SVGIcon, { icon: vnode.attrs.icon, size: 'small', color: types[type]?.color || 'white' }),
                         vnode.attrs.text && m(SmallText, vnode.attrs.text),
                     ) : null,
 
@@ -1170,7 +1178,7 @@ function Spinner() {
 
     return {
         view:(vnode)=>{
-            let {color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
+            let { color = config.elements?.spinner?.color, size = 'small'}= vnode.attrs
 
 
             return [
@@ -1457,6 +1465,11 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 8v5" }),
             m("path", { d: "M12 16h.01" })
+        ],
+        ellipsis: [
+            m("circle",{cx:"12", cy:"12", r:"1"}),
+            m("circle", {cx:"19", cy:"12", r:"1"}),
+            m("circle", {cx:"5", cy:"12", r:"1"})
         ],
         event_seat: [
             m("path", { d: "M5 10V7a2 2 0 0 1 4 0v3" }),
@@ -1858,6 +1871,12 @@ function SVGIcon() {
             m("circle", { cx: "12", cy: "12", r: "10" }),
             m("path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" }),
             m("path", { d: "M2 12h20" })
+        ],
+        wifi: [
+            m("path", {d:"M12 20h.01"}),
+            m("path", {d:"M2 8.82a15 15 0 0 1 20 0"}),
+            m("path", {d:"M5 12.859a10 10 0 0 1 14 0"}),
+            m("path", {d:"M8.5 16.429a5 5 0 0 1 7 0"})
         ],
         warning: [
             m("path",{d:"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}),

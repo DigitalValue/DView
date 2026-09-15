@@ -3,6 +3,7 @@ import {config} from './config.js';
 import { FlexRow, FlexCol, Tappable, Div } from './layout.js';
 import { loadScript } from './util.js';
 import { H2, Text, SmallText } from './texts.js';
+import { SVGIcon } from './elements.js';
 
 // ELEMENTOS PARA APPS MÓVILES !!
 export {
@@ -11,6 +12,7 @@ export {
     AppContent,
     NavBar,
     LucideIcon,
+    ListItem,
     mobileRouter, 
     mobileNavigator
 }
@@ -25,6 +27,7 @@ function AppBar() {
                 padding: '1rem',
                 background:'white',
                 color: 'black',
+                zIndex:1,
                 ...config.app?.appBar,
                 ...vnode.attrs
             }, 
@@ -48,8 +51,8 @@ function AppBar() {
                       }
                     }
                 },
-                    m(LucideIcon, {
-                        icon: vnode.attrs.leading.icon || 'move-left',
+                    m(SVGIcon, {
+                        icon: vnode.attrs.leading.icon || 'close',
                         width: '24',
                         height: '24',
                         style: {
@@ -58,8 +61,12 @@ function AppBar() {
                             ...vnode.attrs.leading.style
                         }
                     })
-                ) : m('div', {style: {width: '24px', height: '24px'}}),
+                )
+                : !vnode.attrs.hideLeading ? m('div', {style: {width: '24px', height: '24px'}})
+                : null,
 
+
+            vnode.attrs.title || vnode.attrs.subtitle ?
             m(FlexCol,
                 
               vnode.attrs.title 
@@ -69,9 +76,10 @@ function AppBar() {
               vnode.attrs.subtitle 
               ? m(Text, {textAlign:'right'},  vnode.attrs.subtitle)
               : null
-            ),
+            ): null,
             
-            vnode.children)
+            vnode.children
+        )
         }
     }  
 
@@ -143,7 +151,9 @@ function NavBar() {
                 zIndex: '1000',
                 ...config.app?.navBar
             },
-                vnode.attrs.icons.map((icon)=> {
+                (vnode.attrs.icons || vnode.children).map((icon)=> {
+                    let link = icon.link || icon.route
+
                     return m(Tappable, {
                         style: {
                             flex: 1,
@@ -153,27 +163,28 @@ function NavBar() {
                             justifyContent: 'center',
                             padding: '0.5rem',
                             gap: '0.2rem',
-                            color: route === icon.link ? config.primaryColor : '#888888',
+                            color: route === link ? config.primaryColor : '#888888',
                             cursor: 'pointer',
-                            transform: route != icon.link ? 'scale(0.9)':  'scale(1)',
+                            transform: route != link ? 'scale(0.9)':  'scale(1)',
                             transition: 'all 0.2s ease-in-out'
                         },
                         onclick: ()=> {
                             //mobileNavigator.clearStack();
-                            m.route.set(icon.link)
+                            m.route.set(link)
                         }
                     },  [
-                            m(LucideIcon,{
+                            m(SVGIcon,{
                                 icon: icon.icon,
                                 style: {
-                                    color: route === icon.link ? config.primaryColor : '#888888',
+                                    color: route === link ? config.primaryColor : '#888888',
                                     display: 'block'
                                 },
                                 width: '24',
                                 height: '24'
                             }),
                         ],
-                        m(SmallText, icon.name)
+
+                        m(SmallText, icon.name || icon.label)
                     )
                 })
             )
@@ -225,6 +236,27 @@ function AppButton() {
             return [
                 
             ]
+        }
+    }
+}
+
+
+function ListItem() {
+    return {
+        view:(vnode)=>{
+            let {header, description, onclick} = vnode.attrs
+
+            return m(Tappable, {style: {display:'flex',justifyContent:'space-between'}, onclick: onclick},
+
+                m(FlexCol, {gap:'0.5em'},
+                    m(Text, header),
+                    description ? m(SmallText, description): null,
+                ),
+
+                m(SVGIcon, {icon:'chevron_right'})
+
+
+            )
         }
     }
 }
