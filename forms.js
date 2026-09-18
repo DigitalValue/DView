@@ -1100,7 +1100,12 @@ function TranslationInput(){
                         languages.map((l, i) => {
                             if(typeof value == "object" && data[name] && data[name][l] && data[name][l].length)
                                 return m(Tappable, {
-                                    onclick: ()=> { selectedlang = i },
+                                    onclick: ()=> {
+                                        selectedlang = i
+                                        
+                                        if(vnode.attrs.changedLang)
+                                            vnode.attrs.changedLang(languages[selectedlang])
+                                    },
                                     style: {
                                         color: selectedlang == i ? "black" : "gray",
                                         cursor: "pointer"
@@ -1117,6 +1122,9 @@ function TranslationInput(){
                             m(Tappable, {
                                 onclick: ()=> {
                                     data[name] = value.und
+
+                                    if(vnode.attrs.changedLang)
+                                        vnode.attrs.changedLang(undefined)
                                 }
                             },
                                 m(SmallText, localize({
