@@ -113,8 +113,8 @@ function App() {
     return {
         view: (vnode) => {
             return m(FlexCol, {
-                minHeight: '100dvh', // Use dynamic viewport height for mobile browsers
-                height: '100dvh',
+                minHeight: '100vh', // Use dynamic viewport height for mobile browsers
+                height: '100vh',
                 ...vnode.attrs
             }, [
                 vnode.children
@@ -244,7 +244,9 @@ function AppButton() {
 function ListItem() {
     return {
         view:(vnode)=>{
-            let {header, description, onclick} = vnode.attrs
+            let {header, description, onclick, right} = vnode.attrs
+
+            console.log('RIGHT', right)
 
             return m(Tappable, {style: {display:'flex',justifyContent:'space-between'}, onclick: onclick},
 
@@ -253,6 +255,8 @@ function ListItem() {
                     description ? m(SmallText, description): null,
                 ),
 
+                right ? 
+                m(Text, right) :
                 m(SVGIcon, {icon:'chevron_right'})
 
 
@@ -461,7 +465,7 @@ function mobileRouter(root, initialroute, routes, realRealm) {
                     }, findPage(vnode))
                 }) : 
                 m("div", { 
-                    style: `position:absolute; z-index: 0; height:100dvh; width:100vw; inset:0px;`,
+                    style: `position:absolute; z-index: 0; height: 100vh;  width:100vw; inset:0px;`,
                     class: ''
                 },  
                     currentpage['page'] ? currentpage['page'](vnode) : 
