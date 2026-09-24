@@ -1367,6 +1367,9 @@ function SVGIcon() {
             m("path", {d:"M21.801 10A10 10 0 1 1 17 3.335"}),
             m("path", {d:"m9 11 3 3L22 4"})
         ],
+        check: [
+            m("path", {d:"M20 6 9 17l-5-5"})
+        ],
         chevron_right: [
             m("path", { d: "m9 18 6-6-6-6" })
         ],
@@ -1925,7 +1928,7 @@ function SVGIcon() {
                 height:sizes[attrs.size]?.height || attrs.height || attrs.width || 18,
                 viewBox: iconViewBox,
                 xmlns: "http://www.w3.org/2000/svg",
-                fill: attrs.filled ? attrs.color : 'none',
+                fill: attrs.filled ? attrs.filledColor || attrs.color : 'none',
                 stroke: attrs.color || 'black',
                 "stroke-width": attrs.strokeWidth || 2,
                 "stroke-linecap": attrs.strokeLinecap || "round",

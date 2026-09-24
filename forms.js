@@ -165,54 +165,54 @@ function CheckboxLabel(){
           }
         },  
 
-          isChecked
-          ? m(SVGIcon,{
-            icon:'circle_check',
-            color: config.colors.blue,
-            width:18
-          })
-          : m(Div, {
-            style: {
-              width: '16px',
-              height: '16px',
-              minWidth: '16px',
-              minHeight: '16px',
-              border: `1px solid ${config.colors.border}`,
-              borderRadius: '50%',
-              background: isChecked ? config.colors.blue : 'transparent',
-              display: 'flex',
-              background:'white',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }
-          }),
+            m(Div, {
+                style: {
+                    width: '16px',
+                    height: '16px',
+                    minWidth: '16px',
+                    minHeight: '16px',
+                    border: `1px solid ${isChecked ? config.colors.blue :config.colors.border}`,
+                    borderRadius: '50%',
+                    background: isChecked ? config.colors.blue : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding:'1px'
+                }
+            }, 
+                isChecked
+                ? m(SVGIcon,{
+                    icon:'check',
+                    color: 'white',
+                    width: 12
+                })
+                : null
+            ),
 
-          m(FlexCol, {maxWidth:'85%', width:'85%', gap:'0.2em', marginLeft:'0.5em'},
-            m(small ? SmallText : Text,{ 
-                ...(config.form?.formLabel || {}),
-                maxWidth:'70%', 
-                userSelect:'none', 
-                padding:'0em',
-                marginBottom:'0px'
-            }, localize(label)),
+            m(FlexCol, {maxWidth:'85%', width:'85%', gap:'0.2em', marginLeft:'0.5em'},
+                m(small ? SmallText : Text,{ 
+                    ...(config.form?.formLabel || {}),
+                    maxWidth:'70%', 
+                    userSelect:'none', 
+                    padding:'0em',
+                    marginBottom:'0px'
+                }, localize(label)),
 
-            description ? 
-            m(SmallText, {color:config.colors.secondaryText}, localize(description)): null
-          ),
+                description ? 
+                m(SmallText, {color:config.colors.secondaryText}, localize(description)): null
+            ),
 
-        
-          
+            
+            info 
+            ? m(InfoTooltip, {text:info, position: infoPosition, style: {  fontStyle:'normal', fontSize:'10px' }}) 
+            : null,
 
-          info 
-          ? m(InfoTooltip, {text:info, position: infoPosition}) 
-          : null,
-
-          icon 
-          ? [
-            m("div", {flex:1}),
-            m(SVGIcon, {icon: icon, color: iconColor}) 
-          ]
-          : null
+            icon 
+            ? [
+                m("div", {flex:1}),
+                m(SVGIcon, {icon: icon, color: iconColor}) 
+            ]
+            : null
         )
       }
     }
@@ -283,7 +283,7 @@ function SwitchLabel(){
         
 
 
-        m(Switch, {isActive: isChecked, disabled: true})
+        m(Switch, {isActive: isChecked, disabled: true, height: 24})
 
 
       )
@@ -1986,7 +1986,7 @@ function Switch() {
 
   return {
     view: ({ attrs }) => {
-      let { isActive, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
+      let { isActive, style, height = 20, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
 
       return m(FlexRow, { gap: '0.5em', alignItems: 'center', marginTop: '0.5em' }, // tal vez se pueda quitar el margin
 
@@ -1994,11 +1994,11 @@ function Switch() {
           style: {
             background: isActive || data && name && data[name] ? activeBg : '#eee',
             width: '60px',
-            height: '30px',
+            height: height +'px' ,
             padding: '5px',
             borderRadius: '50px',
             cursor: 'pointer',
-
+            ...style
           },
           onclick: () => {
 
@@ -2019,14 +2019,14 @@ function Switch() {
           }),
           m('label', {
             style: {
-              width: '20px',
-              height: '20px',
+              width: (height - 10)  +'px',
+              height: (height -10)  +'px' ,
               background: isActive || data && name && data[name] ? activeColor : '#ccc',
               display: 'flex',
               cursor: 'pointer',
               borderRadius: '50px',
               transition: 'all 0.25s ease 0s',
-              marginLeft: isActive || data && name && data[name] ? '30px' : '0px',
+              marginLeft: isActive || data && name && data[name] ? height *30/20 +'px' : '0px',
             }
           })
         ]),
@@ -2077,13 +2077,13 @@ function IntegerInput(){
 
     return {
         view: (vnode)=>{
-            let { max, min=0, label, onchange, jump=1, required, style = {}, canEdit, disabled, extra, hideValue } = vnode.attrs
+            let { max, min=0, label, onchange, flexStyle= {}, jump=1, required, style = {}, canEdit, disabled, extra, hideValue } = vnode.attrs
 
             data = vnode.attrs.data || {}
             name = vnode.attrs.name || ''
             
             return [
-                m(FlexCol,
+                m(FlexCol, { ...flexStyle},
                     label ? m(FormLabel, {required:required}, label) : null,
 
                     m("div",{
@@ -2308,7 +2308,7 @@ function InfoTooltip(){
 
     return {
         view:(vnode)=>{
-            let { text, inverted = false, position } = vnode.attrs
+            let { text, inverted = false, position, style = {}} = vnode.attrs
             const content = text || vnode.children
 
             return m(Tappable, {
@@ -2317,7 +2317,10 @@ function InfoTooltip(){
                     showingInfo = isHovered
                     m.redraw()
                 },
-                style: triggerStyle(),
+                style: {
+                    ...triggerStyle(),
+                    ...style
+                },
             },
                 "i",
                 m("span", {
