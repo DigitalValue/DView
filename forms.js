@@ -1986,7 +1986,7 @@ function Switch() {
 
   return {
     view: ({ attrs }) => {
-      let { isActive, style, height = 20, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
+      let { isActive, style, height = 30, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
 
       return m(FlexRow, { gap: '0.5em', alignItems: 'center', marginTop: '0.5em' }, // tal vez se pueda quitar el margin
 
@@ -2026,7 +2026,7 @@ function Switch() {
               cursor: 'pointer',
               borderRadius: '50px',
               transition: 'all 0.25s ease 0s',
-              marginLeft: isActive || data && name && data[name] ? height *30/20 +'px' : '0px',
+              marginLeft: isActive || data && name && data[name] ? (height-10)*30/(height-10) +'px' : '0px',
             }
           })
         ]),
