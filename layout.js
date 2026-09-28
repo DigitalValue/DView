@@ -125,7 +125,7 @@ function Grid() {
     let id;
 
     function getResponsiveValue(value, key) {
-        if (!value) return null
+        if (value == undefined) return null
         if (typeof value !== "object") return key === 'base' ? value : null
         return value[key] || null
     }
