@@ -358,8 +358,7 @@ function Input() {
 
   return {
     view: (vnode) => {
-      let { data, name, oninput, type, label, required, flexStyle, style, rows, icon, readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint } = vnode.attrs
-
+      let { data, name, oninput, type, label, rightIcon, rightIconColor, divStyle, required, flexStyle, style, rows, icon, readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint } = vnode.attrs
 
 
       return [
@@ -368,12 +367,13 @@ function Input() {
           ...flexStyle || {},
           width: config.form.expandInputs == false ? 'auto' : "100%"
         }, // pensar otra manera sin necesidad de meter width: 100%
-          label
+            label
             ? [
-              m(FormLabel, { required: required, description, info: info }, label),
+                m(FormLabel, { required: required, description, info: info }, label),
             ] : null,
 
-          m(Div, { position: 'relative', width: '100%', display: 'flex' },
+          // PODRÍA SER EL INPUT EL RELATIVE Y NO ESTO??
+          m(Div, { position: 'relative', width: '100%', display: 'flex', ...flexStyle },
             m(type == 'textarea' ? "textarea" : "input", {
               readonly: readonly || false, // es lo mismo que disabbled==
               rows: rows,
@@ -439,15 +439,29 @@ function Input() {
 
             ),
 
+            // DEBERÍA DE PODER HABER IZQUIERDA Y DERECHA
             icon ?
-              m(SVGIcon, {
+            m(SVGIcon, {
                 icon: icon, width: 18, height: 19, color: focused ? 'black' : 'grey',
                 style: {
-                  position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '8px',
-                  ...vnode.attrs?.iconPosition || {}
+                    position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '8px',
+                    ...vnode.attrs?.iconPosition || {}
                 },
                 onclick: vnode.attrs.iconclick
-              }) : null,
+            }) : null,
+
+            rightIcon ?
+            m(SVGIcon, {
+                icon: rightIcon, 
+                width: 18, 
+                height: 19, 
+                color: focused ?  rightIconColor || 'black' : 'grey',
+                style: {
+                    position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '8px',
+                    cursor: vnode.attrs.rightIconClick ? 'pointer': 'default'
+                },
+                onclick: vnode.attrs.rightIconClick
+            }) : null,
 
             vnode.children
           )
