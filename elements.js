@@ -1193,7 +1193,7 @@ function Spinner() {
                         transform: rotate(360deg);
                     }
                 }`),
-                    
+                  
                 m(Div,{
                     display: "inline-flex",
                     justifyContent: "center",
