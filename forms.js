@@ -373,7 +373,7 @@ function Input() {
             ] : null,
 
           // PODRÍA SER EL INPUT EL RELATIVE Y NO ESTO??
-          m(Div, { position: 'relative', width: '100%', display: 'flex', ...flexStyle },
+          m(Div, { position: 'relative', width: '100%', display: 'flex' },
             m(type == 'textarea' ? "textarea" : "input", {
               readonly: readonly || false, // es lo mismo que disabbled==
               rows: rows,
@@ -419,7 +419,8 @@ function Input() {
               ...(data && data[name] ? { value: data[name] } : {}),
               ...type && type != 'textarea' ? { type: type } : {},
               ...vnode.attrs.min && vnode.attrs.max ? { min: vnode.attrs.min, max: vnode.attrs.max } : {},
-              ...vnode.attrs.minlength && vnode.attrs.maxlength ? { minlength: vnode.attrs.minlength, maxlength: vnode.attrs.maxlength } : {},
+              ...vnode.attrs.minlength ? { minlength: vnode.attrs.minlength } : {},
+              ...vnode.attrs.maxlength ? { maxlength: vnode.attrs.maxlength}: {},
               ...pattern ? { pattern: pattern } : {},
               ...(vnode.attrs.id ? { id: vnode.attrs.id } : {}),
               ...title ? { title: title } : {},
@@ -1065,12 +1066,13 @@ function TranslationInput(){
                         style: { flexGrow: 2, borderRadius: ".28571429rem 0em 0em .28571429rem" },
                         rows: rows,
                         required:required,
+                        maxlength: vnode.attrs.maxlength,
                         data: typeof value !== "object" ? data : data[name],
                         name: typeof value !== "object" ? name : languages[selectedlang],
                         oninput: (e)=> {
                           if (!e.target.value.length && typeof value == "object") delete data[name][languages[selectedlang]]
 
-                          if(oninput) oninput()
+                          if(oninput) oninput(e)
                         },
                         type: type,
                         onfocusout: onfocusout,
@@ -1079,10 +1081,11 @@ function TranslationInput(){
                     
                     m(Button,{
                         type:'default',
-                        style:{
+                        style: {
                             background:'white',
                             borderRadius:'0em .28571429rem .28571429rem 0em',
-                            minWidth: "80px", border:'1px solid #22242626', 
+                            minWidth: "80px", 
+                            border:'1px solid #22242626', 
                             flexGrow:1,  
                             padding: config.form.baseStyle?.padding,
                             lineHeight: config.form.baseStyle?.lineHeight,
@@ -1093,6 +1096,7 @@ function TranslationInput(){
                             if(typeof value !== "object") {
                                 data[name] = { und: value }
                             }
+
                             else {
                                 selectedlang++
                                 if(selectedlang > languages.length-1) {
@@ -1216,12 +1220,18 @@ function Dropdown(){
                         disabled,
                         style: {
                             ...(config.form?.baseStyle),
+                            ...vnode.attrs.size == 'small' ?
+                            { 
+                                ...config.fonts.small 
+                            } 
+                            : {},
                             ...vnode.attrs.style
                             // appearance: 'none',
                             // WebkitAppearance: 'none',
                         },
                         onchange:(e)=>{
                             data && name !=undefined ? data[name] = e.target.value: ''
+                            console.log('ONCHANGE', e.target.value )
                             onchange ? onchange(e.target.value) : ''
                             m.redraw()
                         }
@@ -1229,7 +1239,7 @@ function Dropdown(){
                         m("option",{ disabled:true, selected: true}, placeholder ||  "Selecciona una opción"),
                         //, selected:true
                         vnode.children.map((o)=> m("option",{
-                            value: o.value != undefined ? o.value : o, 
+                            value: typeof o =='object' ? o.value: o, 
                             selected: data && name != undefined 
                                 ? typeof o == 'object' 
                                 ? data[name] == o.value 

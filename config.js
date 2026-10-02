@@ -88,6 +88,12 @@ let config = {
 
     },
     
+    layout: {
+        container: {
+            
+        }
+    },
+
     app: {
         appBar: {
             borderBottom:`1px solid rgba(34, 36, 38, 0.15)`

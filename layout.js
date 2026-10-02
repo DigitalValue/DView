@@ -1,3 +1,4 @@
+import { config } from "./config.js"
 import { RippleEffect } from "./elements.js"
 
 
@@ -9,14 +10,19 @@ export {
 }
 
 
-function Container(){
-    
-    
+function Container() {
+
+
     return {
-        view:(vnode)=>{
+        view: (vnode) => {
             return [
                 m("style",
                     `.container {
+                        margin:0 auto !important;
+                    }
+                        
+                    ${config.layout?.container?.size == 'large' ?
+                        `.container {
                         @media (width < 576px ) {
                             width: 95% !important;
                         }
@@ -35,24 +41,51 @@ function Container(){
                         }*/
 
                         @media (width>=1200px ) {
-                            width: 65% !important;
+                            width: 80% !important;
                         }
-                    }
-                    .container {
-                        margin:0 auto !important;
-                    }
+                    }`: `
+                        
+                    
+                    
+                        .container {
+                            @media (width < 576px ) {
+                                width: 95% !important;
+                            }
+
+                            @media (width >= 576px ) {
+                                width: 90% !important;
+                            }
+                            
+                            /*
+                            @media (width>=768px) {
+                                width: 720px !important;
+                            }
+
+                            @media (width>=992px) {
+                                width: 960px !important;
+                            }*/
+
+                            @media (width>=1200px ) {
+                                width: 65% !important;
+                            }
+                        }
+                    
+                    `}
                 `),
 
-                m("div",{
+                m("div", {
                     class: "container",
-                 }, 
-                    m(Div,{
+                },
+                    m(Div, {
                         //width: getWidth(),
-                        paddingTop:'1em',
-                        paddingBottom:'1em',
-                        margin:'0 auto',
+                        ...!vnode.attrs.removePadding ? {
+                            paddingTop: '1em',
+                            paddingBottom: '1em',
+                        } : {},
+
+                        margin: '0 auto',
                         ...vnode.attrs
-                    }, vnode.children)    
+                    }, vnode.children)
                 )
             ]
         }
