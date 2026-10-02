@@ -86,7 +86,7 @@ function Text(){
                     fontFamily: config.fontFamily,
                     margin: 0,
                     // color:'black',
-                    ...(config.fonts?.text ||  config.defaultFont  || {}),
+                    ...(config.fonts?.text || config.fonts?.default || config.defaultFont  || {}),
                     ...(vnode.attrs.style || vnode.attrs)
                 }
             }, vnode.children)
