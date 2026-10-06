@@ -192,7 +192,7 @@ function SecondaryMenu(){
                 opacity: active ? 1 : 0.8
             }, 
             icon:icon, 
-            color: active && activeColor != 'white' ? 'white': 'black' 
+            color: 'black' 
         }): null,
 
         m(Text, text ),
@@ -825,7 +825,7 @@ function Message() {
             icon: 'check_circle'
         },
         'neutral': {
-            background: '#f8fafc',
+            background: 'white',
             color: '#475569',
             borderColor: '#e2e8f0',
             icon: 'info'

@@ -1842,10 +1842,23 @@ function Menu() {
 
                                         if(onselect) onselect(o)
                                     }
-                                }, m(Text, {
-                                    userSelect:'none',
-                                    fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
-                                }, o.label || o))
+                                }, o.icon || o.description
+                                    ? m(FlexRow, { gap:'0.75em', alignItems:'center' },
+                                        o.icon ? m(SVGIcon, { icon: o.icon }) : null,
+
+                                        m(FlexCol, { gap:'0.1em' },
+                                            m(Text, {
+                                                userSelect:'none',
+                                                fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
+                                            }, o.label || o),
+
+                                            o.description ? m(SmallText, { userSelect:'none', color: config.colors?.secondaryText }, o.description) : null
+                                        )
+                                    )
+                                    : m(Text, {
+                                        userSelect:'none',
+                                        fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
+                                    }, o.label || o))
                             )
                         )),
 
@@ -1921,10 +1934,10 @@ function HtmlDropdown() {
             currentName = name
             currentOnchange = onchange
 
-            if(data && name && data[name] && !val){
-                console.log('getting value', data[name], vnode.children)
-                val = vnode.children?.find((o)=> o.value == data[name])?.label
-            }
+            // las opciones pueden llevar icon y description; el campo muestra el label y el icono de la elegida
+            let selected = data && name && data[name] ? vnode.children?.find((o)=> o.value == data[name]) : null
+
+            if(selected?.label) val = selected.label
 
             return [
                 m(FlexCol,{width:'100%', ...flexStyle},
@@ -1960,15 +1973,19 @@ function HtmlDropdown() {
                     },
                         m(FlexRow, { justifyContent:'space-between', alignItems:'center', height:'100%'},
                             
-                            m(Text, {
-                                maxWidth:'80%',
-                                overflow:'hidden',
-                                textOverflow:'ellipsis',
-                                whiteSpace:'nowrap',
-                                color:  data && name && data[name] ? 'black' : 'grey'
-                            }, 
+                            m(FlexRow, { alignItems:'center', gap:'0.5em', maxWidth:'80%' },
+                                selected?.icon ? m(SVGIcon, { icon: selected.icon }) : null,
 
-                                val ? val : data && name && data[name] ? data[name] : 'Selecciona'
+                                m(Text, {
+                                    minWidth:0,
+                                    overflow:'hidden',
+                                    textOverflow:'ellipsis',
+                                    whiteSpace:'nowrap',
+                                    color:  data && name && data[name] ? 'black' : 'grey'
+                                }, 
+
+                                    val ? val : data && name && data[name] ? data[name] : 'Selecciona'
+                                )
                             ),
 
                             // is there a built-in icon without using a library??
