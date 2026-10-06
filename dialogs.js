@@ -131,7 +131,8 @@ function alertDialog(options={
             icon:'info',
         },
         'warning': {
-            icon:'warning', 
+            icon:'warning',
+            color: config.colors.orange
         },
         'error': {
             icon:'error',
