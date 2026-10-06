@@ -27,9 +27,10 @@ let config = {
             marginBottom:0,
         },
         h3: {
+            fontSize:'1.25rem',
+            lineHeight: '1.25',
             marginTop: 0,
             marginBottom: 0,
-            
         },
         h4: {
             marginTop: 0,

@@ -1,15 +1,16 @@
 import { config } from "./config.js";
-import { Button, IconButton, SVGIcon } from "./elements.js";
+import { Button, IconButton, RippleEffect, SVGIcon } from "./elements.js";
 import { Input } from "./forms.js";
-import { Animate, Box, Div, FlexRow } from "./layout.js";
-import { H2, Text } from "./texts.js";
+import { Animate, Box, Div, FlexCol, FlexRow } from "./layout.js";
+import { H2, H3, Text } from "./texts.js";
 
 
 
 export {
     alertDialog, bottomDialog, confirmDialog,  openDialog,
     Dimmer, Modal, ModalContent, ModalFooter,  ModalHeader, 
-    openPopup, promptDialog, showSnackbar
+    openPopup, promptDialog, showSnackbar, KioskInfoDialog,
+    KioskConfirmDialog
 };
 
 
@@ -130,7 +131,8 @@ function alertDialog(options={
             icon:'info',
         },
         'warning': {
-            icon:'warning', 
+            icon:'warning',
+            color: config.colors.orange
         },
         'error': {
             icon:'error',
@@ -894,5 +896,148 @@ function Dimmer(){
 
             )
         }
+    }
+}
+
+
+
+function KioskInfoDialog(){
+      return {
+        view: (vnode)=> {
+          let {text, close} = vnode.attrs;
+
+          return [
+            m(Div,{position:'fixed', inset:'0', background:'rgba(0,0,0,0.5)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center'},
+              m(FlexCol, {
+                background:'white',
+                padding:'1.5rem',
+                maxWidth:'400px',
+                width: '300px',
+                minHeight:'300px',
+                display:'flex',
+                justifyContent:'space-between',
+                alignItems:'center',
+                gap:'2em',
+                borderRadius:'1rem',
+                boxShadow:'0 10px 30px rgba(0,0,0,0.2)'
+              },
+                m(FlexCol,{ gap:'1em', alignItems:'center', gap:'2em'},
+                  m(SVGIcon, { icon: 'help', width:40, color: config.colors.blue}),
+                  m(Text, { textAlign:'center'} , localize(text)),
+                ),
+
+                m(RippleEffect,{
+                  style: {
+                    height: "90px",
+                    width:'100%',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    userSelect: "none",
+                    background: "rgb(43, 48, 59)",
+                    borderRadius: "12px",
+                    color: "rgb(236, 240, 241)",
+                    boxShadow: "rgba(255, 255, 255, 0.1) 0px 1px 0px inset, rgba(0, 0, 0, 0.3) 0px 10px 20px",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
+                    color:'white',
+                    textTransform:'uppercase',
+                    fontWeight:'bold'
+                  },
+                  onclick: close
+                }, m(Text,localize({es:"Cerrar",va:"Tancar"})))
+              )
+            )
+          ]
+        }
+      }
+    }
+
+
+
+// CREAR LA VERSIÓN CON FUNCIONES
+function KioskConfirmDialog(){
+    return {
+    view: (vnode)=> {
+        let {text, close, then, icon, iconColor} = vnode.attrs;
+
+        return [
+            m(Div,{position:'fixed', inset:'0', background:'rgba(0,0,0,0.5)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center'},
+                m(FlexCol, {
+                    background:'white',
+                    padding:'1.5rem',
+                    maxWidth:'450px',
+                    minHeight:'300px',
+                    display:'flex',
+                    justifyContent:'space-between',
+                    alignItems:'center',
+                    gap:'2em',
+                    borderRadius:'1rem',
+                    boxShadow:'0 10px 30px rgba(0,0,0,0.2)'
+                },
+
+                    m(FlexCol,{ gap:'1em', alignItems:'center', gap:'2em', border:`1px solid ${config.colors.blue}`},
+                        
+                        icon ? 
+                        m(SVGIcon, { icon: icon, width:40, color: iconColor || config.colors.blue})
+                        : null,
+
+                        m(H3, { textAlign:'center'} , localize(text)),
+                    ),
+                    
+
+                    m(RippleEffect,{
+                        style: {
+                        height: "90px",
+                        width:'100%',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        userSelect: "none",
+                        background: "rgb(43, 48, 59)",
+                        borderRadius: "12px",
+                        color: "rgb(236, 240, 241)",
+                        boxShadow: "rgba(255, 255, 255, 0.1) 0px 1px 0px inset, rgba(0, 0, 0, 0.3) 0px 10px 20px",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
+                        color:'white',
+                        textTransform:'uppercase',
+                        fontWeight:'bold'
+                        },
+                        onclick: ()=>{
+                            if(then) then(true)
+                            close()
+                        }
+                    }, m(Text,localize({es:"Confirmar",va:"Confirmar"}))),
+                    
+                
+                    m(RippleEffect,{
+                        style: {
+                            height: "90px",
+                            width:'100%',
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            userSelect: "none",
+                            background: "white",
+                            borderRadius: "12px",
+                            color: "rgb(43, 48, 59)",
+                            boxShadow: "rgba(255, 255, 255, 0.1) 0px 1px 0px inset, rgba(0, 0, 0, 0.3) 0px 10px 20px",
+                            border: "1px solid rgba(255, 255, 255, 0.05)",
+                            textTransform:'uppercase',
+                            fontWeight:'bold'
+                        },
+                        onclick: ()=>{
+                            if(then) then(false)
+                            close()
+                        }
+                    }, m(Text,localize({es:"Cancelar",va:"Cancel·lar"})))
+                ),
+
+                
+            )
+        ]
+    }
     }
 }

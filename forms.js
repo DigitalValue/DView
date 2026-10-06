@@ -358,8 +358,11 @@ function Input() {
 
   return {
     view: (vnode) => {
-      let { data, name, oninput, type, label, rightIcon, rightIconColor, divStyle, required, flexStyle, style, rows, icon, readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint } = vnode.attrs
+      let { data, name, oninput, type, isFocused, label, rightIcon, rightIconColor, divStyle, required, flexStyle, style, rows, icon, readonly, pattern, title, onchange, disabled, placeholder, value, info, description, onkeyup, inputmode, enterkeyhint } = vnode.attrs
 
+      if(isFocused){
+        focused = isFocused
+      }
 
       return [
         // TO DO: editar el estilo de focus
@@ -1488,12 +1491,16 @@ function DateSelector() {
 
     return {
         view: (vnode) => {
-            let { data, name, label, onchange, oninput, required, format, dateFormat} = vnode.attrs
+            let { data, name, label, onchange, oninput, required, isFocused, onfocus, format, dateFormat} = vnode.attrs
             let selectedFormat = normalizeDateFormat(dateFormat || format)
             let dateValue = formatDateValue(selectedFormat)
 
             syncFromData(data, name, selectedFormat)
             dateValue = formatDateValue(selectedFormat)
+
+            if(isFocused){
+                focused = isFocused
+            }
 
             return [
                 m(FlexCol,{width:'100%'},
@@ -1529,18 +1536,22 @@ function DateSelector() {
                                     outline:'none',
                                     whiteSpace:'nowrap',
                                     margin: 0,
+                                    
                                     //fontSize:'1.4rem',
                                     color: data && name && data[name] ? 'black' : 'grey',                                    
                                 },
+                                pattern:"[0-9]*",
                                 id: 'date-input',
                                 placeholder: selectedFormat,
-                                type: 'text',
+                                type: 'tel',
                                 inputmode: 'numeric',
                                 maxlength: 10,
                                 value: dateValue,
                                 onclick:(e)=> e.stopPropagation(),
                                 onfocus:(e)=> {
                                     focused = true
+
+                                    onfocus ? onfocus(e) : null,
                                     m.redraw()
                                 },
                                 onblur:(e)=> {
