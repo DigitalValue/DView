@@ -189,7 +189,8 @@ function SecondaryMenu(){
         icon ? m(SVGIcon,{ 
             size:'small', 
             style: {
-                opacity: active ? 1 : 0.8
+                opacity: active ? 1 : 0.8,
+                minWidth: "14px"
             }, 
             icon:icon, 
             color: 'black' 
