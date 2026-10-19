@@ -189,7 +189,8 @@ function SecondaryMenu(){
         icon ? m(SVGIcon,{ 
             size:'small', 
             style: {
-                opacity: active ? 1 : 0.8
+                opacity: active ? 1 : 0.8,
+                minWidth: "14px"
             }, 
             icon:icon, 
             color: 'black' 
@@ -1307,6 +1308,11 @@ function SVGIcon() {
             m("path", {d:"M5 12h14"}),
             m("path", {d:"M12 5v14"})
         ],
+        add_circle: [
+            m("circle", { cx: 12, cy: 12, r: 10 }),
+            m("path", { d: "M8 12h8" }),
+            m("path", { d: "M12 8v8" }),
+        ],
         arrow_down: [
             m("path", { d: "M12 5v14" }),
             m("path", { d: "m19 12-7 7-7-7" })
@@ -1443,6 +1449,12 @@ function SVGIcon() {
             m("path", { d: "M14 2v2" }),
             m("path", { d: "M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" }),
             m("path", { d: "M6 2v2" })
+        ],
+        dashboard: [
+            m("rect", { width: 7, height: 9, x: 3, y: 3, rx: 1 }),
+            m("rect", { width: 7, height: 5, x: 14, y: 3, rx: 1 }),
+            m("rect", { width: 7, height: 9, x: 14, y: 12, rx: 1 }),
+            m("rect", { width: 7, height: 5, x: 3, y: 16, rx: 1 })
         ],
         database: [
             m("ellipse", {
@@ -1699,6 +1711,11 @@ function SVGIcon() {
             m("path", {
                 d: "M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1"
             })
+        ],
+        megaphone: [
+            m("path", { d: "M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" }),
+            m("path", { d: "M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14" }),
+            m("path", { d: "M8 6v8" }),
         ],
         mouse_pointer: [
             m("path", { d: "M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" })

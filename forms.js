@@ -446,7 +446,8 @@ function Input() {
             // DEBERÍA DE PODER HABER IZQUIERDA Y DERECHA
             icon ?
             m(SVGIcon, {
-                icon: icon, width: 18, height: 19, color: focused ? 'black' : 'grey',
+                icon: icon, width: 18, height: 19, 
+                color: vnode.attrs.iconColor || (focused ? 'black' : 'grey'),
                 style: {
                     position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '8px',
                     ...vnode.attrs?.iconPosition || {}
