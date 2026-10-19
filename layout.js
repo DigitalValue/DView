@@ -6,7 +6,7 @@ export {
     Container,
     Grid, FlexCol, FlexRow, 
     Div, Animate, Tappable, Draggable,
-    Box, CssStyle, ViewPortComponent
+    Box, CssStyle, ViewPortComponent, ScrollIfNotVisible
 }
 
 
@@ -154,6 +154,13 @@ function Grid() {
     let largeMobilePadding = null
     let tabletPadding = null
     let computerPadding = null
+    // Con minColumnWidth caben tantas columnas como permita el ancho (auto-fill) en lugar de un número fijo.
+    // Admite un valor o un objeto por pantalla: { mobile: '4em', computer: '6em' }
+    let minColumnWidth = null
+    let mobileMinColumnWidth = null
+    let largeMobileMinColumnWidth = null
+    let tabletMinColumnWidth = null
+    let computerMinColumnWidth = null
 
     let id;
 
@@ -163,9 +170,10 @@ function Grid() {
         return value[key] || null
     }
 
-    function getGridCss(columnValue, gapValue, paddingValue) {
+    function getGridCss(columnValue, gapValue, paddingValue, minWidthValue) {
         return [
-            columnValue ? `grid-template-columns: repeat(${columnValue}, minmax(0, 1fr));` : '',
+            minWidthValue ? `grid-template-columns: repeat(auto-fill, minmax(${minWidthValue}, 1fr));`
+            : columnValue ? `grid-template-columns: repeat(${columnValue}, minmax(0, 1fr));` : '',
             gapValue ? `gap: ${gapValue};` : '',
             paddingValue ? `padding: ${paddingValue};` : '',
         ].join('')
@@ -175,6 +183,12 @@ function Grid() {
         attrs = attrs || {}
 
         let columnConfig = attrs.columns
+
+        minColumnWidth = getResponsiveValue(attrs.minColumnWidth, 'base') || getResponsiveValue(attrs.minColumnWidth, 'computer')
+        mobileMinColumnWidth = getResponsiveValue(attrs.minColumnWidth, 'mobile')
+        largeMobileMinColumnWidth = getResponsiveValue(attrs.minColumnWidth, 'largeMobile')
+        tabletMinColumnWidth = getResponsiveValue(attrs.minColumnWidth, 'tablet')
+        computerMinColumnWidth = getResponsiveValue(attrs.minColumnWidth, 'computer')
 
         largeMobileColumns = null
         tabletColumns = null
@@ -218,6 +232,7 @@ function Grid() {
         delete style.largeMobileColumns
         delete style.tabletColumns
         delete style.computerColumns
+        delete style.minColumnWidth
         delete style.gap
         delete style.padding
         delete style.class
@@ -236,7 +251,7 @@ function Grid() {
         view : (vnode)=> {
             setGridData(vnode.attrs)
 
-            let hasLargeMobile = largeMobileColumns || largeMobileGap || largeMobilePadding
+            let hasLargeMobile = largeMobileColumns || largeMobileGap || largeMobilePadding || largeMobileMinColumnWidth
             let mobileMedia = hasLargeMobile ? '(max-width: 479px)' : '(max-width: 768px)'
             let tabletMedia = hasLargeMobile ? '(min-width: 768px) and (max-width: 1023px)' : '(min-width: 769px) and (max-width: 992px)'
             let computerMedia = hasLargeMobile ? '(min-width: 1024px)' : '(min-width: 993px)'
@@ -245,12 +260,12 @@ function Grid() {
                 m("style",
                     `#${id} {
                         display: grid;
-                        ${getGridCss(columns, gap, padding)}
+                        ${getGridCss(columns, gap, padding, minColumnWidth)}
                     }`
-                    + (mobileColumns || mobileGap || mobilePadding ? `@media ${mobileMedia} { #${id} { ${getGridCss(mobileColumns, mobileGap, mobilePadding)} } }` : '')
-                    + (largeMobileColumns || largeMobileGap || largeMobilePadding ? `@media (min-width: 480px) and (max-width: 767px) { #${id} { ${getGridCss(largeMobileColumns, largeMobileGap, largeMobilePadding)} } }` : '')
-                    + (tabletColumns || tabletGap || tabletPadding ? `@media ${tabletMedia} { #${id} { ${getGridCss(tabletColumns, tabletGap, tabletPadding)} } }` : '')
-                    + (computerColumns || computerGap || computerPadding ? `@media ${computerMedia} { #${id} { ${getGridCss(computerColumns, computerGap, computerPadding)} } }` : '')
+                    + (mobileColumns || mobileGap || mobilePadding || mobileMinColumnWidth ? `@media ${mobileMedia} { #${id} { ${getGridCss(mobileColumns, mobileGap, mobilePadding, mobileMinColumnWidth)} } }` : '')
+                    + (largeMobileColumns || largeMobileGap || largeMobilePadding || largeMobileMinColumnWidth ? `@media (min-width: 480px) and (max-width: 767px) { #${id} { ${getGridCss(largeMobileColumns, largeMobileGap, largeMobilePadding, largeMobileMinColumnWidth)} } }` : '')
+                    + (tabletColumns || tabletGap || tabletPadding || tabletMinColumnWidth ? `@media ${tabletMedia} { #${id} { ${getGridCss(tabletColumns, tabletGap, tabletPadding, tabletMinColumnWidth)} } }` : '')
+                    + (computerColumns || computerGap || computerPadding || computerMinColumnWidth ? `@media ${computerMedia} { #${id} { ${getGridCss(computerColumns, computerGap, computerPadding, computerMinColumnWidth)} } }` : '')
                 ),
 
                 m("div",{
@@ -265,6 +280,20 @@ function Grid() {
                 )
             ]
         }
+    }
+}
+
+// Al crearse, en móvil, desplaza la página lo justo para que su contenido se vea.
+// Para que vuelva a hacer scroll en cada selección, se le pasa una key que cambie con ella.
+function ScrollIfNotVisible() {
+    return {
+        oncreate: ({ dom, attrs }) => {
+            if (attrs.disabled || window.innerWidth > 768) return
+
+            // block 'nearest' no mueve nada si ya se ve entero
+            dom.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        },
+        view: (vnode) => m("div", {style: {scrollMarginTop: vnode.attrs.scrollMarginTop }}, vnode.children)
     }
 }
 
@@ -695,6 +724,7 @@ function Animate() {
                 onkeydown: (e)=> {
                     if(attrs.onkeydown && typeof attrs.onkeydown == "function") attrs.onkeydown(e)
                 },
+            
 
                 style: {
                     ...attrs?.style,

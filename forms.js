@@ -1111,7 +1111,7 @@ function TranslationInput(){
                         }
                     },
                         typeof value !== "object"
-                        ? m(Icon, { icon: "language", color: "gray", size: "tiny" })
+                        ? m(SVGIcon, { icon: "web",  color: "gray", size: "small" })
                         : languages[selectedlang]
                     )
                 ),
@@ -1162,8 +1162,8 @@ function TranslationInput(){
                         // Traducir al valenciano
                         typeof value !== "object"
                         ? null 
-                        : m(Icon, {
-                            icon: "language",
+                        : m(SVGIcon, {
+                            icon: "web",
                             color: "green",
                             size: "small",
                             onclick: async ()=> {
