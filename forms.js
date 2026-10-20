@@ -1482,12 +1482,31 @@ function DateSelector() {
             return
         }
 
-        if(formatDateValue(format) == data[name]) return
+        let currentValue = formatDateValue(format)
+        let value = String(data[name])
 
-        let parsed = parseDateValue(data[name], format)
-        year = parsed.year
-        month = parsed.month
-        day = parsed.day
+        if(currentValue == value) return
+
+        // Teclado externo (Keyboard): si solo se ha borrado una barra, se borra también el dígito anterior.
+        if(value.length < currentValue.length && value.replace(/[^0-9]/g, '') == getDateDigits(format)){
+            setDateDigits(getDateDigits(format).slice(0, -1), format)
+        } else {
+            let parsed = parseDateValue(value, format)
+            year = parsed.year
+            month = parsed.month
+            day = parsed.day
+        }
+
+        // Valor escrito con teclado externo: se guarda con barras para que siga sobre el formato correcto.
+        if(!/^[0-9/]*$/.test(value)) return
+
+        let formattedValue = formatDateValue(format)
+
+        if(formattedValue){
+            data[name] = formattedValue
+        } else {
+            delete data[name]
+        }
     }
 
     return {
@@ -1861,7 +1880,7 @@ function Menu() {
                                         m(FlexCol, { gap:'0.1em' },
                                             m(Text, {
                                                 userSelect:'none',
-                                                fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
+                                                fontWeight: data && name && data[name] != undefined && (String(o?.value) === String(data[name]) || o == data[name]) ?'bold': 'normal'
                                             }, o.label || o),
 
                                             o.description ? m(SmallText, { userSelect:'none', color: config.colors?.secondaryText }, o.description) : null
@@ -1869,7 +1888,7 @@ function Menu() {
                                     )
                                     : m(Text, {
                                         userSelect:'none',
-                                        fontWeight: data && name && data[name] && (o?.value == data[name] || o == data[name]) ?'bold': 'normal'
+                                        fontWeight: data && name && data[name] != undefined && (String(o?.value) === String(data[name]) || o == data[name]) ?'bold': 'normal'
                                     }, o.label || o))
                             )
                         )),
@@ -1947,16 +1966,18 @@ function HtmlDropdown() {
             currentOnchange = onchange
 
             // las opciones pueden llevar icon y description; el campo muestra el label y el icono de la elegida
-            let selected = data && name && data[name] ? vnode.children?.find((o)=> o.value == data[name]) : null
+            // se compara como texto para que una opción con valor '' (p. ej. "Sin grupo") también se muestre, sin que '' coincida con 0
+            let selected = data && name && data[name] != undefined ? vnode.children?.find((o)=> String(o.value) === String(data[name])) : null
 
             if(selected?.label) val = selected.label
 
             return [
                 m(FlexCol,{width:'100%', ...flexStyle},
-                    m(FormLabel,{required}, label),
+                    label && m(FormLabel,{required}, label),
 
                     m(Tappable, {
                         style: {
+                            userSelect:'none',
                             ...(config.form?.baseStyle),
                             ...fieldOpen && (config.form?.focusStyle || {}),
                             ...(fieldOpen
@@ -1993,7 +2014,7 @@ function HtmlDropdown() {
                                     overflow:'hidden',
                                     textOverflow:'ellipsis',
                                     whiteSpace:'nowrap',
-                                    color:  data && name && data[name] ? 'black' : 'grey'
+                                    color: selected || data && name && data[name] ? 'black' : 'grey'
                                 }, 
 
                                     val ? val : data && name && data[name] ? data[name] : 'Selecciona'
@@ -2025,9 +2046,7 @@ function HtmlDropdown() {
                         }, vnode.children)
                 
                     )
-
                 )
-
             ]
         }
     }
