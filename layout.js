@@ -439,6 +439,7 @@ function Tappable(){
                 role: vnode.attrs.role,
                 "aria-haspopup": vnode.attrs["aria-haspopup"],
                 "aria-expanded": vnode.attrs["aria-expanded"],
+                "aria-labelledby": vnode.attrs["aria-labelledby"],
                 onkeydown: vnode.attrs.onkeydown,
                 style:{
                     cursor:'pointer', 

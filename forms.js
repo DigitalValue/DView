@@ -35,6 +35,8 @@ function FormLabel() {
         m(FlexRow,
           // label debería ser Text ??
           m("label", {
+            id: vnode.attrs.id,
+            for: vnode.attrs.for,
             style: {
               userSelect:'none',
               fontFamily: config.fontFamily,
@@ -144,7 +146,7 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...style,
             ...isChecked ? {
-                background: config.colors.selected
+                background: vnode.attrs.selectedColor || config.colors.selected
             } : {},
           },
           onclick: () => {
@@ -223,7 +225,7 @@ function SwitchLabel(){
 
   return {
     view:(vnode)=>{
-      let { data, name, label, checked, onclick, info, style={}, icon, iconColor, description } = vnode.attrs
+      let { data, name, label, checked, onclick, info, style={}, onchange, icon, iconColor, description } = vnode.attrs
       
       let isChecked = checked || data && name && data[name] === true
 
@@ -240,7 +242,7 @@ function SwitchLabel(){
           
           ...style,
           ...isChecked ? {
-            background: config.colors.selected 
+            background: vnode.attrs.selectedColor || config.colors.selected 
           } : {},
         },
         onclick: () => {
@@ -248,6 +250,8 @@ function SwitchLabel(){
           if(onclick){ // mirar de añadir data name ??
             onclick()
           }
+
+          
           
           if(!data && !name) return;
           
@@ -255,6 +259,10 @@ function SwitchLabel(){
             data[name] = true
           } else {
             data[name] = false
+          }
+
+          if(onchange){ // mirar de añadir data name ??
+            onchange()
           }
 
           m.redraw()
@@ -277,7 +285,7 @@ function SwitchLabel(){
           }, localize(label)),
 
           description ?
-          m(SmallText, localize(description)) 
+          m(SmallText, {color:config.colors.secondaryText}, localize(description)) 
           : null,
         ),
         
@@ -1053,13 +1061,14 @@ function TranslationInput(){
 
         },
         view:(vnode)=>{
-            let {data, name, label, required, type, rows, info, onfocusout, onchange, flexStyle, style = {}, oninput } = vnode.attrs
+            let {data, name, label, maxlength, required, type, rows, info, onfocusout, onchange, flexStyle, style = {}, oninput } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
             
             let value = data[name]
 
+            let current = typeof value !== "object" && data ? data[name] : data && name ? data[name]?.[languages[selectedlang]]: ''
 
             return m(FlexCol,{ width:'100%', ...(flexStyle || style) },
 
@@ -1067,10 +1076,10 @@ function TranslationInput(){
 
                 m(FlexRow,
                     m(Input, {
-                        style: { flexGrow: 2, borderRadius: ".28571429rem 0em 0em .28571429rem" },
+                        style: { fontSize:'1rem', position:'relative', flexGrow: 2, borderRadius: ".28571429rem 0em 0em .28571429rem", ...flexStyle && style ? {style: style}:{} },
                         rows: rows,
                         required:required,
-                        maxlength: vnode.attrs.maxlength,
+                        maxlength: maxlength,
                         data: typeof value !== "object" ? data : data[name],
                         name: typeof value !== "object" ? name : languages[selectedlang],
                         oninput: (e)=> {
@@ -1081,7 +1090,20 @@ function TranslationInput(){
                         type: type,
                         onfocusout: onfocusout,
                         onchange: onchange
-                    }),
+                    },
+
+                        maxlength ? 
+                        m(SmallText, {
+                            position:'absolute',
+                            right:'5px',
+                            top:'50%',
+                            transform:'translateY(-50%)',
+                            color: config.colors.secondaryText,
+                            whiteSpace: 'nowrap'
+                        }, `${current?.length || 0}/${maxlength}`) 
+                        : null
+
+                    ),
                     
                     m(Button,{
                         type:'default',
@@ -1620,6 +1642,7 @@ function DateSelector() {
 
 
 
+// menu debería de estar dentro, creo yo
 function Menu() {
     let visible = false
     let expanded = false
@@ -1884,7 +1907,11 @@ function Menu() {
                                             }, o.label || o),
 
                                             o.description ? m(SmallText, { userSelect:'none', color: config.colors?.secondaryText }, o.description) : null
-                                        )
+                                        ),
+
+                                        o.right ? 
+                                        m(Text, {color: config.colors.secondaryText}, o.right )
+                                        : null
                                     )
                                     : m(Text, {
                                         userSelect:'none',
@@ -1958,7 +1985,7 @@ function HtmlDropdown() {
     return {
 
         view: (vnode) => {
-            let { data, name, label, onchange, flexStyle, style, required} = vnode.attrs
+            let { data, name, label, onchange, flexStyle, style, onDropdownOpen, required} = vnode.attrs
             let fieldOpen = open || menuVisible
 
             currentData = data
@@ -1976,6 +2003,9 @@ function HtmlDropdown() {
                     label && m(FormLabel,{required}, label),
 
                     m(Tappable, {
+                        role: 'combobox',
+                        "aria-expanded": String(open),
+                        "aria-labelledby": vnode.attrs["aria-labelledby"],
                         style: {
                             userSelect:'none',
                             ...(config.form?.baseStyle),
@@ -1999,9 +2029,18 @@ function HtmlDropdown() {
                                 open = false
                                 m.redraw()
                             }
+
+                            if(onDropdownOpen){
+                                onDropdownOpen(open)
+                            }
                         },
                         onclick:(e)=> {
                             open = !open
+
+                            if(onDropdownOpen){
+                                onDropdownOpen(open)
+                            }
+
                         }
                     },
                         m(FlexRow, { justifyContent:'space-between', alignItems:'center', height:'100%'},
@@ -2056,16 +2095,18 @@ function HtmlDropdown() {
 // TO DO, que el switch se pueda hacer más pequeño !!
 function Switch() {
 
+
+
   return {
     view: ({ attrs }) => {
-      let { isActive, style, height = 30, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
+      let { isActive, style, width = 60, height = 30, activeColor = config.colors?.blue || '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
 
       return m(FlexRow, { gap: '0.5em', alignItems: 'center', marginTop: '0.5em' }, // tal vez se pueda quitar el margin
 
         m('div', {
           style: {
             background: isActive || data && name && data[name] ? activeBg : '#eee',
-            width: '60px',
+            width: width + 'px',
             height: height +'px' ,
             padding: '5px',
             borderRadius: '50px',
@@ -2098,7 +2139,7 @@ function Switch() {
               cursor: 'pointer',
               borderRadius: '50px',
               transition: 'all 0.25s ease 0s',
-              marginLeft: isActive || data && name && data[name] ? (height-10)*30/(height-10) +'px' : '0px',
+              marginLeft: isActive || data && name && data[name] ? (width - height) +'px' : '0px',
             }
           })
         ]),
@@ -2170,6 +2211,7 @@ function IntegerInput(){
                                 m("input",{
                                     type:"number",
                                     value: value(),
+                                    "aria-labelledby": vnode.attrs["aria-labelledby"],
                                     style:{
                                         width:'100%',
                                         maxWidth:'80px',
@@ -2198,6 +2240,11 @@ function IntegerInput(){
                                     }, m(SVGIcon, { icon:'edit', width: 12, height:12 })) : null,
 
                                     m("span",{
+                                        role: 'spinbutton',
+                                        "aria-labelledby": vnode.attrs["aria-labelledby"],
+                                        "aria-valuenow": value(),
+                                        "aria-valuemin": min,
+                                        "aria-valuemax": max,
                                         style: {
                                             paddingLeft: canShowInput(vnode.attrs) ? '0.5em': '',
                                             cursor: canShowInput(vnode.attrs) ? 'text' : 'default',
@@ -2380,7 +2427,7 @@ function InfoTooltip(){
 
     return {
         view:(vnode)=>{
-            let { text, inverted = false, position, style = {}} = vnode.attrs
+            let { text, inverted = false, position, style = {}, icon, height, iconColor} = vnode.attrs
             const content = text || vnode.children
 
             return m(Tappable, {
@@ -2394,7 +2441,8 @@ function InfoTooltip(){
                     ...style
                 },
             },
-                "i",
+                icon ? m(SVGIcon, {icon:icon, color:iconColor})
+                : "i",
                 m("span", {
                     style: {
                         pointerEvents: "none",

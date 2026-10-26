@@ -349,12 +349,12 @@ function openDialog(Component, options = {}) {
             },
             close: (e) => {
                 m.mount(elem, null)
+                if(options.close){
+                    options.close()
+                }
+                
                 elem.remove()
             },
-            close: (e) => {
-                m.mount(elem, null)
-                elem.remove()
-            }
         })
     })
 }
