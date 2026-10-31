@@ -401,7 +401,8 @@ function Input() {
                 ...(style || {}),
               },
               oninput: (e) => {
-                data && name ? data[name] = e.target.value : ''
+                // name puede ser 0 (índice de array); no usar `data && name`
+                data && name != null && name !== '' ? data[name] = e.target.value : ''
                 oninput ? oninput(e) : ''
               },
 
