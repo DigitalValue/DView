@@ -719,7 +719,7 @@ function Button() {
                 },
                 role:'button',
                 onclick: !disabled && onclick,
-                hover: !disabled && {
+                hover: !disabled && !vnode.attrs.removeHover && {
                     ...config.elements?.button?.hover,
                     ...types[type]?.hover,
                     ...vnode.attrs.hover
