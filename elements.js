@@ -11,6 +11,7 @@ export {
     Message, Card, Spinner,
     BreadCrumb,
     Table, TableHead, TableBody, TableRow, TableCell, TableFooter, SecondaryMenu,
+    TabBar,
     SVGIcon
 }
 
@@ -715,6 +716,7 @@ function Button() {
                     ...config.elements?.button,
                     ...types[type] || types.primary,
                     ...sizes[vnode.attrs.size || 'default'],
+                    ...config.elements?.button?.sizes?.[vnode.attrs.size || 'default'],
                     ...vnode.attrs.style
                 },
                 role:'button',
@@ -2001,5 +2003,119 @@ function SVGIcon() {
                 onclick: attrs.onclick
             }, iconNodes)
         }
+    }
+}
+
+
+/*
+* Barra de pestañas con indicador animado.
+* attrs: tabs [{ id, label, disabled }], active (id de la pestaña activa), onchange(id), style (de la barra), duration (ms)
+* Se personaliza con setConfig: elements.tabs = { bar, tab, active, indicator }
+*/
+function TabBar() {
+    let indicator = null
+    let placed = false
+    let onresize = null
+
+    // Coloca el indicador bajo la pestaña activa. Sin animación en la primera colocación y al redimensionar.
+    function placeIndicator(dom, duration, animate) {
+        const tab = dom.querySelector('[aria-selected="true"]')
+
+        if (!indicator) return
+
+        if (!tab) {
+            indicator.style.opacity = '0'
+            return
+        }
+
+        indicator.style.transition = animate
+            ? `left ${duration}ms ease, width ${duration}ms ease, top ${duration}ms ease`
+            : 'none'
+        indicator.style.opacity = '1'
+        indicator.style.left = tab.offsetLeft + 'px'
+        indicator.style.width = tab.offsetWidth + 'px'
+        indicator.style.top = (tab.offsetTop + tab.offsetHeight - indicator.offsetHeight) + 'px'
+    }
+
+    return {
+        oncreate: (vnode) => {
+            const duration = vnode.attrs.duration || 250
+
+            placeIndicator(vnode.dom, duration, false)
+            placed = true
+
+            // las fuentes pueden cambiar el ancho de las pestañas después del primer pintado
+            requestAnimationFrame(() => vnode.dom && placeIndicator(vnode.dom, duration, false))
+
+            onresize = () => placeIndicator(vnode.dom, vnode.attrs.duration || 250, false)
+            window.addEventListener('resize', onresize)
+        },
+        onupdate: (vnode) => placeIndicator(vnode.dom, vnode.attrs.duration || 250, placed),
+        onremove: () => window.removeEventListener('resize', onresize),
+        view: (vnode) => {
+            const { tabs = [], active, onchange, style = {} } = vnode.attrs
+
+            return m("div", {
+                role: "tablist",
+                style: {
+                    display: "flex",
+                    flexWrap: "wrap",
+                    position: "relative",
+                    ...config.elements?.tabs?.bar,
+                    ...style,
+                },
+            }, [
+                tabs.map((tab) => {
+                    const isActive = tab.id === active
+
+                    return m("div", {
+                        key: tab.id,
+                        role: "tab",
+                        tabindex: tab.disabled ? -1 : 0,
+                        "aria-selected": isActive ? "true" : "false",
+                        "aria-disabled": tab.disabled ? "true" : undefined,
+                        onclick: () => { if (!tab.disabled && onchange) onchange(tab.id) },
+                        onkeydown: (e) => {
+                            if ((e.key === "Enter" || e.key === " ") && !tab.disabled && onchange) {
+                                e.preventDefault()
+                                onchange(tab.id)
+                            }
+                        },
+                        style: {
+                            padding: "0.75em 1.25em",
+                            cursor: tab.disabled ? "not-allowed" : "pointer",
+                            opacity: tab.disabled ? 0.5 : 1,
+                            whiteSpace: "nowrap",
+                            userSelect: "none",
+                            fontFamily: config.fontFamily,
+                            color: config.colors.inverted,
+                            transition: "color 0.2s ease",
+                            ...config.elements?.tabs?.tab,
+                            ...(isActive ? {
+                                color: config.colors.blue,
+                                fontWeight: 600,
+                                ...config.elements?.tabs?.active,
+                            } : {}),
+                        },
+                    }, tab.label)
+                }),
+
+                m("div", {
+                    "aria-hidden": "true",
+                    oncreate: (v) => { indicator = v.dom },
+                    style: {
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        height: "2px",
+                        width: 0,
+                        opacity: 0,
+                        pointerEvents: "none",
+                        background: config.colors.blue,
+                        ...config.elements?.tabs?.indicator,
+                    },
+                }),
+            ])
+        },
     }
 }
