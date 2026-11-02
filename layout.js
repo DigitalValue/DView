@@ -374,7 +374,7 @@ function Div(){
  * @param {Object} style - Estilos base del componente 
  * @param {Object} hover - Estilos para animar al hacer hover
  * @param {Object} click - Estilos para animar al hacer click
- * @param {Function} onhover - Funcion que se ejecuta al hacer hover
+ * @param {Function} onhover - Funcion que se ejecuta al hacer hover. Recibe (isHovered, e). Con e.redraw = false se evita el redraw
  * @param {Function} onclick - Funcion que se ejecuta al hacer click
  * @param {Function} onmousedown - Funcion que se ejecuta al hacer mousedown
  * @param {Function} onmouseup - Funcion que se ejecuta al hacer mouseup
@@ -412,7 +412,7 @@ function Tappable(){
                     }
 
                     if(vnode.attrs.onhover){
-                        vnode.attrs.onhover(true)
+                        vnode.attrs.onhover(true, e)
                     }
                 },
                 onmouseleave: (e)=> {
@@ -421,7 +421,7 @@ function Tappable(){
                     }
 
                     if(vnode.attrs.onhover){
-                        vnode.attrs.onhover(false)
+                        vnode.attrs.onhover(false, e)
                     }
                 },
                 onmousedown:(e)=> {
