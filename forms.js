@@ -2195,7 +2195,7 @@ function IntegerInput(){
 
             data = vnode.attrs.data || {}
             name = vnode.attrs.name || ''
-            
+
             return [
                 m(FlexCol, { ...flexStyle},
                     label ? m(FormLabel, {required:required}, label) : null,
