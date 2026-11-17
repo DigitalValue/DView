@@ -646,6 +646,13 @@ function Button() {
             hover,
             onmousedown
         },
+        ghost: {
+            color: 'black',
+            border: 'none',
+            background: 'transparent',
+            hover,
+            onmousedown
+        },
         glass: {
             color: '#1a1a1a',
             border: '1px solid rgba(255, 255, 255, 0.2)',
