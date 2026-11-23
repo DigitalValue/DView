@@ -2195,7 +2195,7 @@ function IntegerInput(){
 
             data = vnode.attrs.data || {}
             name = vnode.attrs.name || ''
-            
+
             return [
                 m(FlexCol, { ...flexStyle},
                     label ? m(FormLabel, {required:required}, label) : null,
@@ -2269,10 +2269,10 @@ function IntegerInput(){
                             m(FlexRow,
                                 m(IconButton,{
                                     icon:'minus',
-                                    color: !disabled && data[name] && data[name] > 0 && data[name]>min ? config.colors.red : 'lightgrey',
+                                    color: !disabled && data[name] != undefined && data[name]>min ? config.colors.red : 'lightgrey',
                                     onclick:(e)=>{
                                         if(disabled) return
-                                        if((min == undefined || data[name]>min) &&  data[name] && data[name] > 0){
+                                        if(min == undefined || data[name]>min){
                                             data[name] -= jump
                                             
                                             if(onchange) onchange(-1)

@@ -646,6 +646,13 @@ function Button() {
             hover,
             onmousedown
         },
+        ghost: {
+            color: 'black',
+            border: 'none',
+            background: 'transparent',
+            hover,
+            onmousedown
+        },
         glass: {
             color: '#1a1a1a',
             border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -1315,6 +1322,12 @@ function SVGIcon() {
             m("path", { d: "M8 12h8" }),
             m("path", { d: "M12 8v8" }),
         ],
+        arm_chair: [
+            m("path", {d:"M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"}),
+            m("path", {d:"M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"}),
+            m("path", {d:"M5 18v2"}),
+            m("path", {d:"M19 18v2"})
+        ],
         arrow_down: [
             m("path", { d: "M12 5v14" }),
             m("path", { d: "m19 12-7 7-7-7" })
@@ -1976,8 +1989,18 @@ function SVGIcon() {
         X: [
             m("path", { d: "M18 6 6 18" }),
             m("path", { d: "m6 6 12 12" })
+        ],
+        zoom_in: [
+            m("circle", { cx: 11, cy: 11, r: 8 }),
+            m("line", { x1: 21, x2: 16.65, y1: 21, y2: 16.65 }),
+            m("line", { x1: 11, x2: 11, y1: 8, y2: 14 }),
+            m("line", { x1: 8, x2: 14, y1: 11, y2: 11 })
+        ],
+        zoom_out: [
+            m("circle", { cx: 11, cy: 11, r: 8 }),
+            m("line", { x1: 21, x2: 16.65, y1: 21, y2: 16.65 }),
+            m("line", { x1: 8, x2: 14, y1: 11, y2: 11 })
         ]
-
     }
 
     let sizes = {

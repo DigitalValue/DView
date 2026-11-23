@@ -60,7 +60,7 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
                 m(ModalFooter,
 
                     m(Button, {
-                            ...options.buttonColors?.[1] ? 
+                        ...options.buttonColors?.[1] ? 
                         {
                             type:'secondary',
                             style: {
@@ -74,7 +74,8 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
                             options.then ? options.then(true):null; 
                             elem.remove()
                             resolve(true);
-                        }
+                        },
+                        fluid:options.fluid
                     }, options.buttonLabels ? options.buttonLabels[1] : localize({es:'Aceptar',va:'Acceptar'})),
 
                     m(Button, {
@@ -91,7 +92,8 @@ function confirmDialog(options={'title':'','message':'','buttonLabels':[],'then'
                             options.then ? options.then(false):null; 
                             elem.remove()
                             resolve(false)
-                        }
+                        },
+                        fluid:options.fluid
                     },   
                         options.buttonLabels ? options.buttonLabels[0] : localize({es:'Cancelar',va:'Cancel·lar'})
                     )
