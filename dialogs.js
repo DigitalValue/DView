@@ -832,7 +832,8 @@ function ModalContent(){
                     padding:'1em',
                     overflowY:'auto',
                     overscrollBehavior: 'contain',
-                    maxHeight:'70vh',
+                    // el modal empieza a 10vh: así cabecera, contenido y pie caben siempre en la ventana
+                    maxHeight:'calc(90vh - 160px)',
                     ...(vnode.attrs.style || vnode.attrs)
                 },
                 id: vnode.attrs.id

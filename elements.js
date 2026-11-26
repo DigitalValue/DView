@@ -85,8 +85,8 @@ function SecondaryMenu(){
             
             return m(FlexRow, { 
                 border: `1px solid ${config.colors?.border || 'rgb(204 204 204 / 21%)'}`, 
-                background: config.colors.lightgrey, 
-                gap: '0.5em', 
+                background: config.colors.secondaryBackground,
+                gap: '0.5em',
                 padding: '0.2em', 
                 flexWrap:'wrap',
                 borderRadius: config.borderRadius ,
@@ -225,7 +225,7 @@ function Segment() {
             ...config.elements?.segment?.primary,
         },
         secondary: {
-            background: config.colors?.lightgrey || '#f0f0f0',
+            background: config.colors?.secondaryBackground || '#f0f0f0',
             border: `1px solid ${config.colors.border ||  '#e5e7eb'}`,
             color: '#4b5563',
             ...config.elements?.segment?.secondary,

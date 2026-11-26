@@ -117,6 +117,9 @@ let config = {
         purple: '#6435c9',
         red: '#db2828',
         lightgrey: '#f8fafc',
+        // fondo del Segment secundario y del SecondaryMenu. Si una app solo cambia lightgrey,
+        // setConfig lo copia aquí para que se vean como antes
+        secondaryBackground: '#f8fafc',
         borderColor: '#03030326',
         secondaryText: '#555',
         inverted: '#545454',
@@ -131,6 +134,10 @@ let config = {
 function setConfig(newConfig) {
 
     mergeDeep(config, newConfig)
+
+    if (newConfig.colors?.lightgrey && !newConfig.colors.secondaryBackground) {
+        config.colors.secondaryBackground = newConfig.colors.lightgrey
+    }
 
     function isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item));
