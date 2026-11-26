@@ -46,6 +46,7 @@ function SecondaryMenu(){
     let activeColor = 'white'
     let borderColor = config.colors?.border
     let activeTextColor = 'black'
+    let maxWidth, minWidth; // POR HACER
 
     let children, onclick;
 
@@ -66,6 +67,11 @@ function SecondaryMenu(){
             if(vnode.attrs.activeTextColor){ 
                 activeTextColor = vnode.attrs.activeTextColor
             }
+
+            if(config.elements?.secondaryMenu != null){ 
+                
+                activeTextColor = config.secondaryMenu?.activeColor
+            }
         },
         view:(vnode)=>{
 
@@ -75,9 +81,10 @@ function SecondaryMenu(){
 
             onclick = vnode.attrs.onclick
             children = vnode.children
+
             
             return m(FlexRow, { 
-                border: `1px solid rgb(204 204 204 / 21%)`, 
+                border: `1px solid ${config.colors?.border || 'rgb(204 204 204 / 21%)'}`, 
                 background: config.colors.lightgrey, 
                 gap: '0.5em', 
                 padding: '0.2em', 
@@ -101,7 +108,11 @@ function SecondaryMenu(){
                     },
                     icon: child?.icon,
                     active: activeIndex == i,
-                    minWidth: vnode.attrs.minWidth
+                    minWidth: vnode.attrs.minWidth,
+                    ...activeIndex == i && vnode.attrs.activeChildStyle  ? {
+                        activeStyle: vnode.attrs.activeChildStyle
+                    }: {},
+                    style: child.style || vnode.attrs.childStyle || {}
                 })
             }),
 
@@ -122,7 +133,6 @@ function SecondaryMenu(){
                 },
                 icon:'ellipsis',  })
             : null
-
           )
         }
     }
@@ -153,7 +163,7 @@ function SecondaryMenu(){
     }
     
 
-    function Item({ text, active, onclick, icon, minWidth ='80px' }) {
+    function Item({ text, active, onclick, icon, minWidth ='80px', style = {}, activeStyle = {}}) {
       return m(Tappable, {
         style: {
           padding: '0.5rem',
@@ -166,17 +176,18 @@ function SecondaryMenu(){
           alignItems: 'center',
           justifyContent: 'center',
           flex: `1 1  ${minWidth}`,
-          
           borderRadius: config.borderRadius,
           ...active ? {
             background: activeColor,
             color: activeTextColor,
-
             //fontWeight: 'bold',
-            border:`1px solid ${borderColor}`
+            border:`1px solid ${borderColor}`,
+            ...activeStyle
           } : {
             color:'black'
           },
+
+          ...style 
         },
         hover: !active ? {
           //filter:'brightness(90%)',
@@ -209,13 +220,13 @@ function Segment() {
     let types = {
         primary: {
             backgroundColor: 'white',
-            border: '1px solid #e0e0e0',
+            border: `1px solid ${config.colors.border ||  '#e5e7eb'}`,
             color: '#1b1c1d',
             ...config.elements?.segment?.primary,
         },
         secondary: {
             background: config.colors?.lightgrey || '#f0f0f0',
-            border: '1px solid #e5e7eb',
+            border: `1px solid ${config.colors.border ||  '#e5e7eb'}`,
             color: '#4b5563',
             ...config.elements?.segment?.secondary,
         },
@@ -231,6 +242,11 @@ function Segment() {
         },
         warning: {
 
+        },
+        dotted: {
+            background: config.colors?.lightgrey || '#f0f0f0',
+            border: '1px dotted #e5e7eb',
+            color: '#4b5563',
         }
     }
 
@@ -602,7 +618,8 @@ function Button() {
             border: `1px solid ${config.colors.green || '#00c853'}`,
             background: config.colors.green || '#00c853',
             hover,
-            onmousedown
+            onmousedown,
+            ...config.elements?.button?.positive
         },
         negative: {
             color: '#db2828',
@@ -629,7 +646,8 @@ function Button() {
             background:  config.colors.grey,
             border: `1px solid ${config.colors.border}`,
             hover,
-            onmousedown
+            onmousedown,
+            ...config.elements?.button?.grey
         },
         brown: {
             color: 'white',
@@ -1539,6 +1557,11 @@ function SVGIcon() {
             m("path", {d:"M14 2v5a1 1 0 0 0 1 1h5"}),
             m("path", {d:"M16 22a4 4 0 0 0-8 0"}),
             m("circle", {cx:"12", cy:"15", r:"3"})
+        ],
+        folder_add: [
+            m("path", {d:"M12 10v6"}),
+            m("path", {d:"M9 13h6"}),
+            m("path", {d:"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"})
         ],
         file_users: [
             m("path", {d:"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}),
