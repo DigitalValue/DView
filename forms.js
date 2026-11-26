@@ -1062,7 +1062,7 @@ function TranslationInput(){
 
         },
         view:(vnode)=>{
-            let {data, name, label, maxlength, required, type, rows, info, onfocusout, onchange, flexStyle, style = {}, oninput } = vnode.attrs
+            let { data, name, label, maxlength, required, type, rows, info, onfocusout, onchange, flexStyle, style = {}, oninput } = vnode.attrs
 
             if(!data) data = {}
             if(!name) name = 'translation'
