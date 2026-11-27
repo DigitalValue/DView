@@ -595,7 +595,6 @@ function Button() {
         filter: 'brightness(70%)',
     }
 
-
     let types = {
         primary: {
             color: 'white',
@@ -621,6 +620,7 @@ function Button() {
             onmousedown,
             ...config.elements?.button?.positive
         },
+
         negative: {
             color: '#db2828',
             border: '1px solid #db2828',
@@ -634,6 +634,7 @@ function Button() {
             hover,
             onmousedown
         },
+
         blue: {
             color: 'white',
             border: '1px solid #2185d0',
@@ -664,6 +665,7 @@ function Button() {
             hover,
             onmousedown
         },
+
         ghost: {
             color: 'black',
             border: 'none',
@@ -682,11 +684,7 @@ function Button() {
         }
     }
     
-    let design = {
-        'full':{},
-        'basic':{},
-        'ghost':{}
-    }
+    
 
     let sizes = {
         small: {
@@ -711,6 +709,39 @@ function Button() {
             minWidth:'55px'
         },
     }
+    
+    /*
+    const sizes = {
+       small: {
+            fontSize: '0.875em',      // 14px
+            height: '1.5rem',         // 24px
+            paddingInline: '0.5rem',  // 8px
+            minWidth: '3.5rem',       // 56px
+            gap: '0.25rem',
+            iconSize: '0.875rem',     // 14px
+        },
+        default: {
+            fontSize: '1em',            // 16px
+            height: '2.5rem',           // 40px
+            paddingLeft: '1.25rem',     // 20px (mitad del alto, regla Spectrum)
+            paddingRight: '1.25rem',
+            minWidth: '5.625rem',       // 90px
+            gap: '0.5rem',
+            iconSize: '1.25rem',        // 20px
+        },
+        large: {
+            fontSize: '1.25em',         // 20px
+            height: '3rem',             // 48px
+            paddingLeft: '1.5rem',      // 24px
+            paddingRight: '1.5rem',
+            minWidth: '6.75rem',        // 108px
+            gap: '0.5rem',
+            iconSize: '1.5rem',         // 24px
+        },
+    };*/
+
+
+
 
     return {
 
