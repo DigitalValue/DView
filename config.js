@@ -125,7 +125,14 @@ let config = {
         inverted: '#545454',
         dark: '#334156',
         border: 'rgba(34, 36, 38, 0.15)',
-        selected:`#aecbe742`,
+        // color de lo activo: círculo del check, bola del Switch, punto del radio, casilla nativa y menús.
+        // Si una app solo cambia blue, setConfig lo copia aquí para que se vea como antes
+        active: '#2185d0',
+        // fondo de lo activo: lo marcado (CheckboxLabel, SwitchLabel, opción activa de un menú).
+        // Antes se llamaba selected: si una app solo define selected, setConfig lo copia aquí
+        activeBackground: '#aecbe742',
+        // fondo al pasar el ratón por las opciones de un menú (SecondaryMenu y menús de las apps)
+        hoverBackground: '#ffffff',
         pageBackground:'#f1f5f9'
     }
 
@@ -137,6 +144,14 @@ function setConfig(newConfig) {
 
     if (newConfig.colors?.lightgrey && !newConfig.colors.secondaryBackground) {
         config.colors.secondaryBackground = newConfig.colors.lightgrey
+    }
+
+    if (newConfig.colors?.blue && !newConfig.colors.active) {
+        config.colors.active = newConfig.colors.blue
+    }
+
+    if (newConfig.colors?.selected && !newConfig.colors.activeBackground) {
+        config.colors.activeBackground = newConfig.colors.selected
     }
 
     function isObject(item) {

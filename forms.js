@@ -102,7 +102,8 @@ function Checkbox(){
                         checked: data && name ? data[name] : checked,
                         style: {
                             ...checkboxStyle,
-                            ...sizes[size]
+                            ...sizes[size],
+                            accentColor: config.colors.active
                         },
                         onchange:(e)=>{
                             if(data && name){
@@ -146,7 +147,7 @@ function CheckboxLabel(){
             whiteSpace:'wrap',
             ...style,
             ...isChecked ? {
-                background: vnode.attrs.selectedColor || config.colors.selected
+                background: vnode.attrs.selectedColor || config.colors.activeBackground
             } : {},
           },
           onclick: () => {
@@ -173,9 +174,9 @@ function CheckboxLabel(){
                     height: '16px',
                     minWidth: '16px',
                     minHeight: '16px',
-                    border: `1px solid ${isChecked ? config.colors.blue :config.colors.border}`,
+                    border: `1px solid ${isChecked ? config.colors.active : config.colors.border}`,
                     borderRadius: '50%',
-                    background: isChecked ? config.colors.blue : 'transparent',
+                    background: isChecked ? config.colors.active : 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -242,7 +243,7 @@ function SwitchLabel(){
           
           ...style,
           ...isChecked ? {
-            background: vnode.attrs.selectedColor || config.colors.selected 
+            background: vnode.attrs.selectedColor || config.colors.activeBackground 
           } : {},
         },
         onclick: () => {
@@ -304,7 +305,8 @@ function SwitchRow() {
 
   return {
     view: ({ attrs }) => {
-      let { isActive, activeColor = '#47c', activeBg = '#c4d5f1', onchange, data, name, label, description } = attrs
+      // Carril: el de la app (config.elements.switch) o el de siempre
+      let { isActive, activeColor = config.colors.active, activeBg = config.elements?.switch?.activeBg || '#c4d5f1', inactiveBg = config.elements?.switch?.inactiveBg || '#eee', onchange, data, name, label, description } = attrs
 
       return m(FlexRow, { gap: '0.5em', justifyContent: 'space-between'  }, // tal vez se pueda quitar el margin
 
@@ -316,7 +318,7 @@ function SwitchRow() {
 
         m('div', {
           style: {
-            background: isActive || data && name && data[name] ? activeBg : '#eee',
+            background: isActive || data && name && data[name] ? activeBg : inactiveBg,
             width: '60px',
             height: '30px',
             padding: '5px',
@@ -1332,7 +1334,7 @@ function RadioButtons() {
                                 }
                             },
                                 m(Div, { style: {
-                                    background: data && name && data[name] == (o.value != undefined ? o.value : o) ? disabled ? "gray" : "#2185d0" : "white",
+                                    background: data && name && data[name] == (o.value != undefined ? o.value : o) ? disabled ? "gray" : config.colors.active : "white",
                                     width: "10px",
                                     height: "10px",
                                     borderRadius: "100px"
@@ -2100,13 +2102,14 @@ function Switch() {
 
   return {
     view: ({ attrs }) => {
-      let { isActive, style, width = 60, height = 30, activeColor = config.colors?.blue || '#47c', activeBg = '#c4d5f1', onchange, data, name, label } = attrs
+      // Carril: el de la app (config.elements.switch) o el de siempre
+      let { isActive, style, width = 60, height = 30, activeColor = config.colors.active, activeBg = config.elements?.switch?.activeBg || '#c4d5f1', inactiveBg = config.elements?.switch?.inactiveBg || '#eee', onchange, data, name, label } = attrs
 
       return m(FlexRow, { gap: '0.5em', alignItems: 'center', marginTop: '0.5em' }, // tal vez se pueda quitar el margin
 
         m('div', {
           style: {
-            background: isActive || data && name && data[name] ? activeBg : '#eee',
+            background: isActive || data && name && data[name] ? activeBg : inactiveBg,
             width: width + 'px',
             height: height +'px' ,
             padding: '5px',

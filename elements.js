@@ -64,13 +64,8 @@ function SecondaryMenu(){
                 borderColor = vnode.attrs.borderColor
             }
 
-            if(vnode.attrs.activeTextColor){ 
+            if(vnode.attrs.activeTextColor){
                 activeTextColor = vnode.attrs.activeTextColor
-            }
-
-            if(config.elements?.secondaryMenu != null){ 
-                
-                activeTextColor = config.secondaryMenu?.activeColor
             }
         },
         view:(vnode)=>{
@@ -109,8 +104,9 @@ function SecondaryMenu(){
                     icon: child?.icon,
                     active: activeIndex == i,
                     minWidth: vnode.attrs.minWidth,
-                    ...activeIndex == i && vnode.attrs.activeChildStyle  ? {
-                        activeStyle: vnode.attrs.activeChildStyle
+                    // Estilo de la opción activa: el de la app (config.elements.secondaryMenu) y encima el del menú
+                    ...activeIndex == i ? {
+                        activeStyle: { ...config.elements?.secondaryMenu?.activeChildStyle, ...vnode.attrs.activeChildStyle }
                     }: {},
                     style: child.style || vnode.attrs.childStyle || {}
                 })
@@ -192,7 +188,7 @@ function SecondaryMenu(){
         hover: !active ? {
           //filter:'brightness(90%)',
           color: 'black',
-          background: '#ffffff'
+          background: config.colors.hoverBackground || '#ffffff'
         }: null,
         onclick: () => {
           onclick()
